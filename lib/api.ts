@@ -15,8 +15,8 @@ import type { Envelope, FAQ, ScheduleItem, Sponsor } from "./types";
 const BASE_URL = process.env.HARP_API_BASE_URL;
 const API_KEY = process.env.HARP_PUBLIC_API_KEY;
 
-/** How long a fetched payload stays fresh, in seconds. */
-const REVALIDATE_SECONDS = 300;
+/** How long a fetched payload stays fresh, in seconds. Surfaced in the UI. */
+export const REVALIDATE_SECONDS = 300;
 
 export type ConfigStatus =
   | { configured: true; baseUrl: string }

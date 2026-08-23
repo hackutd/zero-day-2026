@@ -1,8 +1,15 @@
+import { CacheNote } from "@/components/cache-note";
 import { ConnectionPanel } from "@/components/connection-panel";
 import { EndpointSection } from "@/components/endpoint-section";
 import { SetupGuide } from "@/components/setup-guide";
 import { SponsorLogo } from "@/components/sponsor-logo";
-import { getConfigStatus, getFAQs, getSchedule, getSponsors } from "@/lib/api";
+import {
+  getConfigStatus,
+  getFAQs,
+  getSchedule,
+  getSponsors,
+  REVALIDATE_SECONDS,
+} from "@/lib/api";
 import { errorMessage, formatEventRange } from "@/lib/format";
 
 export default async function Home() {
@@ -49,6 +56,8 @@ async function PublicData() {
 
   return (
     <>
+      <CacheNote seconds={REVALIDATE_SECONDS} />
+
       <EndpointSection
         title="Schedule"
         path="GET /v1/public/schedule"
