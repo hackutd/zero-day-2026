@@ -1,42 +1,126 @@
 @import "tailwindcss";
 
 /*
- * Deliberately minimal, neutral tokens. This is scaffolding — the year's theme
- * replaces this file wholesale rather than layering on top of it.
- *
- * Light only, on purpose. `color-scheme: light` keeps the browser's own UI
- * (scrollbars, form controls, autofill) light even when the OS is set to dark,
- * which is what makes this hold rather than half-invert.
+ * Zero Day theme. Dark only, on purpose — the wordmark is neon-on-black and
+ * `color-scheme: dark` keeps the browser's own UI (scrollbars, form controls)
+ * dark to match, rather than half-inverting on a light OS.
  */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  --background: #fafafa;
-  --foreground: #18181b;
-  --surface: #ffffff;
-  --line: #e4e4e7;
-  --muted: #71717a;
-  --accent: #4f46e5;
-  --ok: #15803d;
-  --warn: #b45309;
-  --danger: #b91c1c;
+  --background: #07060c;
+  --foreground: #f4f2ff;
+  --muted: #948eb4;
+  --line: #241f38;
+  --magenta: #ff2ee6;
+  --cyan: #22e0ff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-line: var(--line);
   --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --color-ok: var(--ok);
-  --color-warn: var(--warn);
-  --color-danger: var(--danger);
+  --color-line: var(--line);
+  --color-magenta: var(--magenta);
+  --color-cyan: var(--cyan);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
+}
+
+/* Ambient neon wash behind the wordmark. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      60rem 38rem at 50% 40%,
+      color-mix(in oklab, var(--magenta) 15%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      44rem 30rem at 50% 66%,
+      color-mix(in oklab, var(--cyan) 10%, transparent),
+      transparent 70%
+    );
+}
+
+/* Faint grid, masked so it fades out before the edges. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image:
+    linear-gradient(to right, var(--foreground) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--foreground) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(75% 65% at 50% 50%, #000 25%, transparent 100%);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes wordmark-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(
+      0 0 20px color-mix(in oklab, var(--magenta) 30%, transparent)
+    );
+  }
+  50% {
+    filter: drop-shadow(
+        0 0 34px color-mix(in oklab, var(--magenta) 50%, transparent)
+      )
+      drop-shadow(0 0 56px color-mix(in oklab, var(--cyan) 22%, transparent));
+  }
+}
+
+.rise {
+  opacity: 0;
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/*
+ * Both animations live in one declaration: `.rise` and `.wordmark` would
+ * otherwise each set the `animation` shorthand and the loser's would be
+ * dropped, leaving the element stuck at `opacity: 0`.
+ */
+.wordmark {
+  opacity: 0;
+  animation:
+    rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    wordmark-pulse 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    opacity: 1;
+    animation: none;
+  }
+
+  .wordmark {
+    opacity: 1;
+    animation: none;
+    filter: drop-shadow(
+      0 0 22px color-mix(in oklab, var(--magenta) 32%, transparent)
+    );
+  }
 }
