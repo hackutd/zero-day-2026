@@ -111,20 +111,16 @@ function BillboardWordmark() {
 }
 
 /**
- * How many viewport heights the opening scene is pinned for. The sticky panel
- * eats the first 100svh, so the intro plays out over the remainder — at 280
- * that is 1.8 screens of scrolling spent on the city before the page moves on.
- */
-const PREHERO_TRACK_VH = 280;
-
-/**
  * The opening scene, pinned.
  *
- * The tall outer section is pure scroll distance; the panel inside sticks to
- * the top of the viewport and stays there for all of it. So the city holds
- * still and you scroll *through* the intro animation rather than scrolling the
- * city out from under it. When the track runs out the sticky releases and the
- * page carries on normally.
+ * From `sm` up the outer section is pure scroll distance and the panel inside
+ * sticks to the top of the viewport for all of it, so the city holds still and
+ * you scroll *through* the intro rather than scrolling the city out from under
+ * it. When the track runs out the sticky releases.
+ *
+ * On a phone it does neither - see `.prehero-track` for why - and the panel
+ * just scrolls at the plate's own aspect. The intro reads the geometry rather
+ * than a breakpoint, so it follows either arrangement on its own.
  *
  * Unlike the other panels this one fills the viewport rather than holding 16:9
  * — a pinned scene that letterboxed would look broken. It still needs a frame,
@@ -229,12 +225,8 @@ function BuildingAd({
 
 function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
   return (
-    <section
-      id="scene-prehero"
-      className="relative"
-      style={{ height: `${PREHERO_TRACK_VH}svh` }}
-    >
-      <div className="sticky top-0 h-svh w-full overflow-hidden">
+    <section id="scene-prehero" className="prehero-track">
+      <div className="prehero-pin">
         <div className="prehero-frame">
           <Image
             src={src}

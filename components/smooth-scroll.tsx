@@ -97,9 +97,13 @@ export function SmoothScroll() {
       if (!panel) return;
 
       const rect = panel.getBoundingClientRect();
-      // A panel taller than the viewport has no single centred position worth
-      // choosing, so leave those alone.
-      if (rect.height > window.innerHeight * 1.2) return;
+      // Only settle onto a panel that roughly fills the screen. Taller than the
+      // viewport and there is no single centred position worth choosing. Much
+      // shorter — a narrow window, where the panels are a fraction of the
+      // height — and "centred" can resolve above the top of the document, which
+      // clamps to zero and drags the reader back to the top of the page.
+      const fill = rect.height / window.innerHeight;
+      if (fill > 1.2 || fill < 0.6) return;
 
       const centredTop = (window.innerHeight - rect.height) / 2;
       const delta = rect.top - centredTop;

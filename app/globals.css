@@ -307,28 +307,57 @@ body::after {
  * The image inside is then an exact fit, and the ads can be positioned in
  * percentages of the artwork itself.
  */
+/*
+ * The opening scene's scroll track and the panel pinned inside it.
+ *
+ * Phone: neither. Pinning only earns its keep when the plate fills the screen;
+ * a 16:9 plate on a 9:19.5 viewport is ~221px of art in ~844px of viewport, so
+ * pinning it strands the reader in a mostly empty screen, and spreading the
+ * sequence over 280svh means the headline needs most of a screen of scrolling
+ * before it even begins. So the panel simply scrolls, at the plate's own
+ * aspect, and the headline plays as it crosses the viewport.
+ *
+ * From `sm` up the plate covers, pinning is worth it, and the track is tall.
+ */
+.prehero-track {
+  position: relative;
+}
+
+.prehero-pin {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1920 / 1089;
+  overflow: hidden;
+}
+
+@media (width >= 40rem) {
+  .prehero-track {
+    height: 280svh;
+  }
+
+  .prehero-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    aspect-ratio: auto;
+  }
+}
+
 .prehero-frame {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   aspect-ratio: 1920 / 1089;
-  /*
-   * Phone: `min` contains the plate, so the whole city is visible. It
-   * letterboxes onto the page black, which only works because the intro layer
-   * lives inside this frame - the glass pane and the headline sit on the art
-   * rather than on the viewport, so the band reads as a framed panel instead of
-   * a strip floating in an empty field.
-   */
-  width: min(100%, calc(100svh * 1920 / 1089));
+  /* The panel is already the plate's aspect on a phone, so this fits exactly. */
+  width: 100%;
 }
 
 @media (width >= 40rem) {
   .prehero-frame {
     /*
-     * Wider screens are close enough to 16:9 that covering loses almost
-     * nothing, and a pinned scene should fill the viewport. The frame is
-     * centred either way, so the headline stays centred on screen too.
+     * The pinned panel fills the viewport, so the frame has to cover it. The
+     * frame stays centred, which keeps the headline centred on screen.
      */
     width: max(100%, calc(100svh * 1920 / 1089));
   }

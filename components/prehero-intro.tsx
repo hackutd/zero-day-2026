@@ -9,12 +9,13 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
  * centred, then carries on out to the right, and a dark scrim rises and falls
  * with it so the city dims while the line is legible and comes back up after.
  *
- * It simply fills its parent, because that parent is the pinned panel in
- * `PinnedPrehero` — held at the top of the viewport for the whole track. That
- * pinning is what lets this be `absolute inset-0`: earlier, with the panel
- * scrolling freely, the layer had to be `fixed` and re-measured to the panel's
- * visible slice every frame to stop the line drifting off the city and the
- * scrim dimming the panel below. Pinned, none of that is needed.
+ * It fills the artwork frame, so the pane, the headline and the star all sit on
+ * the picture rather than on the viewport. That matters on a phone, where the
+ * plate is a band inside a taller screen: covering the viewport instead would
+ * put the pane over the empty space around the art.
+ *
+ * Progress comes from the panel's geometry, not a breakpoint, so it works
+ * whether the panel is pinned to a tall track or simply scrolling past.
  *
  * CSS scroll-driven animations (`animation-timeline: scroll()`) would express
  * this more cheaply, but they are still Chromium-only, so this uses a passive
@@ -29,8 +30,19 @@ const OUT_END = 0.9;
 /** How far the line travels in and out, before it is scaled to the viewport. */
 const TRAVEL_PX = 140;
 
-/** Darkest the scrim ever gets, at the line's peak. */
+/**
+ * Darkest the scrim gets at the line's peak, pinned. The reader has scrolled
+ * into this deliberately and the city is still legible through the blur.
+ */
 const MAX_SCRIM = 0.88;
+
+/**
+ * Unpinned, the line is at full strength the moment the page loads, so this
+ * density would arrive with it and black out the plate before anyone had seen
+ * it. Lighter here: enough to carry white type over neon, not enough to hide
+ * the city it is written over.
+ */
+const MAX_SCRIM_FLOW = 0.46;
 
 export function PreheroIntro() {
   const textRef = useRef<HTMLParagraphElement>(null);
@@ -71,16 +83,35 @@ export function PreheroIntro() {
     const paint = () => {
       frame = 0;
 
-      // The panel is stuck for exactly the track height minus one screen, so
-      // that distance — not the track's full height — is the animation's
-      // timeline. `-rect.top` is how far into it we have scrolled, which is 0
-      // on load and so starts the sequence at rest.
-      const travel = track.offsetHeight - window.innerHeight;
-      if (travel <= 0) return;
-      const p = Math.min(
-        Math.max(-track.getBoundingClientRect().top / travel, 0),
-        1,
-      );
+      // Two arrangements, told apart by geometry rather than a breakpoint, so
+      // this follows whatever the CSS did.
+      const rect = track.getBoundingClientRect();
+      const pinTravel = track.offsetHeight - window.innerHeight;
+
+      let p: number;
+      let maxScrim: number;
+      if (pinTravel > 0) {
+        maxScrim = MAX_SCRIM;
+        // Pinned: the panel is stuck for the track height minus one screen, so
+        // that distance is the timeline. `-rect.top` is how far into it we
+        // have scrolled, which is 0 on load and starts the sequence at rest.
+        p = clamp(-rect.top / pinTravel);
+      } else {
+        maxScrim = MAX_SCRIM_FLOW;
+        // Not pinned - the panel is shorter than the screen, so it never
+        // sticks. It is also the first thing on the page, so it never enters
+        // from the bottom: it starts flush with the top and only travels up
+        // and out, which is over in about 220px of scrolling.
+        //
+        // There is therefore no moment where the panel is both fully on screen
+        // and far enough in to have played a fade-in - the line would peak with
+        // half the panel already gone, clipped against the top edge. So the
+        // travel is mapped to start at the hold: the line is at full strength
+        // the instant the page loads and fades out as the panel leaves. The
+        // slide-in is a wider-screen flourish; here it would only ever be seen
+        // half-finished.
+        p = IN_END + clamp(-rect.top / rect.height) * (1 - IN_END);
+      }
 
       let opacity: number;
       let shift: number;
@@ -113,7 +144,7 @@ export function PreheroIntro() {
 
       text.style.opacity = String(opacity);
       text.style.transform = reduced ? "none" : `translateX(${shift}px)`;
-      scrim.style.opacity = String(opacity * MAX_SCRIM);
+      scrim.style.opacity = String(opacity * maxScrim);
     };
 
     const onScroll = () => {
@@ -182,6 +213,10 @@ function useReducedMotion(): boolean {
     // No preference is knowable while rendering on the server.
     () => false,
   );
+}
+
+function clamp(v: number): number {
+  return Math.min(Math.max(v, 0), 1);
 }
 
 /** easeOutCubic — quick to arrive, gentle to settle. */
