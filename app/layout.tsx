@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 
 import { AudioToggle } from "@/components/audio-toggle";
+import { EdgeRails } from "@/components/edge-rails";
 import { SiteNav } from "@/components/site-nav";
 import { SmoothScroll } from "@/components/smooth-scroll";
 
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       */}
       <body className="font-sans min-h-full">
         <SmoothScroll />
+        <EdgeRails />
         <SiteNav />
         {children}
         <AudioToggle />
