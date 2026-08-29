@@ -122,7 +122,15 @@ export function SmoothScroll() {
         current = target;
         window.scrollTo(0, current);
         running = false;
-        settling = false;
+        if (settling) {
+          // That was the settle itself finishing; re-arming here would loop.
+          settling = false;
+        } else {
+          // Real input eases for a while after the wheel stops, and the scroll
+          // handler is deaf while it does. This is the moment motion actually
+          // ends, so it is the only reliable place to consider settling.
+          armSettle();
+        }
         return;
       }
       current += distance * EASE;
