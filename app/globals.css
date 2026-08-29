@@ -14,6 +14,21 @@
   --line: #241f38;
   --magenta: #ff2ee6;
   --cyan: #22e0ff;
+
+  /*
+   * Tokens from the HackUTD 2026 Figma file, kept under their Figma names so
+   * the two stay legible against each other. They are additive on purpose: the
+   * palette above was placeholder colour picked for the coming-soon page, and
+   * the design system will replace it piece by piece as more of the file lands.
+   *
+   * Worth knowing when you reconcile them — the accents are NOT the same pink.
+   * Figma's accent/magenta is #ff2e88; the placeholder --magenta is #ff2ee6.
+   */
+  --surface-deep: #0e011f;
+  --accent-magenta: #ff2e88;
+  --text-muted: #8b93a1;
+  --text-dim: #5a6270;
+  --border-hairline: #232a36;
 }
 
 @theme inline {
@@ -23,8 +38,15 @@
   --color-line: var(--line);
   --color-magenta: var(--magenta);
   --color-cyan: var(--cyan);
+  --color-surface-deep: var(--surface-deep);
+  --color-accent-magenta: var(--accent-magenta);
+  --color-text-muted: var(--text-muted);
+  --color-text-dim: var(--text-dim);
+  --color-border-hairline: var(--border-hairline);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-saira);
+  --font-jetbrains: var(--font-jetbrains-mono);
 }
 
 body {

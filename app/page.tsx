@@ -1,5 +1,6 @@
 import Image, { type StaticImageData } from "next/image";
 
+import { SiteFooter } from "@/components/site-footer";
 import prehero from "@/public/backgrounds/01-prehero.png";
 import hero from "@/public/backgrounds/02-hero.png";
 import street from "@/public/backgrounds/03-street.png";
@@ -53,6 +54,7 @@ export default function Home() {
       {scenes.map((scene, i) => (
         <Scene key={scene.src.src} {...scene} first={i === 0} />
       ))}
+      <SiteFooter />
     </main>
   );
 }
