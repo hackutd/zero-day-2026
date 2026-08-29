@@ -16,7 +16,6 @@ import street from "@/public/backgrounds/03-street.png";
  * then street level — so the panels butt against each other with no gap or
  * divider.
  *
- * `focus` is the horizontal point a narrow screen crops around; see `Scene` for
  * why it matters and why it does nothing on a wide one. Two rules set these:
  *
  *  - The hero's billboard carries the logo, so the crop centers on the sign
@@ -31,7 +30,6 @@ import street from "@/public/backgrounds/03-street.png";
 const scenes: {
   src: StaticImageData;
   alt: string;
-  focus: number;
   overlay?: React.ReactNode;
   /** Let the scroll settle onto this panel when the reader stops near it. */
   settle?: boolean;
@@ -39,19 +37,16 @@ const scenes: {
   {
     src: prehero,
     alt: "Neon city skyline at night under a full moon, an MMXXVI tower lit at the left.",
-    focus: 50,
   },
   {
     src: hero,
     alt: "A blank glowing billboard on a wall between skyscrapers, strung with cables.",
-    focus: 25.31,
     overlay: <HeroOverlays />,
     settle: true,
   },
   {
     src: street,
     alt: "Silhouetted figures on a rain-slicked street lined with red neon.",
-    focus: 25.31,
   },
 ];
 
@@ -141,8 +136,6 @@ const PREHERO_TRACK_VH = 280;
  * The id sits on the track rather than the panel, so the navbar — which waits
  * for this element to scroll past — appears once the pinned sequence is done.
  *
- * It takes no `focus`: `.prehero-frame` centres the art, which is what this
- * scene's focus was set to anyway.
  */
 /**
  * Screens playing on the sides of two buildings in the skyline.
@@ -322,14 +315,12 @@ function HeroOverlays() {
 function Scene({
   src,
   alt,
-  focus,
   overlay,
   first,
   settle = false,
 }: {
   src: StaticImageData;
   alt: string;
-  focus: number;
   overlay?: React.ReactNode;
   first: boolean;
   settle?: boolean;
@@ -339,19 +330,14 @@ function Scene({
       // Read by components/smooth-scroll.tsx, which eases onto this panel if
       // the reader comes to rest already close to it.
       data-settle={settle ? "" : undefined}
-      className="relative h-[62svh] min-h-[380px] w-full overflow-hidden sm:aspect-video sm:h-auto sm:min-h-0"
+      className="relative aspect-video w-full overflow-hidden"
     >
-      <div
-        className="scene-frame"
-        style={{ "--focus": `${focus}%` } as React.CSSProperties}
-      >
+      <div className="scene-frame">
         <Image
           src={src}
           alt={alt}
           fill
-          // Below `sm` the frame is wider than the viewport (it overflows to
-          // cover), so 100vw would under-request and soften the art.
-          sizes="(max-width: 639px) 250vw, 100vw"
+          sizes="100vw"
           placeholder="blur"
           // Only the first panel is above the fold; the rest lazy-load by
           // default. `preload`, not `priority` — the latter is deprecated as of

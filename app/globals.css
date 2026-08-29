@@ -59,33 +59,19 @@ body {
 }
 
 /*
- * Cover-crop framing for the scene panels in app/page.tsx.
+ * Framing for the scene panels in app/page.tsx.
  *
- * Below `sm` the panel is narrower than the art's 16:9, so the frame overflows
- * sideways and `--focus` — a percentage measured into the art — is what gets
- * pinned to the middle of the panel. `left: 50%` finds the panel's centre; the
- * negative translate then walks back by `--focus` of the *frame's* own width.
- * The two percentages resolve against different boxes on purpose: that is what
- * makes the result independent of the viewport's aspect ratio, where a plain
- * `object-position: X%` would drift with it.
- *
- * At `sm` and up the panel is itself 16:9, so the frame already fits exactly
- * and any offset would only slide the art off the edge — hence the reset.
+ * The panels hold the art's own 16:9 at every width, so the frame fits them
+ * exactly and needs no offset. It used to crop on mobile - the panel was 62svh
+ * and the frame overflowed sideways, pinned by a `--focus` percentage - which
+ * filled the screen but hid most of each illustration on a phone. Showing the
+ * whole plate was worth more than filling the viewport.
  */
 .scene-frame {
   position: absolute;
-  top: 0;
+  inset: 0;
   height: 100%;
-  aspect-ratio: 16 / 9;
-  left: 50%;
-  transform: translateX(calc(var(--focus) * -1));
-}
-
-@media (width >= 40rem) {
-  .scene-frame {
-    left: 0;
-    transform: none;
-  }
+  width: 100%;
 }
 
 /* Ambient neon wash behind the wordmark. */
@@ -326,8 +312,15 @@ body::after {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: max(100%, calc(100svh * 1920 / 1089));
   aspect-ratio: 1920 / 1089;
+  /*
+   * Covers, at every width. Containing this on a phone was tried and abandoned:
+   * a 16:9 plate inside a 9:19.5 viewport is a ~220px strip in an ~840px field,
+   * which reads as unfinished rather than cinematic. The scrolling panels below
+   * show their plates whole instead - this one is pinned with the headline over
+   * it, so filling the screen matters more here than completeness does.
+   */
+  width: max(100%, calc(100svh * 1920 / 1089));
 }
 
 /*
