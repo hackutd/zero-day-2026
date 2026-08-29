@@ -177,7 +177,6 @@ function BuildingAd({
   top,
   width,
   aspect,
-  skewDeg = 0,
   fade = 1,
 }: {
   src: string;
@@ -186,7 +185,6 @@ function BuildingAd({
   top: string;
   width: string;
   aspect: string;
-  skewDeg?: number;
   /**
    * Atmospheric perspective: 1 is full strength, lower sits the screen further
    * back. It dims the panel and softens its glow together, because a distant
@@ -202,9 +200,6 @@ function BuildingAd({
         top,
         width,
         aspectRatio: aspect,
-        // Screens on a receding plane are sheared onto it, as the billboard is.
-        transform: skewDeg ? `skewY(${skewDeg}deg)` : undefined,
-        transformOrigin: "center",
         opacity: fade,
         // Sells it as a lit panel rather than a sticker on the facade. The
         // bloom scales with `fade` so a distant screen does not glow like a
@@ -262,8 +257,8 @@ function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
 }
 
 /**
- * Everything laid over the hero plate: the billboard wordmark, and a screen on
- * the hexagon wall below it.
+ * Everything laid over the hero plate: the billboard wordmark, and the screen
+ * on the building down the alley.
  */
 function HeroOverlays() {
   return (
@@ -274,30 +269,18 @@ function HeroOverlays() {
         label="Screen on a building down the alley"
         // The orange-windowed slab down the alley. Its facade runs y 500-650 of
         // the plate, split by cable bundles at 540-560 and 655; this sits in
-        // the clean gap between them. Kept small and dimmed: it is the
+        // the clean gap between them, centred across the slab's x 1195-1272
+        // so it clears the blue building abutting it on the left. Kept small
+        // and dimmed: it is the
         // furthest screen in the scene, so it reads as distance rather than as
         // a panel that happens to be tiny. Recentred on the same point as the
         // larger version so it stays in the gap. No shear: the window rows
         // there are drawn horizontal despite the recession.
-        left="62.24%"
+        left="62.66%"
         top="56.47%"
         width="3.18%"
         aspect="800 / 423"
         fade={0.5}
-      />
-      <BuildingAd
-        src="/ads/ad-gif3.mp4"
-        label="Screen on the wall below the billboard"
-        // The wall runs from x 635 to 795 of the 1920 plate here, sitting just
-        // under its top edge, which the shear below matches.
-        left="33.07%"
-        top="87.37%"
-        width="8.33%"
-        aspect="1440 / 1000"
-        // The wall is a plane receding to the right: its top edge was measured
-        // off the plate at 17.24deg, so the screen is sheared onto it rather
-        // than pasted flat, exactly as the billboard is.
-        skewDeg={17.24}
       />
     </>
   );
