@@ -177,3 +177,144 @@ body::after {
     );
   }
 }
+
+/*
+ * A single shooting star crossing the skyline panel.
+ *
+ * Adapted from the CodePen pattern, with three changes. That version scatters
+ * twenty stars and rotates the whole sky 45deg; this is one star on a gently
+ * tilted field so it reads as left-to-right. The palette is the site's lavender
+ * rather than the original blue. And the cycle is long with a short visible
+ * burst, so it is an occasional event instead of a constant streak.
+ *
+ * Two animations run together on the same element, as in the original: one
+ * grows and shrinks the tail's width, the other carries it across. They touch
+ * different properties, so they compose.
+ */
+.star-field {
+  position: absolute;
+  inset: -20% -15%;
+  z-index: 1;
+  /* The star travels straight; the field's tilt is what angles its path. */
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+
+.shooting-star {
+  position: absolute;
+  top: 26%;
+  left: 0;
+  height: 2px;
+  border-radius: 999px;
+  /* Bright at the right-hand end, because that end leads. */
+  background: linear-gradient(
+    90deg,
+    rgba(219, 196, 255, 0) 0%,
+    rgba(219, 196, 255, 0.85) 65%,
+    #ffffff 100%
+  );
+  filter: drop-shadow(0 0 6px rgba(190, 150, 255, 0.95));
+  animation:
+    star-tail 9s ease-in-out infinite,
+    star-shoot 9s ease-in-out infinite;
+}
+
+/* The cross-glint at the head, mirrored to make an X. */
+.shooting-star::before,
+.shooting-star::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 1px);
+  right: 0;
+  height: 2px;
+  border-radius: 100%;
+  background: linear-gradient(
+    -45deg,
+    rgba(219, 196, 255, 0),
+    rgba(233, 220, 255, 1),
+    rgba(219, 196, 255, 0)
+  );
+  animation: star-glint 9s ease-in-out infinite;
+}
+
+.shooting-star::before {
+  transform: translateX(50%) rotateZ(45deg);
+}
+
+.shooting-star::after {
+  transform: translateX(50%) rotateZ(-45deg);
+}
+
+@keyframes star-shoot {
+  0% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(130vw);
+  }
+  100% {
+    transform: translateX(130vw);
+  }
+}
+
+@keyframes star-tail {
+  0% {
+    width: 0;
+  }
+  6% {
+    width: 180px;
+  }
+  25% {
+    width: 180px;
+  }
+  30% {
+    width: 0;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes star-glint {
+  0%,
+  100% {
+    width: 0;
+  }
+  8% {
+    width: 30px;
+  }
+  24% {
+    width: 30px;
+  }
+  30% {
+    width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-field {
+    display: none;
+  }
+}
+
+/*
+ * Cover-frame for the pinned opening panel (PinnedPrehero).
+ *
+ * That panel fills the viewport rather than holding 16:9, so anything pinned to
+ * a point in the artwork — the building ads — needs a box that tracks where the
+ * art actually lands. `max()` picks whichever dimension has to overflow: the
+ * frame is at least as wide as the panel, and at least wide enough that its
+ * 16:9 height covers the panel's. `aspect-ratio` derives the other side, and
+ * the centring matches `object-position: 50% 50%`.
+ *
+ * The image inside is then an exact fit, and the ads can be positioned in
+ * percentages of the artwork itself.
+ */
+.prehero-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, calc(100svh * 1920 / 1089));
+  aspect-ratio: 1920 / 1089;
+}
