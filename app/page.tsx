@@ -2,6 +2,7 @@ import Image, { type StaticImageData } from "next/image";
 
 import { PreheroIntro } from "@/components/prehero-intro";
 import { SiteFooter } from "@/components/site-footer";
+import mlhBadge from "@/public/mlh-badge-2025.png";
 import zeroDay from "@/public/zero_day.png";
 import prehero from "@/public/backgrounds/01-prehero.png";
 import hero from "@/public/backgrounds/02-hero.png";
@@ -251,8 +252,35 @@ function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
           ))}
         </div>
         <PreheroIntro />
+        <MlhBadge />
       </div>
     </section>
+  );
+}
+
+/**
+ * The MLH trust badge, hanging from the top-right of the opening scene.
+ *
+ * Static by design - it just sits there. It is placed above the intro layer
+ * rather than inside it so the scrim does not dim it: the badge is site
+ * furniture, not part of the city, and MLH expects it legible.
+ *
+ * It hangs flush to the top edge because the artwork is drawn as a ribbon with
+ * its own hanger; a top margin would leave it floating.
+ *
+ * NOTE: this is the *2025* badge, carried over from the 2024 site. MLH issues a
+ * new one each season and expects the current year's - swap the asset for the
+ * 2026 badge before launch.
+ */
+function MlhBadge() {
+  return (
+    <div className="pointer-events-none absolute top-0 right-4 z-40 w-[58px] sm:right-6 sm:w-[74px]">
+      <Image
+        src={mlhBadge}
+        alt="Major League Hacking official member badge"
+        className="h-auto w-full"
+      />
+    </div>
   );
 }
 
