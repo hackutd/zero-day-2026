@@ -138,7 +138,7 @@ function MetalGradientDef() {
 }
 
 const MARK =
-  "h-[54px] w-[54px] drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)] sm:h-[68px] sm:w-[68px]";
+  "h-[64px] w-[64px] drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)] sm:h-[82px] sm:w-[82px]";
 const FILL = { fill: "url(#zd-metal)" };
 
 function LinkedInMark() {

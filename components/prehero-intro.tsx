@@ -157,7 +157,7 @@ export function PreheroIntro() {
           textShadow: "0 0 32px rgba(0,0,0,0.55)",
         }}
       >
-        the city needs <span style={{ color: "#dbc4ff" }}>you</span>...
+        the city needs <span className="text-accent-soft">you</span>...
       </p>
     </div>
   );

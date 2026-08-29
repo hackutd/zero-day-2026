@@ -27,6 +27,8 @@
    */
   --surface-deep: #0e011f;
   --accent-magenta: #7828ff;
+  /* The pale lavender the hero picks "you" out in, shared with the footer. */
+  --accent-soft: #dbc4ff;
   --text-muted: #8b93a1;
   --text-dim: #5a6270;
   --border-hairline: #232a36;
@@ -41,6 +43,7 @@
   --color-cyan: var(--cyan);
   --color-surface-deep: var(--surface-deep);
   --color-accent-magenta: var(--accent-magenta);
+  --color-accent-soft: var(--accent-soft);
   --color-text-muted: var(--text-muted);
   --color-text-dim: var(--text-dim);
   --color-border-hairline: var(--border-hairline);

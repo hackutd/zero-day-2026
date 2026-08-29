@@ -70,7 +70,7 @@ export function SiteFooter() {
         >
           {linkColumns.map((column) => (
             <div key={column.heading}>
-              <h3 className="font-sans text-accent-magenta text-[12px] leading-[1.3] font-medium tracking-[0.1em] uppercase">
+              <h3 className="font-sans text-accent-soft text-[12px] leading-[1.3] font-medium tracking-[0.1em] uppercase">
                 {column.heading}
               </h3>
               <ul className="mt-6 space-y-[11px]">
@@ -89,9 +89,7 @@ export function SiteFooter() {
           ))}
         </nav>
 
-        <hr className="border-border-hairline mt-16 border-0 border-t" />
-
-        <p className="font-sans text-text-dim mt-8 text-center text-[9px] leading-[1.3] tracking-[0.12em] uppercase">
+        <p className="font-sans text-text-dim mt-20 text-center text-[9px] leading-[1.3] tracking-[0.12em] uppercase">
           © 2026 HackUTD · Zeroday · University of Texas at Dallas
         </p>
       </div>

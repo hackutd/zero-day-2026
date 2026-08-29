@@ -57,7 +57,7 @@ export function SiteNav() {
           href="#"
           className="font-hypik text-[24px] leading-none tracking-[-0.01em] text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
         >
-          Zero-day
+          Zeroday
         </a>
 
         {/* Hidden on small screens: four links plus the pill's own padding
