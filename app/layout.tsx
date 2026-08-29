@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 
 import { AudioToggle } from "@/components/audio-toggle";
+import { SiteNav } from "@/components/site-nav";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 import "./globals.css";
 
@@ -51,6 +53,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         viewport corner and should survive any route added later.
       */}
       <body className="font-sans min-h-full">
+        <SmoothScroll />
+        <SiteNav />
         {children}
         <AudioToggle />
       </body>
