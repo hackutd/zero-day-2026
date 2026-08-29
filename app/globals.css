@@ -32,6 +32,36 @@ body {
   color: var(--foreground);
 }
 
+/*
+ * Cover-crop framing for the scene panels in app/page.tsx.
+ *
+ * Below `sm` the panel is narrower than the art's 16:9, so the frame overflows
+ * sideways and `--focus` — a percentage measured into the art — is what gets
+ * pinned to the middle of the panel. `left: 50%` finds the panel's centre; the
+ * negative translate then walks back by `--focus` of the *frame's* own width.
+ * The two percentages resolve against different boxes on purpose: that is what
+ * makes the result independent of the viewport's aspect ratio, where a plain
+ * `object-position: X%` would drift with it.
+ *
+ * At `sm` and up the panel is itself 16:9, so the frame already fits exactly
+ * and any offset would only slide the art off the edge — hence the reset.
+ */
+.scene-frame {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  left: 50%;
+  transform: translateX(calc(var(--focus) * -1));
+}
+
+@media (width >= 40rem) {
+  .scene-frame {
+    left: 0;
+    transform: none;
+  }
+}
+
 /* Ambient neon wash behind the wordmark. */
 body::before {
   content: "";
