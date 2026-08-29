@@ -326,3 +326,43 @@ body::after {
   width: max(100%, calc(100svh * 1920 / 1089));
   aspect-ratio: 1920 / 1089;
 }
+
+/*
+ * Custom pointer (Apex Legends Grey, from cursors-4u.com).
+ *
+ * Three departures from the snippet it came from:
+ *
+ *  - Self-hosted PNG rather than a hotlinked .webp. Cursor images are not the
+ *    same as <img> — Safari in particular does not reliably take webp here, and
+ *    hotlinking a third-party CDN puts someone else's uptime in the render
+ *    path. `image-set` hands a hi-dpi screen the 88px copy.
+ *  - 44px instead of the source's 128. Browsers cap cursors at 128 and the
+ *    artwork fills the whole frame, so the original renders about four times
+ *    the size of a normal pointer — roughly a sixth of a phone's width.
+ *  - Set on `body` rather than `* { ... !important }`. That selector overrides
+ *    every contextual cursor on the page: links and buttons stop showing the
+ *    hand, text stops showing the I-beam. The rule below keeps those cues.
+ *
+ * `auto` is the last fallback, so nothing is left cursorless if the PNG 404s.
+ */
+body {
+  cursor:
+    image-set(
+        url("/cursors/apex-grey-44.png") 1x,
+        url("/cursors/apex-grey-88.png") 2x
+      )
+      0 0,
+    auto;
+}
+
+/*
+ * Clickable things keep the hand. Losing that is a real usability cost on a
+ * page whose nav, Apply button and footer are all links — swap this block for
+ * the cursor above if the theme matters more than the affordance.
+ */
+a,
+button,
+summary,
+[role="button"] {
+  cursor: pointer;
+}
