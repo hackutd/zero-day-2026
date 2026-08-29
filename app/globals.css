@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Zero Day theme. Dark only, on purpose — the wordmark is neon-on-black and
+ * Zero Day theme. Dark only, on purpose â€” the wordmark is neon-on-black and
  * `color-scheme: dark` keeps the browser's own UI (scrollbars, form controls)
  * dark to match, rather than half-inverting on a light OS.
  */
@@ -21,11 +21,11 @@
    * palette above was placeholder colour picked for the coming-soon page, and
    * the design system will replace it piece by piece as more of the file lands.
    *
-   * Worth knowing when you reconcile them — the accents are NOT the same pink.
+   * Worth knowing when you reconcile them â€” the accents are NOT the same pink.
    * Figma's accent/magenta is #ff2e88; the placeholder --magenta is #ff2ee6.
    */
   --surface-deep: #0e011f;
-  --accent-magenta: #ff2e88;
+  --accent-magenta: #7828ff;
   --text-muted: #8b93a1;
   --text-dim: #5a6270;
   --border-hairline: #232a36;
@@ -58,7 +58,7 @@ body {
  * Cover-crop framing for the scene panels in app/page.tsx.
  *
  * Below `sm` the panel is narrower than the art's 16:9, so the frame overflows
- * sideways and `--focus` — a percentage measured into the art — is what gets
+ * sideways and `--focus` â€” a percentage measured into the art â€” is what gets
  * pinned to the middle of the panel. `left: 50%` finds the panel's centre; the
  * negative translate then walks back by `--focus` of the *frame's* own width.
  * The two percentages resolve against different boxes on purpose: that is what
@@ -66,7 +66,7 @@ body {
  * `object-position: X%` would drift with it.
  *
  * At `sm` and up the panel is itself 16:9, so the frame already fits exactly
- * and any offset would only slide the art off the edge — hence the reset.
+ * and any offset would only slide the art off the edge â€” hence the reset.
  */
 .scene-frame {
   position: absolute;
