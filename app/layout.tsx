@@ -1,37 +1,37 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, JetBrains_Mono, Saira } from "next/font/google";
+import localFont from "next/font/local";
 
 import { AudioToggle } from "@/components/audio-toggle";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+/*
+ * Satoshi, the HackUTD brand face, carried over from the hackutd.co repo. One
+ * variable file spans the whole 300-900 range, so it is a single request rather
+ * than one per weight. It replaces the Geist pair the Next scaffold shipped
+ * with, which nothing in this project actually used.
+ */
+const satoshi = localFont({
+  src: "./fonts/Satoshi-Variable.woff2",
+  variable: "--font-satoshi",
+  weight: "300 900",
+  display: "swap",
 });
 
 /*
- * The two faces the Figma design is drawn in. Saira Black is the poster
- * wordmark; JetBrains Mono carries every label, link, and caption. They are
- * loaded here rather than in the footer so the rest of the design can use them
- * as it lands, and so Next hosts them itself instead of hitting Google at
- * runtime.
+ * Hypik, by Matt Cole Wilson (mattcolewilson.com) — the brand wordmark face in
+ * the Figma nav. Self-hosted because it isn't on Google Fonts; the licence
+ * (app/fonts/hypik-LICENSE.txt) allows commercial use and free redistribution
+ * with a link back, so the credit belongs in the footer's Info column.
+ *
+ * Heads up: this font is letters only. It has no digits and no punctuation at
+ * all, so anything with a number or a mark in it will silently fall back
+ * mid-word. Keep it to alphabetic display text.
  */
-const saira = Saira({
-  variable: "--font-saira",
-  subsets: ["latin"],
-  weight: ["900"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const hypik = localFont({
+  src: "./fonts/hypik.otf",
+  variable: "--font-hypik",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${saira.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${satoshi.variable} ${hypik.variable} h-full antialiased`}
     >
       {/*
         The audio control sits in the layout, not the page: it's fixed to the

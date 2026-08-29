@@ -34,23 +34,29 @@ export function SiteFooter() {
         keep spanning ~89% of the viewport instead of overflowing on small
         screens. Tracking is -4% of the size, so it stays in `em`.
       */}
+      {/*
+        Hypik, not the Figma's Saira Black. It is a wider face at the same size,
+        so the vw figure comes down to keep the word spanning the viewport
+        rather than overflowing it. "ZERODAY" is all letters, which is the only
+        reason this is safe — Hypik has no digits or punctuation.
+      */}
       <p
         aria-hidden
-        className="font-display text-center leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap text-white uppercase"
-        style={{ fontSize: "clamp(2.5rem, 20.8vw, 22rem)" }}
+        className="font-hypik text-center leading-[0.85] tracking-[-0.02em] whitespace-nowrap text-white uppercase"
+        style={{ fontSize: "clamp(2rem, 15.5vw, 16rem)" }}
       >
         Zeroday
       </p>
 
       <div className="mx-auto max-w-[1200px] px-6">
         <h2
-          className="font-display mt-10 text-center leading-none font-black tracking-[-0.02em] text-white uppercase sm:mt-14"
+          className="font-sans mt-10 text-center leading-none font-black tracking-[-0.02em] text-white uppercase sm:mt-14"
           style={{ fontSize: "clamp(1.75rem, 3.9vw, 3.5rem)" }}
         >
           Registration is <span className="text-accent-magenta">open</span>
         </h2>
 
-        <p className="font-jetbrains text-text-muted mt-5 text-center text-[13px] leading-[1.55] tracking-[0.06em] uppercase">
+        <p className="font-sans text-text-muted mt-5 text-center text-[13px] leading-[1.55] tracking-[0.06em] uppercase">
           HackUTD 2026 — University of Texas at Dallas
         </p>
 
@@ -64,7 +70,7 @@ export function SiteFooter() {
         >
           {linkColumns.map((column) => (
             <div key={column.heading}>
-              <h3 className="font-jetbrains text-accent-magenta text-[12px] leading-[1.3] font-medium tracking-[0.1em] uppercase">
+              <h3 className="font-sans text-accent-magenta text-[12px] leading-[1.3] font-medium tracking-[0.1em] uppercase">
                 {column.heading}
               </h3>
               <ul className="mt-6 space-y-[11px]">
@@ -72,7 +78,7 @@ export function SiteFooter() {
                   <li key={label}>
                     <a
                       href="#"
-                      className="font-jetbrains text-text-muted focus-visible:outline-accent-magenta inline-block text-[12px] leading-[1.4] font-medium tracking-[0.08em] uppercase transition-colors hover:text-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                      className="font-sans text-text-muted focus-visible:outline-accent-magenta inline-block text-[12px] leading-[1.4] font-medium tracking-[0.08em] uppercase transition-colors hover:text-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                     >
                       {label}
                     </a>
@@ -85,7 +91,7 @@ export function SiteFooter() {
 
         <hr className="border-border-hairline mt-16 border-0 border-t" />
 
-        <p className="font-jetbrains text-text-dim mt-8 text-center text-[9px] leading-[1.3] tracking-[0.12em] uppercase">
+        <p className="font-sans text-text-dim mt-8 text-center text-[9px] leading-[1.3] tracking-[0.12em] uppercase">
           © 2026 HackUTD · Zeroday · University of Texas at Dallas
         </p>
       </div>
@@ -113,7 +119,7 @@ function RegisterButton() {
         aria-hidden
         className="absolute inset-0 h-full w-full"
       />
-      <span className="font-jetbrains relative text-[12px] leading-[1.3] font-medium tracking-[0.1em] text-white uppercase">
+      <span className="font-sans relative text-[12px] leading-[1.3] font-medium tracking-[0.1em] text-white uppercase">
         Register
       </span>
     </a>
