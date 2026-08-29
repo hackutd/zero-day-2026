@@ -314,13 +314,24 @@ body::after {
   transform: translate(-50%, -50%);
   aspect-ratio: 1920 / 1089;
   /*
-   * Covers, at every width. Containing this on a phone was tried and abandoned:
-   * a 16:9 plate inside a 9:19.5 viewport is a ~220px strip in an ~840px field,
-   * which reads as unfinished rather than cinematic. The scrolling panels below
-   * show their plates whole instead - this one is pinned with the headline over
-   * it, so filling the screen matters more here than completeness does.
+   * Phone: `min` contains the plate, so the whole city is visible. It
+   * letterboxes onto the page black, which only works because the intro layer
+   * lives inside this frame - the glass pane and the headline sit on the art
+   * rather than on the viewport, so the band reads as a framed panel instead of
+   * a strip floating in an empty field.
    */
-  width: max(100%, calc(100svh * 1920 / 1089));
+  width: min(100%, calc(100svh * 1920 / 1089));
+}
+
+@media (width >= 40rem) {
+  .prehero-frame {
+    /*
+     * Wider screens are close enough to 16:9 that covering loses almost
+     * nothing, and a pinned scene should fill the viewport. The frame is
+     * centred either way, so the headline stays centred on screen too.
+     */
+    width: max(100%, calc(100svh * 1920 / 1089));
+  }
 }
 
 /*

@@ -248,8 +248,14 @@ function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
           {BUILDING_ADS.map((ad) => (
             <BuildingAd key={ad.src} {...ad} />
           ))}
+          {/*
+            Inside the frame, not the panel: on a phone the frame is the
+            letterboxed art, and the pane and headline belong on the picture
+            rather than floating over the black around it. On wider screens the
+            frame covers the viewport, so this is the same thing either way.
+          */}
+          <PreheroIntro />
         </div>
-        <PreheroIntro />
         <MlhBadge />
       </div>
     </section>
