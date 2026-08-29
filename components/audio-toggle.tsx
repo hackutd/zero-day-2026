@@ -26,7 +26,8 @@ export function AudioToggle() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.volume = 0.45;
+    // Background music sitting under the visuals, not the main event.
+    audio.volume = 0.22;
 
     const start = () => {
       if (pausedByUser.current) return;
