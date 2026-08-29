@@ -30,7 +30,7 @@ const OUT_END = 0.9;
 const TRAVEL_PX = 140;
 
 /** Darkest the scrim ever gets, at the line's peak. */
-const MAX_SCRIM = 0.62;
+const MAX_SCRIM = 0.88;
 
 export function PreheroIntro() {
   const textRef = useRef<HTMLParagraphElement>(null);
