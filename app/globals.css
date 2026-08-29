@@ -328,41 +328,48 @@ body::after {
 }
 
 /*
- * Custom pointer (Apex Legends Grey, from cursors-4u.com).
+ * Cyberpunk 2077 cursor set (vsthemes.org), extracted from the .cur files.
  *
- * Three departures from the snippet it came from:
+ * Only the three a web page uses were taken out of the archive - the installer
+ * script, its PDFs and the shortcut were left in it. Nothing was installed
+ * system-wide; these are just images the page references.
  *
- *  - Self-hosted PNG rather than a hotlinked .webp. Cursor images are not the
- *    same as <img> — Safari in particular does not reliably take webp here, and
- *    hotlinking a third-party CDN puts someone else's uptime in the render
- *    path. `image-set` hands a hi-dpi screen the 88px copy.
- *  - 44px instead of the source's 128. Browsers cap cursors at 128 and the
- *    artwork fills the whole frame, so the original renders about four times
- *    the size of a normal pointer — roughly a sixth of a phone's width.
- *  - Set on `body` rather than `* { ... !important }`. That selector overrides
- *    every contextual cursor on the page: links and buttons stop showing the
- *    hand, text stops showing the I-beam. The rule below keeps those cues.
+ * The hotspots are the ones baked into the .cur headers, not guesses, and they
+ * are not 0 0: the arrow's tip sits 8px down its bitmap, the hand's at (6,5),
+ * the beam's centred at (17,15). Getting these wrong makes clicks land off
+ * where the cursor appears to point.
  *
- * `auto` is the last fallback, so nothing is left cursorless if the PNG 404s.
+ * They are 32px pixel art, so the 2x copies are NEAREST-doubled - a smooth
+ * upscale would just blur them, where doubling keeps the pixels crisp on a
+ * hi-dpi screen. Each rule keeps its native keyword as the final fallback, so
+ * a failed image degrades to the right cursor rather than to nothing.
  */
 body {
   cursor:
     image-set(
-        url("/cursors/apex-grey-44.png") 1x,
-        url("/cursors/apex-grey-88.png") 2x
+        url("/cursors/cp-arrow.png") 1x,
+        url("/cursors/cp-arrow@2x.png") 2x
       )
-      0 0,
+      0 8,
     auto;
 }
 
-/*
- * Clickable things keep the hand. Losing that is a real usability cost on a
- * page whose nav, Apply button and footer are all links — swap this block for
- * the cursor above if the theme matters more than the affordance.
- */
 a,
 button,
 summary,
+label,
 [role="button"] {
-  cursor: pointer;
+  cursor:
+    image-set(url("/cursors/cp-link.png") 1x, url("/cursors/cp-link@2x.png") 2x)
+      6 5,
+    pointer;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  cursor:
+    image-set(url("/cursors/cp-beam.png") 1x, url("/cursors/cp-beam@2x.png") 2x)
+      17 15,
+    text;
 }
