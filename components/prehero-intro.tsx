@@ -35,6 +35,7 @@ const MAX_SCRIM = 0.62;
 export function PreheroIntro() {
   const textRef = useRef<HTMLParagraphElement>(null);
   const scrimRef = useRef<HTMLDivElement>(null);
+  const starRef = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotion();
 
   useEffect(() => {
@@ -44,6 +45,28 @@ export function PreheroIntro() {
     if (!track || !text || !scrim) return;
 
     let frame = 0;
+    // Whether the star has already been fired for this pass through the
+    // headline. Cleared when the line leaves, so scrolling back up and down
+    // again earns another one.
+    let starFired = false;
+
+    /**
+     * Restart the star so it flies now. Resetting `currentTime` rather than
+     * just playing also restarts the idle gap, which is the point: without it
+     * the free-running cycle could drop a second star moments later, and the
+     * one on the beat would stop feeling deliberate.
+     *
+     * `subtree` picks up the ::before/::after glints, which are separate
+     * animations and would otherwise fall out of sync with the tail.
+     */
+    const shootStar = () => {
+      const star = starRef.current;
+      if (!star) return;
+      for (const animation of star.getAnimations({ subtree: true })) {
+        animation.currentTime = 0;
+        animation.play();
+      }
+    };
 
     const paint = () => {
       frame = 0;
@@ -77,6 +100,17 @@ export function PreheroIntro() {
         shift = TRAVEL_PX;
       }
 
+      // Fire on the beat: the moment the line finishes arriving and sits
+      // centred, which is when it has the reader's attention.
+      if (p >= IN_END && p < OUT_END) {
+        if (!starFired) {
+          starFired = true;
+          shootStar();
+        }
+      } else {
+        starFired = false;
+      }
+
       text.style.opacity = String(opacity);
       text.style.transform = reduced ? "none" : `translateX(${shift}px)`;
       scrim.style.opacity = String(opacity * MAX_SCRIM);
@@ -108,7 +142,7 @@ export function PreheroIntro() {
       />
       {/* Above the scrim so the streak stays bright, below the line. */}
       <div className="star-field" aria-hidden>
-        <span className="shooting-star" />
+        <span ref={starRef} className="shooting-star" />
       </div>
 
       <p
