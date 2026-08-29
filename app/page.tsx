@@ -41,7 +41,7 @@ const scenes: {
     src: hero,
     alt: "A blank glowing billboard on a wall between skyscrapers, strung with cables.",
     focus: 25.31,
-    overlay: <BillboardWordmark />,
+    overlay: <HeroOverlays />,
   },
   {
     src: street,
@@ -177,7 +177,16 @@ function BuildingAd({
   top,
   width,
   aspect,
-}: (typeof BUILDING_ADS)[number]) {
+  skewDeg = 0,
+}: {
+  src: string;
+  label: string;
+  left: string;
+  top: string;
+  width: string;
+  aspect: string;
+  skewDeg?: number;
+}) {
   return (
     <div
       className="absolute overflow-hidden"
@@ -186,6 +195,9 @@ function BuildingAd({
         top,
         width,
         aspectRatio: aspect,
+        // Screens on a receding plane are sheared onto it, as the billboard is.
+        transform: skewDeg ? `skewY(${skewDeg}deg)` : undefined,
+        transformOrigin: "center",
         // Sells it as a lit panel rather than a sticker on the facade.
         boxShadow: "0 0 1.2vw rgba(150, 90, 255, 0.45)",
       }}
@@ -236,6 +248,32 @@ function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
         <PreheroIntro />
       </div>
     </section>
+  );
+}
+
+/**
+ * Everything laid over the hero plate: the billboard wordmark, and a screen on
+ * the hexagon wall below it.
+ */
+function HeroOverlays() {
+  return (
+    <>
+      <BillboardWordmark />
+      <BuildingAd
+        src="/ads/ad-gif3.mp4"
+        label="Screen on the wall below the billboard"
+        // The wall runs from x 635 to 795 of the 1920 plate here, sitting just
+        // under its top edge, which the shear below matches.
+        left="33.07%"
+        top="87.37%"
+        width="8.33%"
+        aspect="1440 / 1000"
+        // The wall is a plane receding to the right: its top edge was measured
+        // off the plate at 17.24deg, so the screen is sheared onto it rather
+        // than pasted flat, exactly as the billboard is.
+        skewDeg={17.24}
+      />
+    </>
   );
 }
 
