@@ -7,14 +7,31 @@
  * elsewhere, `clip-path` crops a border away, so the hairline is a clipped
  * parent showing through 1px around a clipped child.
  *
- * The track holds the set twice and slides exactly -50%, which is what makes
- * the loop seamless: at the halfway point the second copy sits precisely where
- * the first began. The duplicate is hidden from assistive tech so the links are
- * not announced twice, and the strip pauses on hover so a card can be read and
- * clicked rather than chased.
+ * The track holds two identical halves and slides exactly -50%, which is what
+ * makes the loop seamless: at the halfway point the second half sits precisely
+ * where the first began.
+ *
+ * Each half must be at least as wide as the viewport, or the loop tears. One
+ * set of five is ~1280px, so on a 1440px screen the incoming half ran out
+ * before it reached the right edge and left a gap after the last card until the
+ * cycle restarted. Each half therefore repeats the set REPEATS times; -50%
+ * still lands exactly on the boundary because the halves stay identical.
+ *
+ * Only the first set carries real links. Every repeat is hidden from assistive
+ * tech and taken out of the tab order, so the same five destinations are not
+ * announced or tabbed through REPEATS*2 times.
+ *
+ * The strip pauses on hover so a card can be read and clicked rather than
+ * chased.
  */
 
 const CHAMFER = "polygon(0 0, 78% 0, 100% 22%, 100% 100%, 0 100%)";
+
+/**
+ * Sets per half. Five cards run ~1280px, so three carries a half past 3800px
+ * and covers ultrawide displays without the tear returning.
+ */
+const REPEATS = 3;
 
 type Social = {
   name: string;
@@ -40,8 +57,8 @@ export function SocialMarquee() {
     >
       <div className="social-marquee">
         <div className="social-marquee__track">
-          <Row />
-          <Row duplicate />
+          <Half announce />
+          <Half />
         </div>
       </div>
       <MetalGradientDef />
@@ -49,32 +66,35 @@ export function SocialMarquee() {
   );
 }
 
-function Row({ duplicate = false }: { duplicate?: boolean }) {
+function Half({ announce = false }: { announce?: boolean }) {
   return (
-    <ul
-      aria-hidden={duplicate || undefined}
-      className="flex shrink-0 items-center gap-5 pr-5 sm:gap-7 sm:pr-7"
-    >
-      {SOCIALS.map((s) => (
-        <li key={s.name}>
-          <Card {...s} duplicate={duplicate} />
-        </li>
-      ))}
-    </ul>
+    <>
+      {Array.from({ length: REPEATS }, (_, set) => {
+        // Exactly one set on the whole track is the real, reachable one.
+        const real = announce && set === 0;
+        return (
+          <ul
+            key={set}
+            aria-hidden={real ? undefined : true}
+            className="flex shrink-0 items-center gap-5 pr-5 sm:gap-7 sm:pr-7"
+          >
+            {SOCIALS.map((s) => (
+              <li key={s.name}>
+                <Card {...s} inert={!real} />
+              </li>
+            ))}
+          </ul>
+        );
+      })}
+    </>
   );
 }
 
-function Card({
-  name,
-  href,
-  icon,
-  tone,
-  duplicate,
-}: Social & { duplicate: boolean }) {
+function Card({ name, href, icon, tone, inert }: Social & { inert: boolean }) {
   return (
     <a
       href={href}
-      tabIndex={duplicate ? -1 : undefined}
+      tabIndex={inert ? -1 : undefined}
       className="social-card relative block size-[184px] p-px sm:size-[228px]"
       style={{ clipPath: CHAMFER }}
     >
