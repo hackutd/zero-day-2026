@@ -178,6 +178,7 @@ function BuildingAd({
   width,
   aspect,
   skewDeg = 0,
+  fade = 1,
 }: {
   src: string;
   label: string;
@@ -186,6 +187,12 @@ function BuildingAd({
   width: string;
   aspect: string;
   skewDeg?: number;
+  /**
+   * Atmospheric perspective: 1 is full strength, lower sits the screen further
+   * back. It dims the panel and softens its glow together, because a distant
+   * light source loses its bloom before it loses its shape.
+   */
+  fade?: number;
 }) {
   return (
     <div
@@ -198,8 +205,11 @@ function BuildingAd({
         // Screens on a receding plane are sheared onto it, as the billboard is.
         transform: skewDeg ? `skewY(${skewDeg}deg)` : undefined,
         transformOrigin: "center",
-        // Sells it as a lit panel rather than a sticker on the facade.
-        boxShadow: "0 0 1.2vw rgba(150, 90, 255, 0.45)",
+        opacity: fade,
+        // Sells it as a lit panel rather than a sticker on the facade. The
+        // bloom scales with `fade` so a distant screen does not glow like a
+        // near one.
+        boxShadow: `0 0 ${1.2 * fade}vw rgba(150, 90, 255, ${0.45 * fade})`,
       }}
     >
       {/*
@@ -264,12 +274,16 @@ function HeroOverlays() {
         label="Screen on a building down the alley"
         // The orange-windowed slab down the alley. Its facade runs y 500-650 of
         // the plate, split by cable bundles at 540-560 and 655; this sits in
-        // the clean gap between them, x 1185-1266 by y 605-648. No shear: the
-        // window rows there are drawn horizontal despite the recession.
-        left="61.72%"
-        top="55.97%"
-        width="4.22%"
+        // the clean gap between them. Kept small and dimmed: it is the
+        // furthest screen in the scene, so it reads as distance rather than as
+        // a panel that happens to be tiny. Recentred on the same point as the
+        // larger version so it stays in the gap. No shear: the window rows
+        // there are drawn horizontal despite the recession.
+        left="62.24%"
+        top="56.47%"
+        width="3.18%"
         aspect="800 / 423"
+        fade={0.5}
       />
       <BuildingAd
         src="/ads/ad-gif3.mp4"
