@@ -88,43 +88,74 @@ export function AudioToggle() {
         <source src="/audio/distant-echoes.mp3" type="audio/mpeg" />
       </audio>
 
+      {/*
+        The notched corners are the same motif as the Register and Explore
+        buttons — top-left and bottom-right cut at 25% of the height, matching
+        the ratio in button-accent.svg. It is a clip-path rather than another
+        SVG because this control has no Figma export to reuse, and a path scales
+        with the box where a stretched asset would skew the notch.
+
+        clip-path crops a border away, so the accent hairline is a clipped
+        parent showing through 1px around a clipped child.
+      */}
       <button
         type="button"
         onClick={toggle}
         aria-pressed={playing}
         aria-label={playing ? "Mute music" : "Play music"}
         title={playing ? "Mute music" : "Play music"}
-        className="fixed bottom-5 left-5 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/80 backdrop-blur-md transition hover:border-white/40 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan sm:bottom-6 sm:left-6"
+        className={`fixed bottom-5 left-5 z-50 h-11 w-11 p-px transition-colors sm:bottom-6 sm:left-6 ${
+          playing ? "bg-accent-magenta" : "bg-white/25 hover:bg-white/40"
+        }`}
+        style={{ clipPath: NOTCH }}
       >
-        <SpeakerIcon muted={!playing} />
+        <span
+          className="flex h-full w-full items-center justify-center bg-[#0b0616]/85 backdrop-blur-md"
+          style={{ clipPath: NOTCH }}
+        >
+          <SpeakerIcon muted={!playing} />
+        </span>
       </button>
     </>
   );
 }
 
+/**
+ * Corner notch shared by the button and its inner fill. 25% of the box, the
+ * same proportion the CTA buttons cut at 12px on a 48px height.
+ */
+const NOTCH = "polygon(25% 0, 100% 0, 100% 75%, 75% 100%, 0 100%, 0 25%)";
+
+/**
+ * Deliberately angular: mitred joins and square caps, straight chevrons instead
+ * of the usual arcs, so it reads with the notched buttons and the slanted
+ * display type rather than like a stock rounded icon.
+ */
 function SpeakerIcon({ muted }: { muted: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="20"
-      height="20"
+      width="18"
+      height="18"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      strokeWidth="1.6"
+      strokeLinecap="square"
+      strokeLinejoin="miter"
+      className={muted ? "text-white/70" : "text-white"}
       aria-hidden
     >
-      <path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" />
+      {/* Cone: a straight-sided box and flare, no curves. */}
+      <path d="M3 9h4l5-4v14l-5-4H3z" />
       {muted ? (
         <>
-          <path d="m16.5 9.5 4 5" />
-          <path d="m20.5 9.5-4 5" />
+          <path d="m16 9.5 5 5" />
+          <path d="m21 9.5-5 5" />
         </>
       ) : (
         <>
-          <path d="M15.8 9.2a4 4 0 0 1 0 5.6" />
-          <path d="M18.4 6.6a7.6 7.6 0 0 1 0 10.8" />
+          <path d="m15.5 9 2.5 3-2.5 3" />
+          <path d="m19.5 6.5 3.5 5.5-3.5 5.5" />
         </>
       )}
     </svg>
