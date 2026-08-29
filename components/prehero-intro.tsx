@@ -137,7 +137,7 @@ export function PreheroIntro() {
     >
       <div
         ref={scrimRef}
-        className="absolute inset-0 bg-black"
+        className="prehero-scrim absolute inset-0"
         style={{ opacity: 0 }}
       />
       {/* Above the scrim so the streak stays bright, below the line. */}

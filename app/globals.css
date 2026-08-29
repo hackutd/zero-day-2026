@@ -460,3 +460,32 @@ textarea,
 .social-card:hover .social-card__fill {
   opacity: 0.45;
 }
+
+/*
+ * The pane behind the opening headline.
+ *
+ * A flat black wash reads as a sheet laid over the art. What makes it glass is
+ * blurring the city *through* it, so the buildings stay legible as shape and
+ * colour while losing their detail, and the type sits on a surface rather than
+ * on a dimmer.
+ *
+ * The tint is a radial falloff rather than a uniform fill - heaviest behind the
+ * line where contrast is needed, thinning toward the edges so the frame never
+ * looks like it has a rectangle sitting on it. Saturation is pushed slightly as
+ * it blurs, because blurring averages neon toward grey and the city should not
+ * go muddy.
+ *
+ * The element's opacity is animated by prehero-intro.tsx; opacity composites
+ * the backdrop result too, so the blur fades up and out with the tint rather
+ * than snapping on.
+ */
+.prehero-scrim {
+  background: radial-gradient(
+    125% 95% at 50% 50%,
+    rgba(5, 3, 12, 0.94) 0%,
+    rgba(5, 3, 12, 0.74) 42%,
+    rgba(5, 3, 12, 0.34) 100%
+  );
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
