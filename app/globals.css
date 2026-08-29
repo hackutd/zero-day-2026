@@ -373,3 +373,62 @@ textarea,
       17 15,
     text;
 }
+
+/*
+ * Social card marquee (components/social-marquee.tsx).
+ *
+ * The track carries the card set twice and travels exactly -50%, so at the end
+ * of a cycle the second copy sits precisely where the first started and the
+ * restart is invisible. Any other distance would visibly jump.
+ *
+ * Animating `transform` keeps it on the compositor; animating `left` or a
+ * scroll offset would relayout every frame.
+ *
+ * The mask fades both ends so cards arrive and leave rather than being sliced
+ * off square at the viewport edge.
+ */
+.social-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 7%,
+    #000 93%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 7%,
+    #000 93%,
+    transparent 100%
+  );
+}
+
+.social-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: social-marquee 42s linear infinite;
+}
+
+/* Stop it so a card can be read and clicked rather than chased. */
+.social-marquee:hover .social-marquee__track,
+.social-marquee:focus-within .social-marquee__track {
+  animation-play-state: paused;
+}
+
+@keyframes social-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-marquee__track {
+    animation: none;
+  }
+  /* Without the animation the row is unreachable, so hand it back to the user. */
+  .social-marquee {
+    overflow-x: auto;
+  }
+}

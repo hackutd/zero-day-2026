@@ -2,6 +2,7 @@ import Image, { type StaticImageData } from "next/image";
 
 import { PreheroIntro } from "@/components/prehero-intro";
 import { SiteFooter } from "@/components/site-footer";
+import { SocialMarquee } from "@/components/social-marquee";
 import mlhBadge from "@/public/mlh-badge-2025.png";
 import zeroDay from "@/public/zero_day.png";
 import prehero from "@/public/backgrounds/01-prehero.png";
@@ -61,6 +62,7 @@ export default function Home() {
       {scenes.slice(1).map((scene) => (
         <Scene key={scene.src.src} {...scene} first={false} />
       ))}
+      <SocialMarquee />
       <SiteFooter />
     </main>
   );
