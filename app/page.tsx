@@ -260,6 +260,18 @@ function HeroOverlays() {
     <>
       <BillboardWordmark />
       <BuildingAd
+        src="/ads/ad-gif4.mp4"
+        label="Screen on a building down the alley"
+        // The orange-windowed slab down the alley. Its facade runs y 500-650 of
+        // the plate, split by cable bundles at 540-560 and 655; this sits in
+        // the clean gap between them, x 1185-1266 by y 605-648. No shear: the
+        // window rows there are drawn horizontal despite the recession.
+        left="61.72%"
+        top="55.97%"
+        width="4.22%"
+        aspect="800 / 423"
+      />
+      <BuildingAd
         src="/ads/ad-gif3.mp4"
         label="Screen on the wall below the billboard"
         // The wall runs from x 635 to 795 of the 1920 plate here, sitting just
