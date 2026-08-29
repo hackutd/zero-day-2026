@@ -37,7 +37,7 @@ const hypik = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "HackUTD 2026 — Zero Day",
+  title: "HackUTD Zero Day",
   description:
     "HackUTD 2026: Zero Day is coming soon. Applications will open soon.",
 };
