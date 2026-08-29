@@ -8,7 +8,7 @@
 :root {
   color-scheme: dark;
 
-  --background: #07060c;
+  --background: #000000;
   --foreground: #f4f2ff;
   --muted: #948eb4;
   --line: #241f38;
@@ -408,7 +408,7 @@ textarea,
 .social-marquee__track {
   display: flex;
   width: max-content;
-  animation: social-marquee 42s linear infinite;
+  animation: social-marquee 24s linear infinite;
 }
 
 /* Stop it so a card can be read and clicked rather than chased. */
@@ -431,4 +431,29 @@ textarea,
   .social-marquee {
     overflow-x: auto;
   }
+}
+
+/*
+ * Card hover. No lift - the fill drops toward the page black and the rim
+ * brightens, so the card reads as glass catching light rather than as a tile
+ * being picked up. The fill is a separate layer precisely so this can fade
+ * without dimming the mark and label sitting on top of it.
+ */
+.social-card {
+  background: rgba(255, 255, 255, 0.14);
+  transition: background 300ms ease;
+}
+
+.social-card:hover {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.social-card__fill {
+  position: absolute;
+  inset: 0;
+  transition: opacity 300ms ease;
+}
+
+.social-card:hover .social-card__fill {
+  opacity: 0.45;
 }

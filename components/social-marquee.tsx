@@ -75,22 +75,33 @@ function Card({
     <a
       href={href}
       tabIndex={duplicate ? -1 : undefined}
-      className="relative block size-[184px] p-px transition-transform duration-300 hover:-translate-y-1 sm:size-[228px]"
-      style={{ clipPath: CHAMFER, background: "rgba(255,255,255,0.14)" }}
+      className="social-card relative block size-[184px] p-px sm:size-[228px]"
+      style={{ clipPath: CHAMFER }}
     >
       <span
         className="relative flex h-full w-full flex-col justify-between p-5 sm:p-6"
-        style={{
-          clipPath: CHAMFER,
-          background:
-            tone === "violet"
-              ? "linear-gradient(145deg, #7c34d8 0%, #4a1a8c 48%, #2a0e52 100%)"
-              : "linear-gradient(145deg, #1c1826 0%, #121019 55%, #0b0910 100%)",
-        }}
+        style={{ clipPath: CHAMFER }}
       >
-        <span className="flex flex-1 items-center justify-center">{icon}</span>
+        {/*
+          The fill sits on its own layer so hover can fade it to glass without
+          taking the mark and the label down with it.
+        */}
+        <span
+          aria-hidden
+          className="social-card__fill"
+          style={{
+            backgroundImage:
+              tone === "violet"
+                ? "linear-gradient(145deg, #7c34d8 0%, #4a1a8c 48%, #2a0e52 100%)"
+                : "linear-gradient(145deg, #1c1826 0%, #121019 55%, #0b0910 100%)",
+          }}
+        />
 
-        <span className="font-sans text-[13px] leading-none tracking-[0.14em] text-white uppercase sm:text-[15px]">
+        <span className="relative flex flex-1 items-center justify-center">
+          {icon}
+        </span>
+
+        <span className="font-sans relative text-[13px] leading-none tracking-[0.14em] text-white uppercase sm:text-[15px]">
           {name}
         </span>
 

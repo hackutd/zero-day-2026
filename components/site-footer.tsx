@@ -27,7 +27,7 @@ const linkColumns: { heading: string; links: string[] }[] = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-surface-deep overflow-hidden pt-16 pb-14 sm:pt-24">
+    <footer className="bg-background overflow-hidden pt-16 pb-14 sm:pt-24">
       {/*
         The wordmark is wider than the 1200px content column — 1286 of the
         frame's 1440 — so it sits outside the column and is sized in `vw` to
