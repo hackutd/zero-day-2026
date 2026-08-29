@@ -32,6 +32,8 @@ const scenes: {
   alt: string;
   focus: number;
   overlay?: React.ReactNode;
+  /** Let the scroll settle onto this panel when the reader stops near it. */
+  settle?: boolean;
 }[] = [
   {
     src: prehero,
@@ -43,6 +45,7 @@ const scenes: {
     alt: "A blank glowing billboard on a wall between skyscrapers, strung with cables.",
     focus: 25.31,
     overlay: <HeroOverlays />,
+    settle: true,
   },
   {
     src: street,
@@ -320,15 +323,22 @@ function Scene({
   focus,
   overlay,
   first,
+  settle = false,
 }: {
   src: StaticImageData;
   alt: string;
   focus: number;
   overlay?: React.ReactNode;
   first: boolean;
+  settle?: boolean;
 }) {
   return (
-    <div className="relative h-[62svh] min-h-[380px] w-full overflow-hidden sm:aspect-video sm:h-auto sm:min-h-0">
+    <div
+      // Read by components/smooth-scroll.tsx, which eases onto this panel if
+      // the reader comes to rest already close to it.
+      data-settle={settle ? "" : undefined}
+      className="relative h-[62svh] min-h-[380px] w-full overflow-hidden sm:aspect-video sm:h-auto sm:min-h-0"
+    >
       <div
         className="scene-frame"
         style={{ "--focus": `${focus}%` } as React.CSSProperties}

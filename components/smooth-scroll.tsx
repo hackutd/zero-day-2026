@@ -27,6 +27,23 @@ const PAGE_FACTOR = 0.9;
 const SNAP_THRESHOLD = 0.4;
 
 /**
+ * How long the reader has to be still before the scroll settles onto a panel.
+ * Long enough that it never interrupts a scroll in progress, short enough that
+ * it feels like the same gesture finishing rather than a later correction.
+ */
+const SETTLE_DELAY_MS = 140;
+
+/**
+ * How near a panel has to be, as a fraction of the viewport, for the settle to
+ * engage at all. Past this it is left alone: someone scrolling deliberately
+ * past the panel should never be pulled back to it.
+ */
+const SETTLE_RANGE = 0.35;
+
+/** Close enough to centred already; moving would just be a twitch. */
+const SETTLE_DEADZONE_PX = 3;
+
+/**
  * Matches `scroll-padding-top` in globals.css. The original walked `offsetTop`
  * and landed flush, which here would put the target under the fixed navbar.
  */
@@ -62,12 +79,50 @@ export function SmoothScroll() {
     const maxScroll = () => Math.max(0, root.scrollHeight - window.innerHeight);
     const clamp = (value: number) => Math.max(0, Math.min(value, maxScroll()));
 
+    let settleTimer: ReturnType<typeof setTimeout> | undefined;
+    // Set while the settle drives the loop, so its own scrolling is not read
+    // back as the reader moving and re-armed into a feedback loop.
+    let settling = false;
+
+    /**
+     * Ease onto a marked panel if the reader has come to rest already close to
+     * one. This is deliberately not CSS scroll-snap: this module owns the
+     * scroll position every frame, and snap points would fight it. Doing it
+     * here also makes it velocity-aware, which snap is not — it only ever runs
+     * from a standstill, so a flick straight past the panel is untouched.
+     */
+    const trySettle = () => {
+      if (settling || running) return;
+      const panel = document.querySelector<HTMLElement>("[data-settle]");
+      if (!panel) return;
+
+      const rect = panel.getBoundingClientRect();
+      // A panel taller than the viewport has no single centred position worth
+      // choosing, so leave those alone.
+      if (rect.height > window.innerHeight * 1.2) return;
+
+      const centredTop = (window.innerHeight - rect.height) / 2;
+      const delta = rect.top - centredTop;
+      if (Math.abs(delta) < SETTLE_DEADZONE_PX) return;
+      if (Math.abs(delta) > window.innerHeight * SETTLE_RANGE) return;
+
+      settling = true;
+      scrollTo(target + delta);
+    };
+
+    const armSettle = () => {
+      if (settling) return;
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(trySettle, SETTLE_DELAY_MS);
+    };
+
     const frame = () => {
       const distance = target - current;
       if (Math.abs(distance) < SNAP_THRESHOLD) {
         current = target;
         window.scrollTo(0, current);
         running = false;
+        settling = false;
         return;
       }
       current += distance * EASE;
@@ -101,6 +156,7 @@ export function SmoothScroll() {
       if (e.ctrlKey) return; // pinch-zoom gesture, leave it alone
       e.preventDefault();
       scrollBy(wheelDelta(e) * WHEEL_MULTIPLIER);
+      armSettle();
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -136,6 +192,7 @@ export function SmoothScroll() {
           return;
       }
       e.preventDefault();
+      armSettle();
     };
 
     // `offsetTop` rather than getBoundingClientRect: it ignores CSS transforms,
@@ -169,6 +226,9 @@ export function SmoothScroll() {
     const onScroll = () => {
       if (running) return;
       current = target = window.scrollY;
+      // Covers scrollbar drags and trackpad momentum, which never reach the
+      // wheel handler above.
+      armSettle();
     };
     const onResize = () => {
       target = clamp(target);
@@ -187,6 +247,7 @@ export function SmoothScroll() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       if (frameId) cancelAnimationFrame(frameId);
+      clearTimeout(settleTimer);
       root.style.scrollBehavior = previousBehavior;
     };
   }, []);
