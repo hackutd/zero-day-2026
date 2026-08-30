@@ -273,7 +273,7 @@ function MlhBadge() {
   return (
     <a
       id="mlh-trust-badge"
-      href="https://mlh.io/na?utm_source=na-hackathon&utm_medium=TrustBadge&utm_campaign=2026-season&utm_content=gray"
+      href="https://mlh.io/na?utm_source=na-hackathon&utm_medium=TrustBadge&utm_campaign=2026-season&utm_content=black"
       target="_blank"
       rel="noreferrer"
       className="absolute top-0 right-3 z-40 block w-[60px] sm:right-6 sm:w-[74px]"
@@ -285,7 +285,7 @@ function MlhBadge() {
       */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="https://logged-assets.s3.amazonaws.com/trust-badge/2026/mlh-trust-badge-2026-gray.svg"
+        src="https://logged-assets.s3.amazonaws.com/trust-badge/2026/mlh-trust-badge-2026-black.svg"
         alt="Major League Hacking 2026 Hackathon Season"
         className="block w-full"
       />
