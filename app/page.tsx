@@ -270,7 +270,7 @@ function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
  */
 function MlhBadge() {
   return (
-    <div className="pointer-events-none absolute top-0 right-4 z-40 w-[58px] sm:right-6 sm:w-[74px]">
+    <div className="pointer-events-none absolute top-0 right-3 z-40 w-[42px] sm:right-6 sm:w-[74px]">
       <Image
         src={mlhBadge}
         alt="Major League Hacking official member badge"
