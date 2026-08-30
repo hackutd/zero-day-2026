@@ -71,7 +71,7 @@ const OTHER_HACKATHONS: FooterLink[] = [
 ];
 
 const ORGANIZER_URL = "https://hackutd.co/";
-const SOURCE_URL = "https://github.com/acmutd/hackportal";
+const GITHUB_URL = "https://github.com/hackutd";
 
 /**
  * Anything off-site opens in a new tab; internal placeholders and the mail link
@@ -187,7 +187,7 @@ function RegisterButton() {
 
 /**
  * The credits band carried over from HackPortal's footer: who built the site,
- * where the source lives, and the sibling events in the circuit.
+ * the HackUTD GitHub org, and the sibling events in the circuit.
  *
  * Set apart by spacing rather than a rule, matching the copyright below it.
  */
@@ -212,7 +212,7 @@ function LearnMore() {
             by HackUTD and ACM Development
           </p>
           <p>
-            <CreditLink href={SOURCE_URL}>Source Code</CreditLink>
+            <CreditLink href={GITHUB_URL}>GitHub</CreditLink>
           </p>
         </div>
       </div>
