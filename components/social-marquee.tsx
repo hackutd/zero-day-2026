@@ -42,11 +42,32 @@ type Social = {
 };
 
 const SOCIALS: Social[] = [
-  { name: "LinkedIn", href: "#", tone: "violet", icon: <LinkedInMark /> },
-  { name: "Medium", href: "#", tone: "ink", icon: <MediumMark /> },
-  { name: "Instagram", href: "#", tone: "violet", icon: <InstagramMark /> },
+  {
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/company/hackutd",
+    tone: "violet",
+    icon: <LinkedInMark />,
+  },
+  {
+    name: "Medium",
+    href: "https://medium.com/@hackUTD",
+    tone: "ink",
+    icon: <MediumMark />,
+  },
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com/hackutd",
+    tone: "violet",
+    icon: <InstagramMark />,
+  },
+  // TODO(organizers): the invite URL — the only one of these not supplied yet.
   { name: "Discord", href: "#", tone: "ink", icon: <DiscordMark /> },
-  { name: "YouTube", href: "#", tone: "violet", icon: <YouTubeMark /> },
+  {
+    name: "YouTube",
+    href: "https://www.youtube.com/@realhackutd",
+    tone: "violet",
+    icon: <YouTubeMark />,
+  },
 ];
 
 export function SocialMarquee() {
@@ -94,6 +115,8 @@ function Card({ name, href, icon, tone, inert }: Social & { inert: boolean }) {
   return (
     <a
       href={href}
+      target={href.startsWith("http") ? "_blank" : undefined}
+      rel={href.startsWith("http") ? "noreferrer" : undefined}
       tabIndex={inert ? -1 : undefined}
       className="social-card relative block size-[184px] p-px sm:size-[228px]"
       style={{ clipPath: CHAMFER }}

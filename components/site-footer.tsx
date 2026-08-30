@@ -12,18 +12,75 @@
  * once the sizes start scaling with the viewport.
  */
 
-/** TODO(organizers): real destinations. The Figma has labels, not URLs. */
+/** TODO(organizers): real destination once registration opens. */
 const REGISTER_URL = "#";
 
-const linkColumns: { heading: string; links: string[] }[] = [
-  { heading: "Pages", links: ["Home", "Tracks", "Sponsors", "FAQ"] },
+/** A `#` here is still a placeholder nobody has supplied a URL for yet. */
+type FooterLink = { label: string; href: string };
+
+const linkColumns: { heading: string; links: FooterLink[] }[] = [
+  {
+    heading: "Pages",
+    links: [
+      { label: "Home", href: "#" },
+      { label: "Tracks", href: "#" },
+      { label: "Sponsors", href: "#" },
+      { label: "FAQ", href: "#" },
+    ],
+  },
   {
     heading: "Resources",
-    links: ["Devpost", "Discord", "Starter kits", "Hardware lab"],
+    links: [
+      { label: "Devpost", href: "#" },
+      { label: "Discord", href: "#" },
+      { label: "Starter kits", href: "#" },
+      { label: "Hardware lab", href: "#" },
+    ],
   },
-  { heading: "Socials", links: ["Instagram", "X", "LinkedIn", "GitHub"] },
-  { heading: "Info", links: ["Code of conduct", "Privacy", "Contact"] },
+  {
+    heading: "Socials",
+    links: [
+      { label: "Instagram", href: "https://www.instagram.com/hackutd" },
+      { label: "X", href: "https://x.com/HackUTD" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/hackutd" },
+      { label: "Medium", href: "https://medium.com/@hackUTD" },
+      { label: "YouTube", href: "https://www.youtube.com/@realhackutd" },
+    ],
+  },
+  {
+    heading: "Info",
+    links: [
+      {
+        label: "MLH Code of Conduct",
+        href: "https://static.mlh.io/docs/mlh-code-of-conduct.pdf",
+      },
+      { label: "Privacy", href: "#" },
+      { label: "Contact", href: "mailto:hello@hackutd.co" },
+    ],
+  },
 ];
+
+/** Sibling events, carried over from the HackPortal footer. */
+const OTHER_HACKATHONS: FooterLink[] = [
+  { label: "WEHack", href: "https://www.wehackutd.com" },
+  { label: "HackTX", href: "https://hacktx.com" },
+  { label: "TAMUHack", href: "https://tamuhack.org" },
+  { label: "HackUTA", href: "https://www.hackuta.org" },
+  { label: "HackUNT", href: "https://www.unthackathon.com" },
+  { label: "RowdyHacks", href: "https://rowdyhacks.org" },
+];
+
+const ORGANIZER_URL = "https://hackutd.co/";
+const SOURCE_URL = "https://github.com/acmutd/hackportal";
+
+/**
+ * Anything off-site opens in a new tab; internal placeholders and the mail link
+ * do not. `noreferrer` rather than a bare `noopener` because these are outbound
+ * links to third parties.
+ */
+function isExternal(href: string) {
+  return href.startsWith("http");
+}
 
 export function SiteFooter() {
   return (
@@ -74,10 +131,12 @@ export function SiteFooter() {
                 {column.heading}
               </h3>
               <ul className="mt-6 space-y-[11px]">
-                {column.links.map((label) => (
+                {column.links.map(({ label, href }) => (
                   <li key={label}>
                     <a
-                      href="#"
+                      href={href}
+                      target={isExternal(href) ? "_blank" : undefined}
+                      rel={isExternal(href) ? "noreferrer" : undefined}
                       className="font-sans text-text-muted focus-visible:outline-accent-magenta inline-block text-[12px] leading-[1.4] font-medium tracking-[0.08em] uppercase transition-colors hover:text-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                     >
                       {label}
@@ -89,7 +148,9 @@ export function SiteFooter() {
           ))}
         </nav>
 
-        <p className="font-sans text-text-dim mt-20 text-center text-[9px] leading-[1.3] tracking-[0.12em] uppercase">
+        <LearnMore />
+
+        <p className="font-sans text-text-dim mt-16 text-center text-[9px] leading-[1.3] tracking-[0.12em] uppercase">
           © 2026 HackUTD · Zeroday · University of Texas at Dallas
         </p>
       </div>
@@ -120,6 +181,80 @@ function RegisterButton() {
       <span className="font-sans relative text-[12px] leading-[1.3] font-medium tracking-[0.1em] text-white uppercase">
         Register
       </span>
+    </a>
+  );
+}
+
+/**
+ * The credits band carried over from HackPortal's footer: who built the site,
+ * where the source lives, and the sibling events in the circuit.
+ *
+ * Set apart by spacing rather than a rule, matching the copyright below it.
+ */
+function LearnMore() {
+  return (
+    <div className="mt-20 grid gap-10 sm:grid-cols-2 sm:gap-6">
+      <div>
+        <h3 className="font-sans text-accent-soft text-[12px] leading-[1.3] font-medium tracking-[0.1em] uppercase">
+          Learn more
+        </h3>
+        <div className="text-text-muted mt-6 space-y-[11px] text-[12px] leading-[1.5] font-medium tracking-[0.06em]">
+          <p>
+            Check out HackUTD&rsquo;s{" "}
+            <CreditLink href={ORGANIZER_URL}>organizer website</CreditLink>
+          </p>
+          <p>Designed by HackUTD</p>
+          <p>
+            HackPortal developed with{" "}
+            <span aria-label="love" role="img">
+              &hearts;
+            </span>{" "}
+            by HackUTD and ACM Development
+          </p>
+          <p>
+            <CreditLink href={SOURCE_URL}>Source Code</CreditLink>
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="font-sans text-accent-soft text-[12px] leading-[1.3] font-medium tracking-[0.1em] uppercase">
+          Other Hackathons
+        </h3>
+        <ul className="mt-6 grid grid-cols-2 gap-x-6 gap-y-[11px]">
+          {OTHER_HACKATHONS.map(({ label, href }) => (
+            <li key={label}>
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="font-sans text-text-muted focus-visible:outline-accent-magenta inline-block text-[12px] leading-[1.4] font-medium tracking-[0.08em] uppercase transition-colors hover:text-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function CreditLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="focus-visible:outline-accent-magenta text-white underline underline-offset-2 transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-4"
+    >
+      {children}
     </a>
   );
 }
