@@ -186,8 +186,8 @@ function RegisterButton() {
 }
 
 /**
- * The credits band carried over from HackPortal's footer: who built the site,
- * the HackUTD GitHub org, and the sibling events in the circuit.
+ * The credits band: who designed the site, the HackUTD GitHub org, and the
+ * sibling events in the circuit.
  *
  * Set apart by spacing rather than a rule, matching the copyright below it.
  */
@@ -204,13 +204,6 @@ function LearnMore() {
             <CreditLink href={ORGANIZER_URL}>organizer website</CreditLink>
           </p>
           <p>Designed by HackUTD</p>
-          <p>
-            HackPortal developed with{" "}
-            <span aria-label="love" role="img">
-              &hearts;
-            </span>{" "}
-            by HackUTD and ACM Development
-          </p>
           <p>
             <CreditLink href={GITHUB_URL}>GitHub</CreditLink>
           </p>
