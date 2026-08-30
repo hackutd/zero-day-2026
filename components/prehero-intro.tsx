@@ -164,7 +164,11 @@ export function PreheroIntro() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center overflow-hidden"
+      // Low in the band on a phone, centred from `sm`. The plate is only ~221px
+      // tall there and the trust badge occupies the top-right ~105px of it, so a
+      // centred line runs straight under the badge. Dropping it clears the badge
+      // without shrinking the type.
+      className="pointer-events-none absolute inset-0 z-30 flex items-end justify-center overflow-hidden pb-5 sm:items-center sm:pb-0"
     >
       <div
         ref={scrimRef}

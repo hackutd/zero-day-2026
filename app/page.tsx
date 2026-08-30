@@ -3,7 +3,6 @@ import Image, { type StaticImageData } from "next/image";
 import { PreheroIntro } from "@/components/prehero-intro";
 import { SiteFooter } from "@/components/site-footer";
 import { SocialMarquee } from "@/components/social-marquee";
-import mlhBadge from "@/public/mlh-badge-2025.png";
 import zeroDay from "@/public/zero_day.png";
 import prehero from "@/public/backgrounds/01-prehero.png";
 import hero from "@/public/backgrounds/02-hero.png";
@@ -255,28 +254,42 @@ function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
 }
 
 /**
- * The MLH trust badge, hanging from the top-right of the opening scene.
+ * The MLH trust badge — MLH's own embed, not a copy.
  *
- * Static by design - it just sits there. It is placed above the intro layer
- * rather than inside it so the scrim does not dim it: the badge is site
- * furniture, not part of the city, and MLH expects it legible.
+ * Served from MLH's bucket rather than self-hosted, which is the one case where
+ * hotlinking is right: they roll the badge each season and expect the link's
+ * campaign parameters intact, so a local copy would silently go stale and stop
+ * attributing. It links to mlh.io as they require.
  *
- * It hangs flush to the top edge because the artwork is drawn as a ribbon with
- * its own hanger; a top margin would leave it floating.
+ * Sizing follows their embed's own floor and ceiling. Their snippet sets
+ * min-width 60px; the 42px this used before was under that, so it goes back up
+ * on phones. 74px on wider screens keeps it inside their 60-100px range while
+ * staying the size that already looked right here.
  *
- * NOTE: this is the *2025* badge, carried over from the 2024 site. MLH issues a
- * new one each season and expects the current year's - swap the asset for the
- * 2026 badge before launch.
+ * Hangs flush to the top edge because the artwork is a ribbon with its own
+ * hanger, and sits above the intro layer so the scrim never dims it.
  */
 function MlhBadge() {
   return (
-    <div className="pointer-events-none absolute top-0 right-3 z-40 w-[42px] sm:right-6 sm:w-[74px]">
-      <Image
-        src={mlhBadge}
-        alt="Major League Hacking official member badge"
-        className="h-auto w-full"
+    <a
+      id="mlh-trust-badge"
+      href="https://mlh.io/na?utm_source=na-hackathon&utm_medium=TrustBadge&utm_campaign=2026-season&utm_content=gray"
+      target="_blank"
+      rel="noreferrer"
+      className="absolute top-0 right-3 z-40 block w-[60px] sm:right-6 sm:w-[74px]"
+    >
+      {/*
+        A plain img, not next/image: it is a remote SVG, so there is nothing to
+        resize or re-encode, and routing it through the optimizer would only add
+        a hop and a remote-host allowlist entry.
+      */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://logged-assets.s3.amazonaws.com/trust-badge/2026/mlh-trust-badge-2026-gray.svg"
+        alt="Major League Hacking 2026 Hackathon Season"
+        className="block w-full"
       />
-    </div>
+    </a>
   );
 }
 
