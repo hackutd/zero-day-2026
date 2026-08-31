@@ -522,3 +522,29 @@ textarea,
   -webkit-backdrop-filter: blur(18px) saturate(135%);
   backdrop-filter: blur(18px) saturate(135%);
 }
+
+/*
+ * FAQ disclosure (components/site-faq.tsx).
+ *
+ * Safari still paints its own triangle on `<summary>` unless the WebKit
+ * pseudo-element is cleared too, so both are removed - `list-none` alone leaves
+ * a marker there.
+ */
+.faq-item summary::-webkit-details-marker,
+.faq-item summary::marker {
+  display: none;
+}
+
+.faq-chevron {
+  transition: transform 200ms ease;
+}
+
+.faq-item[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-chevron {
+    transition: none;
+  }
+}

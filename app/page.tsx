@@ -1,6 +1,7 @@
 import Image, { type StaticImageData } from "next/image";
 
 import { PreheroIntro } from "@/components/prehero-intro";
+import { SiteFaq } from "@/components/site-faq";
 import { SiteFooter } from "@/components/site-footer";
 import { SocialMarquee } from "@/components/social-marquee";
 import zeroDay from "@/public/zero_day.png";
@@ -56,6 +57,7 @@ export default function Home() {
       {scenes.slice(1).map((scene) => (
         <Scene key={scene.src.src} {...scene} first={false} />
       ))}
+      <SiteFaq />
       <SocialMarquee />
       <SiteFooter />
     </main>
