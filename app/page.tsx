@@ -8,13 +8,16 @@ import zeroDay from "@/public/zero_day.png";
 import prehero from "@/public/backgrounds/01-prehero.png";
 import hero from "@/public/backgrounds/02-hero.png";
 import street from "@/public/backgrounds/03-street.png";
+import subwayBackground from "@/public/backgrounds/04-subway-background.png";
+import subwayForefront from "@/public/backgrounds/04-subway-forefront.png";
+import tracksPrizesFaq from "@/public/backgrounds/05-tracks-prizes-faq.png";
 
 /**
  * The opening scenes of the site, stacked in reading order.
  *
  * The art is one continuous descent — skyline, then down between the towers,
- * then street level — so the panels butt against each other with no gap or
- * divider.
+ * then street level, then underground to the platform — so the panels butt
+ * against each other with no gap or divider.
  *
  * why it matters and why it does nothing on a wide one. Two rules set these:
  *
@@ -33,6 +36,11 @@ const scenes: {
   overlay?: React.ReactNode;
   /** Let the scroll settle onto this panel when the reader stops near it. */
   settle?: boolean;
+  /**
+   * Hold the plate's own aspect instead of cropping it to 16:9. For art that
+   * is not a 16:9 frame and would lose most of itself to the crop.
+   */
+  native?: boolean;
 }[] = [
   {
     src: prehero,
@@ -47,6 +55,16 @@ const scenes: {
   {
     src: street,
     alt: "Silhouetted figures on a rain-slicked street lined with red neon.",
+  },
+  {
+    src: subwayBackground,
+    alt: "A neon-lit subway platform, a train stopped at it with its doors closed.",
+    overlay: <SubwayOverlays />,
+  },
+  {
+    src: tracksPrizesFaq,
+    alt: "A tunnel below the platform, rails running toward a glowing magenta hexagon under a canopy of cables.",
+    native: true,
   },
 ];
 
@@ -325,25 +343,204 @@ function HeroOverlays() {
   );
 }
 
+/**
+ * The train stopped at the platform, laid over the platform plate.
+ *
+ * Two files rather than one because the car's windows are genuinely
+ * transparent — a third of `04-subway-forefront.png` is alpha — and the
+ * platform wall behind it shows through them. Flattening the pair in the
+ * artwork would lose that.
+ *
+ * Both plates are 1920x1080 and drawn on the same camera, so this sits on the
+ * frame with no offset and takes the same `object-cover` crop as the layer
+ * under it. They have to stay identical in size and fit: crop one differently
+ * and the car slides off its own doorway.
+ *
+ * `alt=""` because the layer beneath already describes the scene, and a
+ * screen reader announcing it twice would just be noise.
+ */
+function SubwayCar() {
+  return (
+    <Image
+      src={subwayForefront}
+      alt=""
+      fill
+      sizes="100vw"
+      className="pointer-events-none object-cover"
+    />
+  );
+}
+
+/**
+ * Everything on the platform wall, in paint order: the screen, the stats, then
+ * the train car over the top of both.
+ *
+ * The order is the whole trick. Both wall features sit *behind* the glass —
+ * measured against `04-subway-forefront.png`, the screen's rectangle and the
+ * ring's interior are 100% alpha there, so they read through the windows with
+ * the car's mullions framing them. The car is painted last so it occludes
+ * correctly, and carries `pointer-events-none` so clicks still reach the video
+ * underneath it. Drop that class and the player goes dead behind the glass.
+ */
+function SubwayOverlays() {
+  return (
+    <>
+      <WallScreen />
+      <WallStats />
+      <SubwayCar />
+      {/*
+        Last, so it sinks the car and the platform floor together — the floor
+        belongs to the forefront plate, so fading only the background would
+        leave the lit tiles untouched. See `.subway-floor-fade`.
+      */}
+      <div className="subway-floor-fade" />
+    </>
+  );
+}
+
+/**
+ * The HackUTD channel, playing on the bracketed screen on the back wall.
+ *
+ * The four corner brackets painted on the tiles mark a real rectangle, so the
+ * frame is measured off them rather than eyeballed: the bracket ink spans
+ * x 769-1093 and y 216-429 of the 1920x1080 plate. That is 324x213, a 1.52
+ * aspect rather than 16:9, so the player letterboxes itself by a few pixels
+ * top and bottom. That reads as a screen and matching 16:9 instead would pull
+ * the picture off the brackets, which are the thing the eye actually lines up
+ * against.
+ *
+ * The window mullion beside it runs to x 744, so the frame clears it by 25px.
+ * Anything wider here would slide under the car's door frame.
+ */
+const WALL_SCREEN = {
+  left: "40.05%",
+  top: "20.00%",
+  width: "16.88%",
+  height: "19.72%",
+} as const;
+
+/**
+ * YouTube cannot embed a *channel* URL — `/embed/<id>` wants a video, and the
+ * channel link the organizers gave (youtube.com/channel/UCEM6btSfs7X7Yvv1dLMoyfA)
+ * has no video id in it. The uploads playlist is the documented way to point an
+ * embed at a whole channel: every channel has one, and its id is the channel id
+ * with the `UC` prefix swapped for `UU`. So this plays the channel's newest
+ * uploads and keeps working as they post.
+ *
+ * TODO(organizers): swap to a single video once there is a recap to feature —
+ * replace this with `embed/<VIDEO_ID>` and drop the `list` parameter.
+ */
+const YOUTUBE_UPLOADS_PLAYLIST = "UUEM6btSfs7X7Yvv1dLMoyfA";
+
+function WallScreen() {
+  return (
+    <div className="absolute overflow-hidden bg-black" style={WALL_SCREEN}>
+      {/*
+        `youtube-nocookie.com` so a visitor who never presses play is not
+        handed tracking cookies for it. `loading="lazy"` because this panel is
+        several screens down — the player is well over a megabyte and there is
+        no reason to spend it before the reader gets here.
+      */}
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/videoseries?list=${YOUTUBE_UPLOADS_PLAYLIST}`}
+        title="HackUTD on YouTube"
+        loading="lazy"
+        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="h-full w-full border-0"
+      />
+    </div>
+  );
+}
+
+/**
+ * Event numbers, sitting inside the ring of graffiti further along the wall.
+ *
+ * The ring is an ellipse centred at (470.5, 310.5) of the plate with radii
+ * 129.5 x 115.5, fitted to the ink from its beam-free lower arc — the ceiling
+ * spotlights throw bright streaks across its top edge that swallow a naive
+ * bounding box. This block is 62% of those axes, inside the ~71% that would
+ * touch the ring, so the text keeps a margin off the paint at every size.
+ *
+ * Sized in `cqw` against the block itself, so the numbers scale with the
+ * artwork instead of stepping at breakpoints. At phone widths this is genuinely
+ * small — it is wall detail seen across a platform — but it stays real text, so
+ * it is selectable and a screen reader still reads all three.
+ */
+const WALL_STATS_BOX = {
+  left: "20.32%",
+  top: "22.12%",
+  width: "8.36%",
+  height: "13.26%",
+  containerType: "inline-size",
+} as const;
+
+const WALL_STATS = [
+  { value: "1200+", label: "Hackers" },
+  { value: "30+", label: "Universities" },
+  { value: "200+", label: "Projects" },
+] as const;
+
+function WallStats() {
+  return (
+    <ul
+      className="absolute flex flex-col items-center justify-center text-center"
+      style={WALL_STATS_BOX}
+    >
+      {WALL_STATS.map(({ value, label }) => (
+        <li key={label} className="leading-none">
+          <span
+            className="font-hypik block text-white"
+            style={{
+              fontSize: "17cqw",
+              // Lets the numbers sit on the tiles as painted light rather than
+              // as a caption laid over them.
+              textShadow: "0 0 0.5em rgba(255, 46, 230, 0.75)",
+            }}
+          >
+            {value}
+          </span>
+          <span
+            className="text-accent-soft mt-[0.35em] block tracking-[0.12em] uppercase"
+            style={{ fontSize: "7cqw" }}
+          >
+            {label}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function Scene({
   src,
   alt,
   overlay,
   first,
   settle = false,
+  native = false,
 }: {
   src: StaticImageData;
   alt: string;
   overlay?: React.ReactNode;
   first: boolean;
   settle?: boolean;
+  native?: boolean;
 }) {
   return (
     <div
       // Read by components/smooth-scroll.tsx, which eases onto this panel if
       // the reader comes to rest already close to it.
       data-settle={settle ? "" : undefined}
-      className="relative aspect-video w-full overflow-hidden"
+      className={`relative w-full overflow-hidden${native ? "" : " aspect-video"}`}
+      // A native panel is as tall as its own art, which for a portrait plate
+      // means taller than the viewport — deliberately so, it is scrolled
+      // through rather than taken in at once. Read off the import so the box
+      // can never drift from the file it is holding. The 16:9 panels keep the
+      // class and no inline style at all.
+      style={
+        native ? { aspectRatio: `${src.width} / ${src.height}` } : undefined
+      }
     >
       <div className="scene-frame">
         <Image
