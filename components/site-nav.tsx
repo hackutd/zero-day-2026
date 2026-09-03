@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
+import { APPLY_URL } from "@/lib/links";
+
 /**
  * The hero navbar, from the Figma Hero frame (node 1994:101).
  *
@@ -80,10 +82,10 @@ export function SiteNav() {
     >
       <div className="relative flex h-12 w-full items-center px-5 sm:px-6">
         <a
-          href="#"
+          href="#scene-prehero"
           className="font-hypik text-[20px] leading-none tracking-[-0.01em] text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:text-[24px]"
         >
-          Zeroday
+          HackUTD
         </a>
 
         <NavPill className="absolute left-1/2 hidden -translate-x-1/2 lg:block" />
@@ -104,11 +106,26 @@ export function SiteNav() {
   );
 }
 
-const NAV_LINKS = ["Home", "Tracks", "Sponsors", "FAQ"];
+/**
+ * The bar's destinations, in Figma's order. Every one is an in-page anchor:
+ * components/smooth-scroll.tsx intercepts `a[href^="#"]`, eases to the target
+ * and pushes the hash, so these need no click handler of their own. It ignores
+ * a bare "#", which is what keeps a placeholder from scrolling to the top.
+ *
+ * TODO(organizers): Sponsors has nowhere to go yet. There is no sponsors
+ * section on the page, so it stays a placeholder rather than pointing at
+ * something it does not mean.
+ */
+const NAV_LINKS: { label: string; href: string }[] = [
+  { label: "Home", href: "#scene-prehero" },
+  { label: "Tracks", href: "#tracks" },
+  { label: "Sponsors", href: "#" },
+  { label: "FAQ", href: "#faq" },
+];
 
 /**
  * The small-screen disclosure. Only rendered below `lg`, where the pill is
- * hidden — above that the links are already on the bar and a second copy would
+ * hidden - above that the links are already on the bar and a second copy would
  * be a duplicate tab stop.
  */
 function MenuButton({
@@ -174,10 +191,10 @@ function MobilePanel({
         style={{ clipPath: NOTCH_LG }}
       >
         <ul className="flex flex-col">
-          {NAV_LINKS.map((label) => (
+          {NAV_LINKS.map(({ label, href }) => (
             <li key={label}>
               <a
-                href="#"
+                href={href}
                 onClick={onNavigate}
                 className="font-sans block px-4 py-3 text-[13px] tracking-[0.1em] text-white/85 uppercase transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
               >
@@ -213,10 +230,10 @@ function NavPill({ className }: { className?: string }) {
       className={`h-10 rounded-md bg-white ${className ?? ""}`}
     >
       <ul className="flex h-full items-center gap-[18px] px-[26px]">
-        {NAV_LINKS.map((label) => (
+        {NAV_LINKS.map(({ label, href }) => (
           <li key={label}>
             <a
-              href="#"
+              href={href}
               className="font-sans text-[12px] leading-[1.4] font-medium tracking-[0.08em] text-[#05070a] uppercase transition-opacity hover:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#05070a]"
             >
               {label}
@@ -240,7 +257,7 @@ const NOTCH =
 function ApplyButton() {
   return (
     <a
-      href="#"
+      href={APPLY_URL}
       style={{ clipPath: NOTCH }}
       className="bg-accent-magenta relative inline-flex h-10 w-32 items-center justify-center transition-opacity hover:opacity-90 sm:h-12 sm:w-44"
     >

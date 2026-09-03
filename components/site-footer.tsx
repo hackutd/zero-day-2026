@@ -12,8 +12,13 @@
  * once the sizes start scaling with the viewport.
  */
 
-/** TODO(organizers): real destination once registration opens. */
-const REGISTER_URL = "#";
+import { APPLY_URL } from "@/lib/links";
+
+/**
+ * Registration is HARP, the same portal the nav's Apply button opens - the two
+ * are one destination under two labels, so both read it from `lib/links`.
+ */
+const REGISTER_URL = APPLY_URL;
 
 /** A `#` here is still a placeholder nobody has supplied a URL for yet. */
 type FooterLink = { label: string; href: string };
@@ -21,11 +26,13 @@ type FooterLink = { label: string; href: string };
 const linkColumns: { heading: string; links: FooterLink[] }[] = [
   {
     heading: "Pages",
+    // The same anchors the nav uses. TODO(organizers): Sponsors has no section
+    // to land on yet, so it stays a placeholder.
     links: [
-      { label: "Home", href: "#" },
-      { label: "Tracks", href: "#" },
+      { label: "Home", href: "#scene-prehero" },
+      { label: "Tracks", href: "#tracks" },
       { label: "Sponsors", href: "#" },
-      { label: "FAQ", href: "#" },
+      { label: "FAQ", href: "#faq" },
     ],
   },
   {
@@ -95,14 +102,20 @@ export function SiteFooter() {
         Hypik, not the Figma's Saira Black. It is a wider face at the same size,
         so the vw figure comes down to keep the word spanning the viewport
         rather than overflowing it. "ZERODAY" is all letters, which is the only
-        reason this is safe — Hypik has no digits or punctuation.
+        reason this is safe - Hypik has no digits or punctuation.
+
+        DAY takes the accent purple, the same token as the Apply button and
+        the "open" below it, so the one word carries the site accent at the
+        size where it reads best. It is one `<p>` with a span rather than two
+        elements, so the two halves cannot be split across a line break or
+        drift apart in tracking.
       */}
       <p
         aria-hidden
         className="font-hypik text-center leading-[0.85] tracking-[-0.02em] whitespace-nowrap text-white uppercase"
         style={{ fontSize: "clamp(2rem, 15.5vw, 16rem)" }}
       >
-        Zeroday
+        Zero<span className="text-accent-magenta">day</span>
       </p>
 
       <div className="mx-auto max-w-[1200px] px-6">
