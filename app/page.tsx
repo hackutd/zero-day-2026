@@ -188,6 +188,27 @@ const BUILDING_ADS = [
     width: "7.55%",
     aspect: "600 / 338",
   },
+  {
+    // The wide slab under the MMXXVI clock tower - aligned with the lettered
+    // tower and stopping well short of it, its roof a flat edge at y 455 where
+    // the tower carries on up past the oval.
+    //
+    // The lit facade runs x 184-366 of the plate - read off the pixels either
+    // side, where the wall drops to the near-black of its own edge. The screen
+    // is 124 wide at x 227-351, which is not the geometric centre of that
+    // (275) but sits right of it by request: the wall's left end carries a
+    // bright column of windows at 184-206 that pulls the eye, so a screen
+    // centred on the measurement reads as sitting left of centre. It keeps
+    // 35px above it, clear of the roofline. Wider than the tower to its right
+    // could ever carry, which is the point: at this size the neon reads as a
+    // sign rather than as a lit window.
+    src: "/ads/ad-tmobile.mp4",
+    label: "T-Mobile advertisement screen on a city building",
+    left: "11.82%",
+    top: "45.00%",
+    width: "6.46%",
+    aspect: "480 / 228",
+  },
 ] as const;
 
 function BuildingAd({
