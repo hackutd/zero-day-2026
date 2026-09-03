@@ -402,32 +402,39 @@ function SubwayOverlays() {
  * The HackUTD channel, playing on the bracketed screen on the back wall.
  *
  * The four corner brackets painted on the tiles mark a real rectangle, so the
- * frame is measured off them rather than eyeballed: the bracket ink spans
- * x 769-1093 and y 216-429 of the 1920x1080 plate. That is 324x213, a 1.52
- * aspect rather than 16:9, so the player letterboxes itself by a few pixels
- * top and bottom. That reads as a screen and matching 16:9 instead would pull
- * the picture off the brackets, which are the thing the eye actually lines up
- * against.
+ * frame is measured off them rather than eyeballed. The ink runs x 769-1092 by
+ * y 225-426 of the 1920x1080 plate, and the strokes are about 7px thick, so the
+ * clear space they enclose is x 776-1085 by y 232-419.
  *
- * The window mullion beside it runs to x 744, so the frame clears it by 25px.
+ * The player sits *inside* that clear space with a ~5px margin on each side -
+ * x 782-1079 by y 237-413 - rather than filling the brackets' outer bounds. At
+ * the outer bounds the video covered the corner marks entirely, which read as a
+ * misplaced overlay; leaving them showing is what makes the picture read as
+ * something mounted on the wall.
+ *
+ * That is 297x176, a 1.69 aspect rather than 16:9, so the player letterboxes
+ * itself by a few pixels top and bottom. Matching 16:9 instead would pull the
+ * picture back off the brackets, which are the thing the eye lines up against.
+ *
+ * The window mullion beside it runs to x 744, so the frame clears it by 38px.
  * Anything wider here would slide under the car's door frame.
  */
 const WALL_SCREEN = {
-  left: "40.05%",
-  top: "20.00%",
-  width: "16.88%",
-  height: "19.72%",
+  left: "40.73%",
+  top: "21.94%",
+  width: "15.47%",
+  height: "16.30%",
 } as const;
 
 /**
- * YouTube cannot embed a *channel* URL — `/embed/<id>` wants a video, and the
+ * YouTube cannot embed a *channel* URL - `/embed/<id>` wants a video, and the
  * channel link the organizers gave (youtube.com/channel/UCEM6btSfs7X7Yvv1dLMoyfA)
  * has no video id in it. The uploads playlist is the documented way to point an
  * embed at a whole channel: every channel has one, and its id is the channel id
  * with the `UC` prefix swapped for `UU`. So this plays the channel's newest
  * uploads and keeps working as they post.
  *
- * TODO(organizers): swap to a single video once there is a recap to feature —
+ * TODO(organizers): swap to a single video once there is a recap to feature -
  * replace this with `embed/<VIDEO_ID>` and drop the `list` parameter.
  */
 const YOUTUBE_UPLOADS_PLAYLIST = "UUEM6btSfs7X7Yvv1dLMoyfA";
@@ -457,15 +464,25 @@ function WallScreen() {
  * Event numbers, sitting inside the ring of graffiti further along the wall.
  *
  * The ring is an ellipse centred at (470.5, 310.5) of the plate with radii
- * 129.5 x 115.5, fitted to the ink from its beam-free lower arc — the ceiling
+ * 129.5 x 115.5, fitted to the ink from its beam-free lower arc - the ceiling
  * spotlights throw bright streaks across its top edge that swallow a naive
  * bounding box. This block is 62% of those axes, inside the ~71% that would
  * touch the ring, so the text keeps a margin off the paint at every size.
  *
+ * Set in Elevon, not the Hypik used elsewhere for display type. Hypik has no
+ * digits and no punctuation at all, so every one of these - "1200+", "30+",
+ * "200+" - was falling back to Satoshi mid-string, at Satoshi's metrics inside
+ * a size tuned for Hypik. That is what made them look mis-scaled against their
+ * own labels. Elevon covers digits and the plus, so the numbers are now one
+ * face at one size.
+ *
  * Sized in `cqw` against the block itself, so the numbers scale with the
- * artwork instead of stepping at breakpoints. At phone widths this is genuinely
- * small — it is wall detail seen across a platform — but it stays real text, so
- * it is selectable and a screen reader still reads all three.
+ * artwork instead of stepping at breakpoints, and the ratios hold at every
+ * width: the widest value is 3.6em (61% of the block) and the longest label,
+ * UNIVERSITIES, is 11.4em with its tracking (80%), so nothing reaches the ink
+ * even before the 62% inset above. At phone widths this is genuinely small - it
+ * is wall detail seen across a platform - but it stays real text, so it is
+ * selectable and a screen reader still reads all three.
  */
 const WALL_STATS_BOX = {
   left: "20.32%",
@@ -488,9 +505,13 @@ function WallStats() {
       style={WALL_STATS_BOX}
     >
       {WALL_STATS.map(({ value, label }) => (
-        <li key={label} className="leading-none">
+        // The gap between stats rides on the items, not as `gap` on the list:
+        // `cqw` in a property of the container element itself resolves against
+        // the *next* container out, not against itself, so a gap here would be
+        // sized off the viewport and throw the block clear of the ring.
+        <li key={label} className="leading-none not-first:mt-[3cqw]">
           <span
-            className="font-hypik block text-white"
+            className="font-elevon block font-extrabold text-white"
             style={{
               fontSize: "17cqw",
               // Lets the numbers sit on the tiles as painted light rather than
