@@ -117,6 +117,162 @@ body {
   );
 }
 
+/*
+ * The other half of a seam, on the panel below it.
+ *
+ * `.subway-floor-fade` sinks the platform onto black, and the street plate
+ * above it already ends on rgb(1, 1, 1), so every join on the page wants the
+ * same thing: the panel underneath has to arrive at its own top edge black too.
+ * Neither does on its own - the platform opens on its lit ceiling girder at
+ * rgb(69, 50, 70), the tunnel on a dark teal around rgb(0, 17, 22) - so this
+ * runs the floor fade backwards across the top of the plate, and the two panels
+ * meet on matching pixels.
+ *
+ * Same stops and same easing as that fade, mirrored, with the span left to the
+ * caller: the stops are fractions of `--scene-fade-end` rather than fixed
+ * percentages, because each panel can spare a different amount of its own art,
+ * and because a percentage is a share of the panel's height - the same number
+ * covers a different distance on two panels of different aspects.
+ *
+ *  - The tunnel gives 15.5%. That plate is 1920x2160 where the platform above
+ *    it is 16:9, twice as tall for the same width, so half the share of its own
+ *    height is the same distance on screen as the floor fade opposite it.
+ *  - The platform gives 8%, not the 31% that would match the fade at its own
+ *    foot. Its ceiling band is dark for the first ~60px, but the strip lights,
+ *    the neon ring and the station sign all start around 11% down, and a
+ *    full-length ramp would swallow the three of them. It does not need the
+ *    length anyway: the street above ends on black already, so only the girder
+ *    has to be carried down to meet it.
+ */
+.scene-ceiling-fade,
+.scene-floor-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--scene-fade-direction),
+    rgb(0 0 0 / 100%) 0%,
+    rgb(0 0 0 / 96%) calc(var(--scene-fade-end) * 0.126),
+    rgb(0 0 0 / 84%) calc(var(--scene-fade-end) * 0.248),
+    rgb(0 0 0 / 68%) calc(var(--scene-fade-end) * 0.374),
+    rgb(0 0 0 / 50%) calc(var(--scene-fade-end) * 0.5),
+    rgb(0 0 0 / 32%) calc(var(--scene-fade-end) * 0.626),
+    rgb(0 0 0 / 16%) calc(var(--scene-fade-end) * 0.748),
+    rgb(0 0 0 / 4%) calc(var(--scene-fade-end) * 0.874),
+    rgb(0 0 0 / 0%) var(--scene-fade-end)
+  );
+}
+
+.scene-ceiling-fade {
+  --scene-fade-direction: to bottom;
+}
+
+.scene-ceiling-fade-subway {
+  --scene-fade-end: 8%;
+}
+
+.scene-ceiling-fade-tunnel {
+  --scene-fade-end: 15.5%;
+}
+
+/*
+ * The same ramp read from the other end, for the foot of a panel.
+ *
+ * `to top` is the whole difference: the stops are offsets from where the
+ * gradient starts, so pointing it upwards makes 0% the panel's last row and
+ * `--scene-fade-end` the distance up from it. Solid black therefore lands on
+ * the boundary row exactly, without `.subway-floor-fade`'s trick of finishing
+ * a few percent early.
+ *
+ * The tunnel gives 17%. It is the last panel on the page and the FAQ opens on
+ * `--background`, pure black, so this is a fade to the page rather than to
+ * another plate - and it needs the length, because the lit walkway is still
+ * running at rgb(53, 23, 65) at 80% down. 17% of 2160 is 367px, the same
+ * distance the platform's own floor fade covers.
+ *
+ * The platform keeps `.subway-floor-fade` rather than moving here: that one is
+ * measured against the plate below it and documents its own reasons.
+ */
+.scene-floor-fade {
+  --scene-fade-direction: to top;
+}
+
+.scene-floor-fade-tunnel {
+  --scene-fade-end: 17%;
+}
+
+/*
+ * The train crossing the platform on the far track (components/passing-train).
+ *
+ * The plate is two and a half panels wide, so the box is 250% and the whole
+ * animation is one horizontal translate. Percentages on `translate` resolve
+ * against the element's own width, which is what keeps the pass framed the same
+ * at every viewport: 40% of the box is exactly one panel, so `40%` parks it
+ * off the right edge, and `-100%` puts its right edge on the panel's left.
+ *
+ * The cycle is 15s but the pass takes the first 5 of them; the remaining two
+ * thirds hold the train off-frame, which is the gap between services. Linear,
+ * because a train crossing a window does not ease.
+ *
+ * It is declared `paused` and started by the class the component adds when the
+ * panel comes into view, so the first pass happens on arrival instead of having
+ * run its course while the reader was still three panels up.
+ *
+ * The track around it is what the component's observer watches: it covers the
+ * panel and never moves, where the carriage spends most of the cycle parked
+ * outside the panel's own `overflow: hidden` and so is clipped to nothing an
+ * observer could see.
+ */
+.subway-train-track {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.subway-train {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 250%;
+  pointer-events: none;
+  transform: translate3d(40%, 0, 0);
+  animation: subway-train-pass 15s linear infinite paused;
+}
+
+.subway-train-running {
+  animation-play-state: running;
+}
+
+@keyframes subway-train-pass {
+  0% {
+    transform: translate3d(40%, 0, 0);
+  }
+  33% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subway-train {
+    display: none;
+  }
+}
+
+/*
+ * The clips behind the countdown figures. They are decoration on top of a cell
+ * that already has its own ground, so dropping them for a reader who has asked
+ * for less motion costs nothing but the texture.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .countdown-clip {
+    display: none;
+  }
+}
+
 /* Ambient neon wash behind the wordmark. */
 body::before {
   content: "";

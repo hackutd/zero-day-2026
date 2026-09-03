@@ -1,6 +1,12 @@
 import Image, { type StaticImageData } from "next/image";
 
+import { ChallengeTracks } from "@/components/challenge-tracks";
+import { DayOfSchedule } from "@/components/day-of-schedule";
+import { EventBoard } from "@/components/event-board";
+import { KeynoteSpeaker } from "@/components/keynote-speaker";
+import { PassingTrain } from "@/components/passing-train";
 import { PreheroIntro } from "@/components/prehero-intro";
+import { SiteCountdown } from "@/components/site-countdown";
 import { SiteFaq } from "@/components/site-faq";
 import { SiteFooter } from "@/components/site-footer";
 import { SocialMarquee } from "@/components/social-marquee";
@@ -387,9 +393,21 @@ function SubwayOverlays() {
     <>
       <WallScreen />
       <WallStats />
+      {/*
+        Between the wall and the carriage, so the train runs behind the window
+        openings and over the wall features - it passes in front of the tiles,
+        so it should cover the screen and the stats while it is across them.
+      */}
+      <PassingTrain />
       <SubwayCar />
       {/*
-        Last, so it sinks the car and the platform floor together — the floor
+        The platform's own half of the seam with the street above it, over the
+        car for the same reason the floor fade is: the carriage roof runs up
+        into the ceiling band, so fading only the background would leave it lit.
+      */}
+      <div className="scene-ceiling-fade scene-ceiling-fade-subway" />
+      {/*
+        Last, so it sinks the car and the platform floor together - the floor
         belongs to the forefront plate, so fading only the background would
         leave the lit tiles untouched. See `.subway-floor-fade`.
       */}
