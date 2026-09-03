@@ -26,12 +26,11 @@ type FooterLink = { label: string; href: string };
 const linkColumns: { heading: string; links: FooterLink[] }[] = [
   {
     heading: "Pages",
-    // The same anchors the nav uses. TODO(organizers): Sponsors has no section
-    // to land on yet, so it stays a placeholder.
+    // The same anchors the nav uses.
     links: [
       { label: "Home", href: "#scene-prehero" },
       { label: "Tracks", href: "#tracks" },
-      { label: "Sponsors", href: "#" },
+      { label: "Sponsors", href: "#sponsors" },
       { label: "FAQ", href: "#faq" },
     ],
   },

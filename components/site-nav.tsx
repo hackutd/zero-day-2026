@@ -111,15 +111,11 @@ export function SiteNav() {
  * components/smooth-scroll.tsx intercepts `a[href^="#"]`, eases to the target
  * and pushes the hash, so these need no click handler of their own. It ignores
  * a bare "#", which is what keeps a placeholder from scrolling to the top.
- *
- * TODO(organizers): Sponsors has nowhere to go yet. There is no sponsors
- * section on the page, so it stays a placeholder rather than pointing at
- * something it does not mean.
  */
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Home", href: "#scene-prehero" },
   { label: "Tracks", href: "#tracks" },
-  { label: "Sponsors", href: "#" },
+  { label: "Sponsors", href: "#sponsors" },
   { label: "FAQ", href: "#faq" },
 ];
 

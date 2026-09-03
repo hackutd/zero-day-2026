@@ -9,7 +9,10 @@ import { PreheroIntro } from "@/components/prehero-intro";
 import { SiteCountdown } from "@/components/site-countdown";
 import { SiteFaq } from "@/components/site-faq";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteSponsors } from "@/components/site-sponsors";
 import { SocialMarquee } from "@/components/social-marquee";
+import { getConfigStatus, getFAQs, getSchedule, getSponsors } from "@/lib/api";
+import type { FAQ, ScheduleItem, Sponsor } from "@/lib/types";
 import zeroDay from "@/public/zero_day.png";
 import prehero from "@/public/backgrounds/01-prehero.png";
 import hero from "@/public/backgrounds/02-hero.png";
@@ -68,7 +71,9 @@ function renderScene(scene: (typeof scenes)[number]) {
   return <Scene key={scene.src.src} {...scene} first={false} />;
 }
 
-export default function Home() {
+export default async function Home() {
+  const content = await getPublicContent();
+
   return (
     <main>
       <PinnedPrehero {...scenes[0]} />
@@ -83,12 +88,81 @@ export default function Home() {
       {scenes.slice(1).map(renderScene)}
       <SiteCountdown />
       <KeynoteSpeaker />
-      <EventBoard schedule={<DayOfSchedule />} tracks={<ChallengeTracks />} />
-      <SiteFaq />
+      <EventBoard
+        schedule={
+          <DayOfSchedule
+            schedule={content.schedule.items}
+            unavailable={content.schedule.unavailable}
+          />
+        }
+        tracks={<ChallengeTracks />}
+      />
+      <SiteSponsors
+        sponsors={content.sponsors.items}
+        unavailable={content.sponsors.unavailable}
+      />
+      <SiteFaq
+        faqs={content.faqs.items}
+        unavailable={content.faqs.unavailable}
+      />
       <SocialMarquee />
       <SiteFooter />
     </main>
   );
+}
+
+/**
+ * Starts the three independent HARP requests together. A temporary failure in
+ * one public endpoint should empty only its own section, not take down the
+ * rest of the marketing site.
+ */
+type PublicContent = {
+  schedule: { items: ScheduleItem[]; unavailable: boolean };
+  sponsors: { items: Sponsor[]; unavailable: boolean };
+  faqs: { items: FAQ[]; unavailable: boolean };
+};
+
+async function getPublicContent(): Promise<PublicContent> {
+  const status = getConfigStatus();
+
+  if (!status.configured) {
+    return {
+      schedule: { items: [], unavailable: true },
+      sponsors: { items: [], unavailable: true },
+      faqs: { items: [], unavailable: true },
+    };
+  }
+
+  const [schedule, sponsors, faqs] = await Promise.allSettled([
+    getSchedule(),
+    getSponsors(),
+    getFAQs(),
+  ]);
+
+  if (schedule.status === "rejected") {
+    console.error("Could not load the public HARP schedule", schedule.reason);
+  }
+  if (sponsors.status === "rejected") {
+    console.error("Could not load public HARP sponsors", sponsors.reason);
+  }
+  if (faqs.status === "rejected") {
+    console.error("Could not load public HARP FAQs", faqs.reason);
+  }
+
+  return {
+    schedule:
+      schedule.status === "fulfilled"
+        ? { items: schedule.value, unavailable: false }
+        : { items: [], unavailable: true },
+    sponsors:
+      sponsors.status === "fulfilled"
+        ? { items: sponsors.value, unavailable: false }
+        : { items: [], unavailable: true },
+    faqs:
+      faqs.status === "fulfilled"
+        ? { items: faqs.value, unavailable: false }
+        : { items: [], unavailable: true },
+  };
 }
 
 /**
