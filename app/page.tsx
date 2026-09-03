@@ -488,8 +488,28 @@ function WallScreen() {
       {/*
         `youtube-nocookie.com` so a visitor who never presses play is not
         handed tracking cookies for it. `loading="lazy"` because this panel is
-        several screens down — the player is well over a megabyte and there is
+        several screens down - the player is well over a megabyte and there is
         no reason to spend it before the reader gets here.
+      */}
+      {/*
+        The player is laid out four times the size of its box on a phone and
+        scaled back down to fit it.
+      
+        YouTube draws its own chrome - the channel avatar, the title, the play
+        button - at a size it picks from the iframe's own pixel width, and it
+        has a floor. At the ~63px this screen gets on a phone, that chrome came
+        out nearly as large as the picture. Nothing about it can be styled from
+        here: it is a cross-origin document, and the parameters that used to
+        trim it (`showinfo`, `modestbranding`) are gone.
+      
+        So the iframe is given four times the width and height it will occupy
+        and scaled by a quarter from its top-left corner: YouTube sees a 250px
+        player and sizes its furniture for one, while the box on the wall is
+        unchanged. Clicks and fullscreen come through the transform intact.
+      
+        Above `sm` the screen is wide enough that YouTube's own sizing is
+        right, so the scaling is switched off rather than left on at a size it
+        was not needed for.
       */}
       <iframe
         src={`https://www.youtube-nocookie.com/embed/videoseries?list=${YOUTUBE_UPLOADS_PLAYLIST}`}
@@ -497,7 +517,7 @@ function WallScreen() {
         loading="lazy"
         allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="h-full w-full border-0"
+        className="h-[400%] w-[400%] origin-top-left scale-25 border-0 sm:h-full sm:w-full sm:scale-100"
       />
     </div>
   );
