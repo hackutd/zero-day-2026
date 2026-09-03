@@ -7,7 +7,7 @@ import type { Envelope, FAQ, ScheduleItem, Sponsor } from "./types";
  *
  * `/v1/public/*` sits behind APIKeyMiddleware and expects an `X-API-Key` header
  * matching the backend's PUBLIC_API_KEY. That is a shared secret, so every call
- * here must stay on the server — hence `server-only` above, and hence the env
+ * here must stay on the server - hence `server-only` above, and hence the env
  * vars are deliberately NOT prefixed with NEXT_PUBLIC_. Reaching for this module
  * from a Client Component is a build error, which is the intent.
  */
@@ -24,7 +24,7 @@ export type ConfigStatus =
 
 /**
  * Whether the backend connection is configured. Returns the base URL (safe to
- * display) but never the key — callers only learn whether it is present.
+ * display) but never the key - callers only learn whether it is present.
  */
 export function getConfigStatus(): ConfigStatus {
   const missing: string[] = [];
@@ -51,7 +51,7 @@ async function getPublic<T>(path: string): Promise<T> {
       next: { revalidate: REVALIDATE_SECONDS, tags: [`public:${path}`] },
     });
   } catch (cause) {
-    // Connection refused, DNS failure, TLS error — the backend isn't reachable.
+    // Connection refused, DNS failure, TLS error - the backend isn't reachable.
     throw new Error(`Could not reach ${BASE_URL}. Is the Go service running?`, {
       cause,
     });
@@ -66,11 +66,11 @@ async function getPublic<T>(path: string): Promise<T> {
 
     if (res.status === 401) {
       throw new Error(
-        "401 Unauthorized — HARP_PUBLIC_API_KEY does not match the backend's PUBLIC_API_KEY.",
+        "401 Unauthorized: HARP_PUBLIC_API_KEY does not match the backend's PUBLIC_API_KEY.",
       );
     }
     throw new Error(
-      `GET /v1/public/${path} failed: ${res.status}${detail ? ` — ${detail}` : ""}`,
+      `GET /v1/public/${path} failed: ${res.status}${detail ? `, ${detail}` : ""}`,
     );
   }
 

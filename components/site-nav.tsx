@@ -27,7 +27,7 @@ import { APPLY_URL } from "@/lib/links";
  * The wordmark and button also step down a size there to make room.
  *
  * FONT NOTE: the Figma specifies `Elevon TwoG` for the links and the button,
- * and that font is nowhere on this machine. They are set in Satoshi instead —
+ * and that font is nowhere on this machine. They are set in Satoshi instead -
  * right size, tracking, and case, wrong face. Drop the Elevon file in and it is
  * a one-line swap. The wordmark's Hypik is the real thing.
  */
@@ -215,7 +215,7 @@ const NOTCH_LG =
   "polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px)";
 
 /**
- * The centre pill: a plain white box with a soft 6px radius — enough to read as
+ * The centre pill: a plain white box with a soft 6px radius - enough to read as
  * rounded without going full capsule, which fought the angular chrome around
  * it. It sits at 40px against the bar's 48px so it reads as lighter than the
  * Apply button rather than matching its weight.
@@ -248,7 +248,7 @@ function NavPill({ className }: { className?: string }) {
 /**
  * Keeps the notched silhouette of the Figma button but drops its outline. The
  * corners stay a true 12px at any width because the polygon is in px, not
- * percentages — the notch is 12 of 176 across and 12 of 48 down, so a
+ * percentages - the notch is 12 of 176 across and 12 of 48 down, so a
  * percentage polygon would skew it out of square.
  */
 const NOTCH =

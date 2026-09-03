@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
  * Browsers refuse to autoplay audible media until the visitor has interacted
  * with the page, and that refusal is a silent promise rejection rather than an
  * error. So this tries to play on mount, and if it's blocked, arms a one-shot
- * listener that starts the track on the first click, key, or tap anywhere —
+ * listener that starts the track on the first click, key, or tap anywhere -
  * which is what makes it feel like it "just started playing" while still
  * obeying the autoplay policy. Once the visitor pauses it, that's final; the
  * fallback listener is torn down and only the button will start it again.
@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from "react";
 export function AudioToggle() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
-  // Mirrors `playing` for the effect below without making it a dependency —
+  // Mirrors `playing` for the effect below without making it a dependency -
   // re-running the effect on every toggle would re-arm the gesture listener and
   // restart audio the visitor had deliberately paused.
   const pausedByUser = useRef(false);
@@ -32,7 +32,7 @@ export function AudioToggle() {
     const start = () => {
       if (pausedByUser.current) return;
       void audio.play().catch(() => {
-        /* Still blocked, or no supported source — leave the button showing off. */
+        /* Still blocked, or no supported source - leave the button showing off. */
       });
     };
 
@@ -91,7 +91,7 @@ export function AudioToggle() {
 
       {/*
         The notched corners are the same motif as the Register and Explore
-        buttons — top-left and bottom-right cut at 25% of the height, matching
+        buttons - top-left and bottom-right cut at 25% of the height, matching
         the ratio in button-accent.svg. It is a clip-path rather than another
         SVG because this control has no Figma export to reuse, and a path scales
         with the box where a stretched asset would skew the notch.

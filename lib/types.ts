@@ -1,7 +1,7 @@
 /**
  * Response shapes for the HARP public API (`/v1/public/*`).
  *
- * These mirror the Go structs in `internal/store/` — keep them in sync:
+ * These mirror the Go structs in `internal/store/` - keep them in sync:
  *   ScheduleItem -> internal/store/schedule.go
  *   Sponsor      -> internal/store/sponsors.go
  *   FAQ          -> internal/store/faqs.go

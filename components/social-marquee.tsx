@@ -60,7 +60,7 @@ const SOCIALS: Social[] = [
     tone: "violet",
     icon: <InstagramMark />,
   },
-  // TODO(organizers): the invite URL — the only one of these not supplied yet.
+  // TODO(organizers): the invite URL - the only one of these not supplied yet.
   { name: "Discord", href: "#", tone: "ink", icon: <DiscordMark /> },
   {
     name: "YouTube",

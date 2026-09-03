@@ -41,7 +41,7 @@ export function SetupGuide({ missing }: { missing: string[] }) {
         <Step n={4} title="Restart the dev server">
           <Code>npm run dev</Code>
           <p className="mt-2 text-muted">
-            Next reads env files at startup — edits to{" "}
+            Next reads env files at startup, so edits to{" "}
             <code className="font-mono">.env.local</code> need a restart.
           </p>
         </Step>

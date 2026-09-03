@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Zero Day theme. Dark only, on purpose — the wordmark is neon-on-black and
+ * Zero Day theme. Dark only, on purpose - the wordmark is neon-on-black and
  * `color-scheme: dark` keeps the browser's own UI (scrollbars, form controls)
  * dark to match, rather than half-inverting on a light OS.
  */
@@ -80,24 +80,25 @@ body {
  * not end on a hard line.
  *
  * Without it the seam is brutal: the lit floor averages rgb(108, 97, 110) right
- * up to the plate's last row, and the tunnel panel underneath opens on rgb(5, 0,
- * 7). The fade carries the floor down to black, so the two panels meet on
- * matching pixels and the join stops reading as an edge.
+ * up to the plate's last row, and the tunnel panel underneath opens near black.
+ * The fade carries the floor down to black, so the two panels meet on matching
+ * pixels and the join stops reading as an edge. `.scene-ceiling-fade` takes the
+ * other side of this join, and of the one above the platform.
  *
  * The stops trace a smoothstep rather than a straight ramp. A linear fade over
  * this distance shows its own start as a faint horizontal line across the
  * floor, and bands visibly in the midtones; easing in and out hides both. It
  * starts at 66%, under the carriage where the plate is already near black, so
- * the fade has no visible beginning, and finishes at 97% rather than 100% —
+ * the fade has no visible beginning, and finishes at 97% rather than 100% - 
  * that last strip is solid, which guarantees the boundary row matches even
  * after the browser rounds the gradient to device pixels.
  *
  * Black is written out rather than mixed from `--background`. It is matched to
- * the tunnel plate's own top edge, which is painted black in the artwork, so it
- * is a property of the image rather than of the theme. Going through
+ * the tunnel plate's own top edge, which its ceiling fade carries to black,
+ * so it is a property of the images rather than of the theme. Going through
  * `color-mix` also made this worse, not better: Lightning CSS emits a fallback
  * for browsers that lack it, and every mixed stop flattens to a fully opaque
- * colour there — which would drop a hard black band across the entire floor.
+ * colour there - which would drop a hard black band across the entire floor.
  */
 .subway-floor-fade {
   position: absolute;
@@ -497,7 +498,7 @@ body::after {
  * Cover-frame for the pinned opening panel (PinnedPrehero).
  *
  * That panel fills the viewport rather than holding 16:9, so anything pinned to
- * a point in the artwork — the building ads — needs a box that tracks where the
+ * a point in the artwork - the building ads - needs a box that tracks where the
  * art actually lands. `max()` picks whichever dimension has to overflow: the
  * frame is at least as wide as the panel, and at least wide enough that its
  * 16:9 height covers the panel's. `aspect-ratio` derives the other side, and

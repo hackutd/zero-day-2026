@@ -20,7 +20,7 @@ export function SponsorLogo({ sponsor }: { sponsor: Sponsor }) {
   }
 
   return (
-    // next/image can't optimize a data: URI — it would pass through unoptimized
+    // next/image can't optimize a data: URI - it would pass through unoptimized
     // while still demanding explicit dimensions we don't have. A plain img is
     // both smaller and more honest here.
     // eslint-disable-next-line @next/next/no-img-element

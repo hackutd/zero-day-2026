@@ -28,7 +28,7 @@ export function EndpointSection({
         </p>
       ) : count === 0 ? (
         <p className="mt-4 text-sm text-muted">
-          Reached the endpoint — it returned no items yet.
+          Reached the endpoint. It returned no items yet.
         </p>
       ) : (
         <div className="mt-4">{children}</div>

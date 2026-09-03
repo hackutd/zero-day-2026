@@ -16,21 +16,20 @@ import hero from "@/public/backgrounds/02-hero.png";
 import street from "@/public/backgrounds/03-street.png";
 import subwayBackground from "@/public/backgrounds/04-subway-background.png";
 import subwayForefront from "@/public/backgrounds/04-subway-forefront.png";
-import tracksPrizesFaq from "@/public/backgrounds/05-tracks-prizes-faq.png";
 
 /**
  * The opening scenes of the site, stacked in reading order.
  *
- * The art is one continuous descent — skyline, then down between the towers,
- * then street level, then underground to the platform — so the panels butt
+ * The art is one continuous descent - skyline, then down between the towers,
+ * then street level, then underground to the platform - so the panels butt
  * against each other with no gap or divider.
  *
  * why it matters and why it does nothing on a wide one. Two rules set these:
  *
  *  - The hero's billboard carries the logo, so the crop centers on the sign
  *    rather than on the frame: 25.31% is where the sign's own middle sits.
- *  - The hero and the street below it share an edge — the same hexagon wall
- *    runs off the bottom of one and into the top of the other — so they must
+ *  - The hero and the street below it share an edge - the same hexagon wall
+ *    runs off the bottom of one and into the top of the other - so they must
  *    crop around the *same* point or the seam visibly slips. The street panel
  *    is 25% because the hero is, not on its own merits.
  *
@@ -96,7 +95,7 @@ export default function Home() {
  * The "HackUTD's Zero Day" wordmark, sitting on the hero's blank billboard.
  *
  * Every number here was measured off `02-hero.png` rather than eyeballed. The
- * sign is not a rotated rectangle — its left and right edges are vertical while
+ * sign is not a rotated rectangle - its left and right edges are vertical while
  * the top and bottom slope down to the right (~6.0 deg and ~7.5 deg). That is a
  * vertical shear, so `skewY` is what makes the art sit *on* the sign; a
  * `rotate` would tilt the upright strokes away from the sign's own vertical
@@ -108,7 +107,7 @@ export default function Home() {
  *
  * The offsets look crooked because they are correcting for the artwork's own
  * padding. `zero_day.png` is 781x307 but its ink only occupies 774x228, with 51
- * transparent pixels above it and 28 below — so centring the *image box* on the
+ * transparent pixels above it and 28 below - so centring the *image box* on the
  * sign would hang the visible wordmark low. These percentages centre the ink
  * instead, which is why they aren't symmetric.
  */
@@ -152,14 +151,14 @@ function BillboardWordmark() {
  * than a breakpoint, so it follows either arrangement on its own.
  *
  * Unlike the other panels this one fills the viewport rather than holding 16:9
- * — a pinned scene that letterboxed would look broken. It still needs a frame,
+ * - a pinned scene that letterboxed would look broken. It still needs a frame,
  * though: the building ads are pinned to specific windows, so `.prehero-frame`
  * tracks where the artwork actually lands and the ads sit inside it in
  * percentages of the art. The intro text is deliberately outside that frame,
  * because it should centre on the viewport rather than on the city.
  *
- * The id sits on the track rather than the panel, so the navbar — which waits
- * for this element to scroll past — appears once the pinned sequence is done.
+ * The id sits on the track rather than the panel, so the navbar - which waits
+ * for this element to scroll past - appears once the pinned sequence is done.
  *
  */
 /**
@@ -253,7 +252,7 @@ function BuildingAd({
       }}
     >
       {/*
-        Muted autoplay is allowed everywhere — unlike the soundtrack, this needs
+        Muted autoplay is allowed everywhere - unlike the soundtrack, this needs
         no gesture. `playsInline` stops iOS taking it fullscreen. Shipped as MP4
         only: H.264 plays in every current browser, and VP9 came out larger for
         the longer clip, so a second format would be weight for nothing.
@@ -305,7 +304,7 @@ function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
 }
 
 /**
- * The MLH trust badge — MLH's own embed, not a copy.
+ * The MLH trust badge - MLH's own embed, not a copy.
  *
  * Served from MLH's bucket rather than self-hosted, which is the one case where
  * hotlinking is right: they roll the badge each season and expect the link's
@@ -378,7 +377,7 @@ function HeroOverlays() {
  * The train stopped at the platform, laid over the platform plate.
  *
  * Two files rather than one because the car's windows are genuinely
- * transparent — a third of `04-subway-forefront.png` is alpha — and the
+ * transparent - a third of `04-subway-forefront.png` is alpha - and the
  * platform wall behind it shows through them. Flattening the pair in the
  * artwork would lose that.
  *
@@ -406,7 +405,7 @@ function SubwayCar() {
  * Everything on the platform wall, in paint order: the screen, the stats, then
  * the train car over the top of both.
  *
- * The order is the whole trick. Both wall features sit *behind* the glass —
+ * The order is the whole trick. Both wall features sit *behind* the glass -
  * measured against `04-subway-forefront.png`, the screen's rectangle and the
  * ring's interior are 100% alpha there, so they read through the windows with
  * the car's mullions framing them. The car is painted last so it occludes
@@ -585,7 +584,7 @@ function WallStats() {
             {value}
           </span>
           <span
-            className="text-accent-soft mt-[0.35em] block tracking-[0.12em] uppercase"
+            className="font-elevon text-accent-soft mt-[0.35em] block font-medium tracking-[0.12em] uppercase"
             style={{ fontSize: "7cqw" }}
           >
             {label}
@@ -628,7 +627,7 @@ function Scene({
           sizes="100vw"
           placeholder="blur"
           // Only the first panel is above the fold; the rest lazy-load by
-          // default. `preload`, not `priority` — the latter is deprecated as of
+          // default. `preload`, not `priority` - the latter is deprecated as of
           // Next 16.
           preload={first}
           className="object-cover"

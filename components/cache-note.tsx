@@ -16,7 +16,7 @@ export function CacheNote({ seconds }: { seconds: number }) {
         Data below is cached for {window}.
       </span>{" "}
       Changes made in the Go service won&apos;t show up until that window
-      expires. Reloading won&apos;t help — not even a hard reload — because the
+      expires. Reloading won&apos;t help, not even a hard reload, because the
       page is cached on the server, not in your browser.
     </aside>
   );

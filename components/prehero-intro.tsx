@@ -200,7 +200,7 @@ export function PreheroIntro() {
 
 /**
  * The media query is external mutable state, so it is read through
- * `useSyncExternalStore` rather than mirrored into state from an effect — that
+ * `useSyncExternalStore` rather than mirrored into state from an effect - that
  * keeps the first paint correct instead of rendering once with the wrong value
  * and immediately re-rendering.
  */
@@ -223,7 +223,7 @@ function clamp(v: number): number {
   return Math.min(Math.max(v, 0), 1);
 }
 
-/** easeOutCubic — quick to arrive, gentle to settle. */
+/** easeOutCubic - quick to arrive, gentle to settle. */
 function ease(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }

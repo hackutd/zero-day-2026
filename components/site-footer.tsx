@@ -3,8 +3,8 @@
  *
  * The Figma frame is a fixed 1440x1010 board with every element absolutely
  * positioned, which is a description of one screen width rather than a layout.
- * This rebuilds the same design as ordinary flow — a centred 1200px column with
- * the wordmark bleeding past it — so it holds together at any width. The design
+ * This rebuilds the same design as ordinary flow - a centred 1200px column with
+ * the wordmark bleeding past it - so it holds together at any width. The design
  * measurements survive as the ratios below.
  *
  * Type scale is expressed in `em`-based tracking rather than the px values the
@@ -93,8 +93,8 @@ export function SiteFooter() {
   return (
     <footer className="bg-background overflow-hidden pt-16 pb-14 sm:pt-24">
       {/*
-        The wordmark is wider than the 1200px content column — 1286 of the
-        frame's 1440 — so it sits outside the column and is sized in `vw` to
+        The wordmark is wider than the 1200px content column - 1286 of the
+        frame's 1440 - so it sits outside the column and is sized in `vw` to
         keep spanning ~89% of the viewport instead of overflowing on small
         screens. Tracking is -4% of the size, so it stays in `em`.
       */}
@@ -127,7 +127,7 @@ export function SiteFooter() {
         </h2>
 
         <p className="font-sans text-text-muted mt-5 text-center text-[13px] leading-[1.55] tracking-[0.06em] uppercase">
-          HackUTD 2026 — University of Texas at Dallas
+          HackUTD 2026 · University of Texas at Dallas
         </p>
 
         <div className="mt-8 flex justify-center">

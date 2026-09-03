@@ -55,7 +55,7 @@ export function SmoothScroll() {
   useEffect(() => {
     // Touch devices already have momentum scrolling, and reduced-motion users
     // have asked not to have this. Both conditions on the touch check, so a
-    // touchscreen laptop with a trackpad still gets it — only genuinely
+    // touchscreen laptop with a trackpad still gets it - only genuinely
     // touch-only devices opt out. CSS `scroll-behavior: smooth` still handles
     // anchor jumps in that case.
     const reduced = window.matchMedia(
@@ -88,7 +88,7 @@ export function SmoothScroll() {
      * Ease onto a marked panel if the reader has come to rest already close to
      * one. This is deliberately not CSS scroll-snap: this module owns the
      * scroll position every frame, and snap points would fight it. Doing it
-     * here also makes it velocity-aware, which snap is not — it only ever runs
+     * here also makes it velocity-aware, which snap is not - it only ever runs
      * from a standstill, so a flick straight past the panel is untouched.
      */
     const trySettle = () => {
@@ -99,8 +99,8 @@ export function SmoothScroll() {
       const rect = panel.getBoundingClientRect();
       // Only settle onto a panel that roughly fills the screen. Taller than the
       // viewport and there is no single centred position worth choosing. Much
-      // shorter — a narrow window, where the panels are a fraction of the
-      // height — and "centred" can resolve above the top of the document, which
+      // shorter - a narrow window, where the panels are a fraction of the
+      // height - and "centred" can resolve above the top of the document, which
       // clamps to zero and drags the reader back to the top of the page.
       const fill = rect.height / window.innerHeight;
       if (fill > 1.2 || fill < 0.6) return;

@@ -22,7 +22,7 @@ const satoshi = localFont({
 });
 
 /*
- * Hypik, by Matt Cole Wilson (mattcolewilson.com) — the brand wordmark face in
+ * Hypik, by Matt Cole Wilson (mattcolewilson.com) - the brand wordmark face in
  * the Figma nav. Self-hosted because it isn't on Google Fonts; the licence
  * (app/fonts/hypik-LICENSE.txt) allows commercial use and free redistribution
  * with a link back, so the credit belongs in the footer's Info column.
