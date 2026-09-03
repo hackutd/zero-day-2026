@@ -729,21 +729,26 @@ textarea,
  * pseudo-element is cleared too, so both are removed - `list-none` alone leaves
  * a marker there.
  */
-.faq-item summary::-webkit-details-marker,
-.faq-item summary::marker {
+/*
+ * Shared by every native disclosure on the page: the FAQ's questions and the
+ * challenge-track briefs. Both hide the browser's own marker and rotate a
+ * chevron of their own instead.
+ */
+.disclosure summary::-webkit-details-marker,
+.disclosure summary::marker {
   display: none;
 }
 
-.faq-chevron {
+.disclosure-chevron {
   transition: transform 200ms ease;
 }
 
-.faq-item[open] .faq-chevron {
+.disclosure[open] .disclosure-chevron {
   transform: rotate(180deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .faq-chevron {
+  .disclosure-chevron {
     transition: none;
   }
 }

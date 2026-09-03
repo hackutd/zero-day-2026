@@ -144,7 +144,7 @@ function FaqList({ items }: { items: typeof FAQS }) {
             // All of them share one group name across both columns, so only
             // one answer is ever open on the whole section.
             name="faq"
-            className="faq-item border-b border-white/10"
+            className="disclosure border-b border-white/10"
           >
             <summary className="font-sans flex cursor-pointer list-none items-center justify-between gap-6 py-4 text-left text-[14px] leading-[1.4] font-medium tracking-[0.02em] text-white transition-colors hover:text-white/75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-[15px]">
               {q}
@@ -171,7 +171,7 @@ function Chevron() {
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="square"
-      className="faq-chevron text-accent-soft shrink-0"
+      className="disclosure-chevron text-accent-soft shrink-0"
       aria-hidden
     >
       <path d="m6 9 6 6 6-6" />
