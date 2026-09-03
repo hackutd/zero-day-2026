@@ -51,6 +51,7 @@
   --font-mono: var(--font-satoshi);
   --font-satoshi: var(--font-satoshi);
   --font-hypik: var(--font-hypik);
+  --font-elevon: var(--font-elevon);
 }
 
 body {

@@ -37,6 +37,42 @@ const hypik = localFont({
   display: "swap",
 });
 
+/*
+ * Elevon, by Dalton Maag - a display face whose five styles are a gravity axis
+ * (ZeroG through FourG) rather than the usual light-to-black naming. They map
+ * onto CSS weights by the usWeightClass each file declares: 300, 400, 500, 700,
+ * 800. Reach for them by weight, e.g. `font-elevon font-bold`.
+ *
+ * These are the TRIAL files, converted from the shipped TTFs to woff2 (same
+ * outlines, ~40KB each instead of ~155KB). The trial licence in
+ * app/fonts/elevon-TRIAL-LICENCE.pdf is for evaluation, so before this face
+ * goes out on the live site it needs a purchased licence and the retail files
+ * dropped in over these. The filenames say `trial` so that stays obvious.
+ */
+const elevon = localFont({
+  src: [
+    {
+      path: "./fonts/elevon-trial-zerog.woff2",
+      weight: "300",
+      style: "normal",
+    },
+    { path: "./fonts/elevon-trial-oneg.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/elevon-trial-twog.woff2", weight: "500", style: "normal" },
+    {
+      path: "./fonts/elevon-trial-threeg.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "./fonts/elevon-trial-fourg.woff2",
+      weight: "800",
+      style: "normal",
+    },
+  ],
+  variable: "--font-elevon",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "HackUTD Zero Day",
   description:
@@ -47,7 +83,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${satoshi.variable} ${hypik.variable} h-full antialiased`}
+      className={`${satoshi.variable} ${hypik.variable} ${elevon.variable} h-full antialiased`}
     >
       {/*
         The audio control sits in the layout, not the page: it's fixed to the
