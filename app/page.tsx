@@ -52,12 +52,6 @@ export default function Home() {
         <p className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Coming soon
         </p>
-        <a
-          href="https://harp.hackutd.co/"
-          className="mt-4 rounded-full border border-cyan/40 px-6 py-2.5 font-mono text-xs tracking-[0.3em] text-cyan uppercase transition-colors hover:bg-cyan/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan sm:text-sm"
-        >
-          Apply
-        </a>
       </div>
     </main>
   );
