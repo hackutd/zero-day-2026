@@ -42,10 +42,11 @@ export function KeynoteSpeaker() {
     <section
       id="keynote"
       aria-labelledby="keynote-heading"
-      // A screenful, like the countdown above it: at least the viewport tall
-      // and centred in it, so the speaker is the whole view rather than a band
-      // of text between two others.
-      className="bg-background flex min-h-svh flex-col justify-center px-5 py-16 sm:px-6"
+      // Not a screenful: the card sets the height and the section just gives
+      // it air. Held to the viewport instead, the card floated in the middle of
+      // a mostly empty screen, which read as a gap rather than as breathing
+      // room.
+      className="bg-background flex flex-col justify-center px-5 py-14 sm:px-6 sm:py-20"
     >
       {/*
         The hairline is a clipped parent showing through 1px around a clipped
