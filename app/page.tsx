@@ -42,11 +42,6 @@ const scenes: {
   overlay?: React.ReactNode;
   /** Let the scroll settle onto this panel when the reader stops near it. */
   settle?: boolean;
-  /**
-   * Hold the plate's own aspect instead of cropping it to 16:9. For art that
-   * is not a 16:9 frame and would lose most of itself to the crop.
-   */
-  native?: boolean;
 }[] = [
   {
     src: prehero,
@@ -67,20 +62,29 @@ const scenes: {
     alt: "A neon-lit subway platform, a train stopped at it with its doors closed.",
     overlay: <SubwayOverlays />,
   },
-  {
-    src: tracksPrizesFaq,
-    alt: "A tunnel below the platform, rails running toward a glowing magenta hexagon under a canopy of cables.",
-    native: true,
-  },
 ];
+
+/** Shared by both halves of the stack, so the two render identically. */
+function renderScene(scene: (typeof scenes)[number]) {
+  return <Scene key={scene.src.src} {...scene} first={false} />;
+}
 
 export default function Home() {
   return (
     <main>
       <PinnedPrehero {...scenes[0]} />
-      {scenes.slice(1).map((scene) => (
-        <Scene key={scene.src.src} {...scene} first={false} />
-      ))}
+      {/*
+        The descent runs unbroken from the skyline down to the platform, then
+        stops there. The countdown and the keynote open on the page
+        background, which is what the platform above them fades down to, and
+        the board below carries the descent's last plate itself - the tunnel is
+        its backdrop rather than a panel of its own, so the artwork arrives
+        under the content instead of ahead of it.
+      */}
+      {scenes.slice(1).map(renderScene)}
+      <SiteCountdown />
+      <KeynoteSpeaker />
+      <EventBoard schedule={<DayOfSchedule />} tracks={<ChallengeTracks />} />
       <SiteFaq />
       <SocialMarquee />
       <SiteFooter />
@@ -578,29 +582,23 @@ function Scene({
   overlay,
   first,
   settle = false,
-  native = false,
 }: {
   src: StaticImageData;
   alt: string;
   overlay?: React.ReactNode;
   first: boolean;
   settle?: boolean;
-  native?: boolean;
 }) {
   return (
     <div
       // Read by components/smooth-scroll.tsx, which eases onto this panel if
       // the reader comes to rest already close to it.
       data-settle={settle ? "" : undefined}
-      className={`relative w-full overflow-hidden${native ? "" : " aspect-video"}`}
-      // A native panel is as tall as its own art, which for a portrait plate
-      // means taller than the viewport — deliberately so, it is scrolled
-      // through rather than taken in at once. Read off the import so the box
-      // can never drift from the file it is holding. The 16:9 panels keep the
-      // class and no inline style at all.
-      style={
-        native ? { aspectRatio: `${src.width} / ${src.height}` } : undefined
-      }
+      // Every panel in the descent is a 16:9 frame. The one plate that is not
+      // - the portrait tunnel - is no longer a panel at all: it is the
+      // backdrop the board lays its content over, and lives in
+      // components/event-board.tsx.
+      className="relative aspect-video w-full overflow-hidden"
     >
       <div className="scene-frame">
         <Image
