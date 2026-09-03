@@ -19,9 +19,7 @@ export default function Home() {
         />
       </a>
 
-      <h1 className="sr-only">
-        HackUTD 2026 — Zero Day. Coming soon; applications will open soon.
-      </h1>
+      <h1 className="sr-only">HackUTD 2026 — Zero Day. Coming soon.</h1>
 
       {/*
         The copy below the wordmark pulls the centered stack upward, so the
@@ -48,12 +46,18 @@ export default function Home() {
         <p className="font-mono text-xs tracking-[0.4em] text-cyan uppercase sm:text-sm">
           HackUTD 2026
         </p>
+        <p className="font-mono text-xs tracking-[0.4em] text-muted uppercase sm:text-sm">
+          Website
+        </p>
         <p className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Coming soon
         </p>
-        <p className="text-sm text-muted sm:text-base">
-          Applications will open soon.
-        </p>
+        <a
+          href="https://harp.hackutd.co/"
+          className="mt-4 rounded-full border border-cyan/40 px-6 py-2.5 font-mono text-xs tracking-[0.3em] text-cyan uppercase transition-colors hover:bg-cyan/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan sm:text-sm"
+        >
+          Apply
+        </a>
       </div>
     </main>
   );

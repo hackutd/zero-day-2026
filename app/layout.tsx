@@ -15,8 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "HackUTD 2026 — Zero Day",
-  description:
-    "HackUTD 2026: Zero Day is coming soon. Applications will open soon.",
+  description: "HackUTD 2026: Zero Day is coming soon.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
