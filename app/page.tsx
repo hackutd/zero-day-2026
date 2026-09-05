@@ -558,6 +558,35 @@ const WALL_SCREEN = {
  */
 const YOUTUBE_UPLOADS_PLAYLIST = "UUEM6btSfs7X7Yvv1dLMoyfA";
 
+/**
+ * Player parameters for the wall screen. This is set dressing on a platform,
+ * not a video anyone came here to operate, so it should read as a screen
+ * playing rather than as a YouTube page sitting in the wall.
+ *
+ * `showinfo` and `modestbranding` are gone, so the title bar, the channel
+ * avatar and the watermark cannot be turned off directly. What removes them is
+ * playing: YouTube only draws that furniture over a paused or hovered player,
+ * so an autoplaying muted loop with no controls shows the picture and nothing
+ * else. Muted is not a preference here, it is the only way autoplay is allowed
+ * at all.
+ *
+ *  - controls=0        no scrubber, no play button, no fullscreen chrome
+ *  - rel=0             end screen suggestions stay on this channel
+ *  - iv_load_policy=3  no annotation cards over the picture
+ *  - disablekb=1       the wall does not steal arrow keys from the page
+ *  - playsinline=1     iOS plays it in the wall instead of going fullscreen
+ */
+const WALL_SCREEN_PARAMS = [
+  "autoplay=1",
+  "mute=1",
+  "loop=1",
+  "controls=0",
+  "rel=0",
+  "iv_load_policy=3",
+  "disablekb=1",
+  "playsinline=1",
+].join("&");
+
 function WallScreen() {
   return (
     <div className="absolute overflow-hidden bg-black" style={WALL_SCREEN}>
@@ -588,7 +617,7 @@ function WallScreen() {
         was not needed for.
       */}
       <iframe
-        src={`https://www.youtube-nocookie.com/embed/videoseries?list=${YOUTUBE_UPLOADS_PLAYLIST}`}
+        src={`https://www.youtube-nocookie.com/embed/videoseries?list=${YOUTUBE_UPLOADS_PLAYLIST}&${WALL_SCREEN_PARAMS}`}
         title="HackUTD on YouTube"
         loading="lazy"
         allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -689,10 +718,27 @@ function WallStats() {
  * The image is block rather than inline: an inline image sits on the text
  * baseline and leaves a gap beneath it, which on a full bleed band shows as a
  * hairline of page background across the join.
+ *
+ * The negative margins close the dead black around it. Neither join had any
+ * layout gap, but the plates carry their own black edges and those stack: the
+ * street ends on 69 black rows and this plate opens on 12, which together read
+ * as ~60px of nothing above the pipework at 1440. Pulling up by the street's
+ * foot leaves this plate's own 12 rows to soften the meeting, which is all the
+ * blending the join needs since both sides are already black. The smaller pull
+ * at the bottom takes back this plate's 7 black rows and leaves the platform's
+ * ceiling fade to do its work untouched.
+ *
+ * Both are percentages, not vw: a percentage margin resolves against the
+ * containing block's width, which is what the plates are scaled to, where vw
+ * would also count the scrollbar and over-pull by its width. 69/1920 = 3.59%
+ * and 7/1920 = 0.36%.
  */
 function PipesBand() {
   return (
-    <div className="relative w-full overflow-hidden">
+    <div
+      className="relative w-full overflow-hidden"
+      style={{ marginTop: "-3.59%", marginBottom: "-0.36%" }}
+    >
       <Image
         src={pipes}
         alt="Pipework running beneath the city street."
