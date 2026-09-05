@@ -98,7 +98,7 @@ export function SiteCountdown() {
       <div className="mx-auto w-full max-w-[1400px]">
         <h2
           id="countdown-heading"
-          className="font-hypik text-center leading-none tracking-[-0.02em] text-white uppercase"
+          className="reveal font-hypik text-center leading-none tracking-[-0.02em] text-white uppercase"
           style={{ fontSize: "clamp(2.25rem, 8vw, 6rem)" }}
         >
           {/* Hypik has no digits, so the year stays out of the display face. */}
@@ -106,7 +106,7 @@ export function SiteCountdown() {
         </h2>
 
         <p
-          className="font-sans text-text-muted mt-5 text-center text-[12px] leading-[1.6] tracking-[0.1em] uppercase sm:text-[13px]"
+          className="reveal reveal-1 font-sans text-text-muted mt-5 text-center text-[12px] leading-[1.6] tracking-[0.1em] uppercase sm:text-[13px]"
           // The live region is polite and only the summary line is announced -
           // a screen reader being read four numbers every second is unusable.
           aria-live="polite"
@@ -116,7 +116,7 @@ export function SiteCountdown() {
             : "Until HackUTD 2026 · University of Texas at Dallas"}
         </p>
 
-        <ol className="mt-8 grid grid-cols-2 gap-3 sm:mt-12 sm:grid-cols-4 sm:gap-5">
+        <ol className="reveal reveal-2 mt-8 grid grid-cols-2 gap-3 sm:mt-12 sm:grid-cols-4 sm:gap-5">
           {UNITS.map(({ label, clip, accent }, i) => (
             <li
               key={label}

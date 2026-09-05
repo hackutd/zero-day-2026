@@ -74,7 +74,11 @@ export function SocialMarquee() {
   return (
     <section
       aria-label="Follow HackUTD"
-      className="bg-background py-14 sm:py-20"
+      // Raised above the mascots block, and deliberately without a background:
+      // an opaque one paints page black over whatever sits behind it, which is
+      // exactly what the mascots need to show through. The page is that same
+      // black, so this looks identical everywhere else.
+      className="relative z-10 py-14 sm:py-20"
     >
       <div className="social-marquee">
         <div className="social-marquee__track">

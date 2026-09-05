@@ -93,7 +93,7 @@ export function KeynoteSpeaker() {
             */}
             <h2
               id="keynote-heading"
-              className="font-hypik mt-4 leading-none tracking-[-0.02em] text-white uppercase"
+              className="reveal font-hypik mt-4 leading-none tracking-[-0.02em] text-white uppercase"
               style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}
             >
               To be announced

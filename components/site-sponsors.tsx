@@ -22,7 +22,7 @@ export function SiteSponsors({
       <div className="mx-auto max-w-[1000px]">
         <h2
           id="sponsors-heading"
-          className="font-hypik text-center leading-none tracking-[-0.02em] text-white uppercase"
+          className="reveal font-hypik text-center leading-none tracking-[-0.02em] text-white uppercase"
           style={{ fontSize: "clamp(2.25rem, 7vw, 4.5rem)" }}
         >
           Sponsors

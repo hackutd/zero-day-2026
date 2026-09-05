@@ -25,13 +25,13 @@ export function SiteFaq({
       <div className="mx-auto max-w-[820px]">
         <h2
           id="faq-heading"
-          className="font-hypik text-center leading-none tracking-[-0.02em] text-white uppercase"
+          className="reveal font-hypik text-center leading-none tracking-[-0.02em] text-white uppercase"
           style={{ fontSize: "clamp(2.25rem, 7vw, 4.5rem)" }}
         >
           FAQ
         </h2>
 
-        <p className="font-sans text-text-muted mt-5 text-center text-[13px] leading-[1.6] tracking-[0.04em]">
+        <p className="reveal reveal-1 font-sans text-text-muted mt-5 text-center text-[13px] leading-[1.6] tracking-[0.04em]">
           Can&rsquo;t find what you&rsquo;re looking for? Connect with our team
           at{" "}
           <a
@@ -42,7 +42,7 @@ export function SiteFaq({
           </a>
         </p>
 
-        <div className="mt-8 flex justify-center">
+        <div className="reveal reveal-2 mt-8 flex justify-center">
           <AskButton />
         </div>
 

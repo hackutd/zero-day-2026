@@ -96,7 +96,7 @@ export function EventBoard({
       </div>
 
       <div className="relative px-5 py-20 sm:px-6 sm:py-28">
-        <h2 className="sr-only">Schedule and challenge tracks</h2>
+        <h2 className="reveal sr-only">Schedule and challenge tracks</h2>
 
         <div
           ref={tablist}

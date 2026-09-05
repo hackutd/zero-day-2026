@@ -18,6 +18,7 @@ import prehero from "@/public/backgrounds/01-prehero.png";
 import hero from "@/public/backgrounds/02-hero.png";
 import street from "@/public/backgrounds/03-street.png";
 import pipes from "@/public/backgrounds/03b-pipes.jpg";
+import mascots from "@/public/mascots.png";
 import subwayBackground from "@/public/backgrounds/04-subway-background.png";
 import subwayForefront from "@/public/backgrounds/04-subway-forefront.png";
 
@@ -43,8 +44,11 @@ const scenes: {
   src: StaticImageData;
   alt: string;
   overlay?: React.ReactNode;
+  seams?: React.ReactNode;
   /** Let the scroll settle onto this panel when the reader stops near it. */
   settle?: boolean;
+  zoom?: number;
+  zoomOrigin?: string;
 }[] = [
   {
     src: prehero,
@@ -64,6 +68,17 @@ const scenes: {
     src: subwayBackground,
     alt: "A neon-lit subway platform, a train stopped at it with its doors closed.",
     overlay: <SubwayOverlays />,
+    seams: <SubwaySeams />,
+    /*
+     * Pushed in so the back wall reads. The screen and the stats are wall
+     * detail seen across a platform, and at 1:1 the video was a postage stamp
+     * and the numbers were near unreadable on a phone. The origin sits between
+     * them, at the midpoint of the stats block's centre (24.5%, 28.8%) and the
+     * screen's (48.5%, 30.1%), so the zoom grows the wall in place instead of
+     * sliding it out of frame.
+     */
+    zoom: 1.3,
+    zoomOrigin: "37% 29%",
   },
 ];
 
@@ -108,7 +123,17 @@ export default async function Home() {
         faqs={content.faqs.items}
         unavailable={content.faqs.unavailable}
       />
-      <SocialMarquee />
+      {/*
+        Both in one opaque block. The marquee had to give up its own background
+        so the mascots could show through it, which exposed the ambient wash on
+        body::before behind them - a grid over what should be flat black. The
+        black lives out here instead, covering the pair and the overlap between
+        them.
+      */}
+      <div className="bg-background relative">
+        <Mascots />
+        <SocialMarquee />
+      </div>
       <SiteFooter />
     </main>
   );
@@ -412,8 +437,8 @@ function MlhBadge() {
       */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="https://logged-assets.s3.amazonaws.com/trust-badge/2026/mlh-trust-badge-2026-black.svg"
-        alt="Major League Hacking 2026 Hackathon Season"
+        src="https://logged-assets.s3.amazonaws.com/trust-badge/2027/mlh-trust-badge-2027-black.svg"
+        alt="Major League Hacking 2027 Hackathon Season"
         className="block w-full"
       />
     </a>
@@ -501,17 +526,28 @@ function SubwayOverlays() {
       */}
       <PassingTrain />
       <SubwayCar />
-      {/*
-        The platform's own half of the seam with the street above it, over the
-        car for the same reason the floor fade is: the carriage roof runs up
-        into the ceiling band, so fading only the background would leave it lit.
-      */}
+    </>
+  );
+}
+
+/**
+ * The platform's two seam fades, kept out of the overlay so they are not
+ * scaled with it.
+ *
+ * The ceiling half sits over the car for the same reason the floor half does:
+ * the carriage roof runs up into the ceiling band, so fading only the
+ * background would leave it lit. The floor half sinks the car and the platform
+ * together, since the floor belongs to the forefront plate. See
+ * `.subway-floor-fade`.
+ *
+ * Both are measured against the panel, not the plate, which is exactly why the
+ * zoom must not reach them: their black has to land on the panel's own first
+ * and last rows to meet the plates above and below.
+ */
+function SubwaySeams() {
+  return (
+    <>
       <div className="scene-ceiling-fade scene-ceiling-fade-subway" />
-      {/*
-        Last, so it sinks the car and the platform floor together - the floor
-        belongs to the forefront plate, so fading only the background would
-        leave the lit tiles untouched. See `.subway-floor-fade`.
-      */}
       <div className="subway-floor-fade" />
     </>
   );
@@ -733,6 +769,34 @@ function WallStats() {
  * would also count the scrollbar and over-pull by its width. 69/1920 = 3.59%
  * and 7/1920 = 0.36%.
  */
+/**
+ * The mascots, standing under the FAQ with the marquee crossing in front of
+ * their feet.
+ *
+ * The overlap is a negative bottom margin here rather than a pull on the
+ * marquee, so the marquee keeps its own spacing and only this block reaches
+ * under it. The marquee is raised above this in the stack and had to give up
+ * its opaque background to do it: it was painting page black over anything
+ * behind it, so the cards would have crossed a black bar instead of the
+ * mascots. The page is that same black underneath, so nothing else changes.
+ *
+ * The plate is trimmed to its ink and carries no padding of its own, so the
+ * overlap below is a share of the art rather than of empty pixels.
+ */
+function Mascots() {
+  return (
+    <div className="relative -mb-[7%] px-5 sm:px-6">
+      <Image
+        src={mascots}
+        alt="The HackUTD mascots: an octopus cat, a masked raccoon, a winged messenger, a hooded pig and a spotted panther."
+        sizes="(max-width: 940px) 100vw, 880px"
+        placeholder="blur"
+        className="mx-auto block h-auto w-full max-w-[880px]"
+      />
+    </div>
+  );
+}
+
 function PipesBand() {
   return (
     <div
@@ -746,6 +810,10 @@ function PipesBand() {
         placeholder="blur"
         className="block h-auto w-full"
       />
+      {/* Tint first, then the fades, so black still wins at both edges. */}
+      <div className="pipes-tint" />
+      <div className="scene-ceiling-fade scene-ceiling-fade-pipes" />
+      <div className="scene-floor-fade scene-floor-fade-pipes" />
     </div>
   );
 }
@@ -754,14 +822,26 @@ function Scene({
   src,
   alt,
   overlay,
+  seams,
   first,
   settle = false,
+  zoom,
+  zoomOrigin,
 }: {
   src: StaticImageData;
   alt: string;
   overlay?: React.ReactNode;
+  /**
+   * Rendered outside the zoomed frame. The seam fades have to stay welded to
+   * the panel's own top and bottom rows, and scaling the frame would carry
+   * them off it and leave the joins unfaded.
+   */
+  seams?: React.ReactNode;
   first: boolean;
   settle?: boolean;
+  /** Enlarge the plate and everything pinned to it, about `zoomOrigin`. */
+  zoom?: number;
+  zoomOrigin?: string;
 }) {
   return (
     <div
@@ -774,7 +854,14 @@ function Scene({
       // components/event-board.tsx.
       className="relative aspect-video w-full overflow-hidden"
     >
-      <div className="scene-frame">
+      <div
+        className="scene-frame"
+        style={
+          zoom
+            ? { transform: `scale(${zoom})`, transformOrigin: zoomOrigin }
+            : undefined
+        }
+      >
         <Image
           src={src}
           alt={alt}
@@ -789,6 +876,7 @@ function Scene({
         />
         {overlay}
       </div>
+      {seams}
     </div>
   );
 }

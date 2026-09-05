@@ -119,7 +119,7 @@ export function SiteFooter() {
 
       <div className="mx-auto max-w-[1200px] px-6">
         <h2
-          className="font-sans mt-10 text-center leading-none font-black tracking-[-0.02em] text-white uppercase sm:mt-14"
+          className="reveal font-sans mt-10 text-center leading-none font-black tracking-[-0.02em] text-white uppercase sm:mt-14"
           style={{ fontSize: "clamp(1.75rem, 3.9vw, 3.5rem)" }}
         >
           Registration is <span className="text-accent-magenta">open</span>

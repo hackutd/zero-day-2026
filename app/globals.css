@@ -211,9 +211,10 @@ body {
  * at every viewport: 40% of the box is exactly one panel, so `40%` parks it
  * off the right edge, and `-100%` puts its right edge on the panel's left.
  *
- * The cycle is 15s but the pass takes the first 5 of them; the remaining two
- * thirds hold the train off-frame, which is the gap between services. Linear,
- * because a train crossing a window does not ease.
+ * One service, not a loop. The pass takes 5s and `both` holds the carriage
+ * where it finishes, off the left edge, so the platform is quiet afterwards
+ * rather than having a train through it every fifteen seconds. Linear, because
+ * a train crossing a window does not ease.
  *
  * It is declared `paused` and started by the class the component adds when the
  * panel comes into view, so the first pass happens on arrival instead of having
@@ -238,7 +239,7 @@ body {
   width: 250%;
   pointer-events: none;
   transform: translate3d(40%, 0, 0);
-  animation: subway-train-pass 15s linear infinite paused;
+  animation: subway-train-pass 5s linear 1 both paused;
 }
 
 .subway-train-running {
@@ -246,13 +247,10 @@ body {
 }
 
 @keyframes subway-train-pass {
-  0% {
+  from {
     transform: translate3d(40%, 0, 0);
   }
-  33% {
-    transform: translate3d(-100%, 0, 0);
-  }
-  100% {
+  to {
     transform: translate3d(-100%, 0, 0);
   }
 }
@@ -750,6 +748,104 @@ textarea,
 
 @media (prefers-reduced-motion: reduce) {
   .disclosure-chevron {
+    transition: none;
+  }
+}
+
+/*
+ * The pipes band gives 20% at each end, far more than the scene panels do.
+ * It is only 360px tall against their 1080, so the same share is a much
+ * shorter run on screen, and it is a transition rather than a place: the
+ * pipework should emerge and recede rather than start and stop.
+ */
+.scene-ceiling-fade-pipes,
+.scene-floor-fade-pipes {
+  --scene-fade-end: 20%;
+}
+
+/*
+ * A wash over the pipework.
+ *
+ * The plate is scratchy, and at the size it renders that texture reads as
+ * noise rather than detail. Laying the brand violet over it pulls the whole
+ * band onto one hue, which lets the shapes carry it instead of the grain, and
+ * ties a piece of stock-looking art to the rest of the page.
+ *
+ * `soft-light` rather than a flat overlay: a flat wash at this strength greys
+ * the plate off, where soft-light tints the midtones and leaves the darks
+ * alone, so the edges stay the black the seams above and below depend on.
+ */
+.pipes-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(120 40 255 / 55%),
+    rgb(90 30 190 / 45%)
+  );
+  mix-blend-mode: soft-light;
+}
+
+/*
+ * The site's one text reveal. Driven by components/reveal-on-scroll.tsx, which
+ * sets `data-revealed` when an element reaches the viewport.
+ *
+ * Deliberately one rule for every heading and lead line on the page. A
+ * different entrance per section is what makes a site feel assembled rather
+ * than designed, so the distance, the duration and the curve are fixed here and
+ * only the delay varies, which is what produces a stagger without inventing a
+ * second motion.
+ *
+ * The curve is an ease-out with a long tail: most of the travel happens
+ * immediately and the last few pixels settle slowly, which reads as something
+ * arriving and coming to rest rather than sliding into place. Blur is part of
+ * it - a pure fade looks like an image loading, where a blur that resolves as
+ * it lands reads as focus being found.
+ *
+ * Only opacity, transform and filter animate, so this stays off layout entirely
+ * and the compositor does the work.
+ */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  filter: blur(6px);
+  transition:
+    opacity 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    transform 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    filter 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal[data-revealed] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  will-change: auto;
+}
+
+/* Steps for staggering a group. The gap is short on purpose: long enough to
+   read as a sequence, short enough that the last item is not still arriving
+   after the reader has moved on. */
+.reveal-1 {
+  --reveal-delay: 90ms;
+}
+.reveal-2 {
+  --reveal-delay: 180ms;
+}
+.reveal-3 {
+  --reveal-delay: 270ms;
+}
+
+/*
+ * Without JavaScript nothing ever sets `data-revealed`, so the page would be
+ * blank text. This puts it all back.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
     transition: none;
   }
 }
