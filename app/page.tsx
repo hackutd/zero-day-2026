@@ -17,6 +17,7 @@ import zeroDay from "@/public/zero_day.png";
 import prehero from "@/public/backgrounds/01-prehero.png";
 import hero from "@/public/backgrounds/02-hero.png";
 import street from "@/public/backgrounds/03-street.png";
+import pipes from "@/public/backgrounds/03b-pipes.jpg";
 import subwayBackground from "@/public/backgrounds/04-subway-background.png";
 import subwayForefront from "@/public/backgrounds/04-subway-forefront.png";
 
@@ -85,7 +86,9 @@ export default async function Home() {
         its backdrop rather than a panel of its own, so the artwork arrives
         under the content instead of ahead of it.
       */}
-      {scenes.slice(1).map(renderScene)}
+      {scenes.slice(1, 3).map(renderScene)}
+      <PipesBand />
+      {scenes.slice(3).map(renderScene)}
       <SiteCountdown />
       <KeynoteSpeaker />
       <EventBoard
@@ -666,6 +669,38 @@ function WallStats() {
         </li>
       ))}
     </ul>
+  );
+}
+
+/**
+ * The pipework under the street, between it and the platform below.
+ *
+ * A transition piece rather than a scene: a 1920x360 strip that holds its own
+ * 5.33:1 ratio at every width instead of cropping, with no overlay and no
+ * settle. It is short enough that it reads as a beat in the descent rather
+ * than a stop in it.
+ *
+ * It needs neither of the seam fades. The plate is already black at both edges,
+ * averaging rgb(6, 2, 4) across its top row and rgb(8, 3, 5) across its bottom,
+ * so it meets the street's rgb(1, 1, 1) foot above it and the platform's
+ * ceiling fade below it on matching pixels. That is what makes this usable as
+ * an interstitial in the first place.
+ *
+ * The image is block rather than inline: an inline image sits on the text
+ * baseline and leaves a gap beneath it, which on a full bleed band shows as a
+ * hairline of page background across the join.
+ */
+function PipesBand() {
+  return (
+    <div className="relative w-full overflow-hidden">
+      <Image
+        src={pipes}
+        alt="Pipework running beneath the city street."
+        sizes="100vw"
+        placeholder="blur"
+        className="block h-auto w-full"
+      />
+    </div>
   );
 }
 
