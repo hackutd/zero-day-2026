@@ -1,5 +1,6 @@
 import Image, { type StaticImageData } from "next/image";
 
+import { AmbientVideo } from "@/components/ambient-video";
 import { ChallengeTracks } from "@/components/challenge-tracks";
 import { DayOfSchedule } from "@/components/day-of-schedule";
 import { EventBoard } from "@/components/event-board";
@@ -354,22 +355,16 @@ function BuildingAd({
       }}
     >
       {/*
-        Muted autoplay is allowed everywhere - unlike the soundtrack, this needs
-        no gesture. `playsInline` stops iOS taking it fullscreen. Shipped as MP4
-        only: H.264 plays in every current browser, and VP9 came out larger for
-        the longer clip, so a second format would be weight for nothing.
+        Shipped as MP4 only: H.264 plays in every current browser, and VP9 came
+        out larger for the longer clip, so a second format would be weight for
+        nothing. AmbientVideo holds the fetch until the screen is in view and
+        pauses it on the way out.
       */}
-      <video
-        aria-label={label}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
+      <AmbientVideo
+        src={src}
+        label={label}
         className="h-full w-full object-cover"
-      >
-        <source src={src} type="video/mp4" />
-      </video>
+      />
     </div>
   );
 }

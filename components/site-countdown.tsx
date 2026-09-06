@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
+import { AmbientVideo } from "@/components/ambient-video";
+
 /**
  * Countdown to the hackathon.
  *
@@ -133,17 +135,10 @@ export function SiteCountdown() {
                   fullscreen, and `aria-hidden` keeps it out of the reading
                   order - the figure over it is the content.
                 */}
-                <video
-                  aria-hidden
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
+                <AmbientVideo
+                  src={clip}
                   className="countdown-clip absolute inset-0 h-full w-full object-cover"
-                >
-                  <source src={clip} type="video/mp4" />
-                </video>
+                />
 
                 {/*
                   A scrim between the footage and the figure. The clips are
