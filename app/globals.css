@@ -272,40 +272,13 @@ body {
   }
 }
 
-/* Ambient neon wash behind the wordmark. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      60rem 38rem at 50% 40%,
-      color-mix(in oklab, var(--magenta) 15%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      44rem 30rem at 50% 66%,
-      color-mix(in oklab, var(--cyan) 10%, transparent),
-      transparent 70%
-    );
-}
-
-/* Faint grid, masked so it fades out before the edges. */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image:
-    linear-gradient(to right, var(--foreground) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--foreground) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(75% 65% at 50% 50%, #000 25%, transparent 100%);
-}
+/*
+ * The page background is flat. A neon wash and a faint grid used to sit behind
+ * everything, both left over from the coming-soon page, whose content was a
+ * wordmark on an empty field. This page is full-bleed art on black, so they had
+ * nothing to lift and only showed through wherever a section was not painted
+ * over them.
+ */
 
 @keyframes rise {
   from {

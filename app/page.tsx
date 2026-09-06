@@ -124,17 +124,8 @@ export default async function Home() {
         faqs={content.faqs.items}
         unavailable={content.faqs.unavailable}
       />
-      {/*
-        Both in one opaque block. The marquee had to give up its own background
-        so the mascots could show through it, which exposed the ambient wash on
-        body::before behind them - a grid over what should be flat black. The
-        black lives out here instead, covering the pair and the overlap between
-        them.
-      */}
-      <div className="bg-background relative">
-        <Mascots />
-        <SocialMarquee />
-      </div>
+      <Mascots />
+      <SocialMarquee />
       <SiteFooter />
     </main>
   );
@@ -733,7 +724,7 @@ function WallStats() {
  */
 function Mascots() {
   return (
-    <div className="relative -mb-[7%] px-5 sm:px-6">
+    <div className="relative -mb-[7%] px-5 pt-[4%] sm:px-6">
       <Image
         src={mascots}
         alt="The HackUTD mascots: an octopus cat, a masked raccoon, a winged messenger, a hooded pig and a spotted panther."
