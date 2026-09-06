@@ -82,8 +82,27 @@ export function EventBoard({
   }
 
   return (
-    <section id="tracks" className="bg-background relative overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0">
+    <section
+      id="tracks"
+      className="bg-background relative grid overflow-hidden"
+    >
+      {/*
+        Art and content share one grid cell, so the section is the taller of
+        the two. It used to be the content's height alone, with the plate
+        absolutely positioned inside it: fine while the schedule was full, but
+        with an empty schedule the section collapsed shorter than the artwork
+        and `overflow-hidden` cut the plate off partway down, taking its floor
+        fade with it. Stacked like this the plate is always whole, and content
+        longer than it simply grows the row.
+
+        `self-start` keeps the plate at its own height at the top of the cell
+        rather than stretching to the row, and the wrapper is `relative` so the
+        two fades measure against the artwork rather than the section.
+      */}
+      <div
+        aria-hidden
+        className="pointer-events-none relative col-start-1 row-start-1 self-start"
+      >
         <Image
           src={tracksPrizesFaq}
           alt=""
@@ -95,7 +114,7 @@ export function EventBoard({
         <div className="scene-floor-fade scene-floor-fade-tunnel" />
       </div>
 
-      <div className="relative px-5 py-20 sm:px-6 sm:py-28">
+      <div className="relative col-start-1 row-start-1 px-5 py-20 sm:px-6 sm:py-28">
         <h2 className="reveal sr-only">Schedule and challenge tracks</h2>
 
         <div
