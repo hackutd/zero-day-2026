@@ -796,11 +796,18 @@ function Scene({
       // Read by components/smooth-scroll.tsx, which eases onto this panel if
       // the reader comes to rest already close to it.
       data-settle={settle ? "" : undefined}
-      // Every panel in the descent is a 16:9 frame. The one plate that is not
-      // - the portrait tunnel - is no longer a panel at all: it is the
-      // backdrop the board lays its content over, and lives in
-      // components/event-board.tsx.
-      className="relative aspect-video w-full overflow-hidden"
+      /*
+       * The panel takes its own plate's shape rather than a fixed 16:9. The
+       * plates are not all the same height - the skyline is 1920x1089, the
+       * billboard 1920x1081, the rest 1920x1080 - so a 16:9 box made
+       * `object-cover` crop each of them by a different amount, 3.5px off the
+       * skyline's foot and none off the street's. In a descent meant to run
+       * unbroken that is exactly where it shows: consecutive plates stopped
+       * meeting on their true edge rows. Sized to the import, nothing is
+       * cropped and the joins land where the art intends.
+       */
+      style={{ aspectRatio: `${src.width} / ${src.height}` }}
+      className="relative w-full overflow-hidden"
     >
       <div
         className="scene-frame"
