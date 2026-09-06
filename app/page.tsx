@@ -577,83 +577,36 @@ const WALL_SCREEN = {
 } as const;
 
 /**
- * YouTube cannot embed a *channel* URL - `/embed/<id>` wants a video, and the
- * channel link the organizers gave (youtube.com/channel/UCEM6btSfs7X7Yvv1dLMoyfA)
- * has no video id in it. The uploads playlist is the documented way to point an
- * embed at a whole channel: every channel has one, and its id is the channel id
- * with the `UC` prefix swapped for `UU`. So this plays the channel's newest
- * uploads and keeps working as they post.
+ * The wall screen, dark.
  *
- * TODO(organizers): swap to a single video once there is a recap to feature -
- * replace this with `embed/<VIDEO_ID>` and drop the `list` parameter.
+ * There is no recap to run here yet. It held a YouTube playlist embed, which
+ * cost well over a megabyte of player for a box this size and drew its own
+ * chrome that could not be styled from outside a cross-origin document. A
+ * screen between showings is a better answer than a bad showing.
+ *
+ * So this is the panel with nothing playing: the same box, unlit, with the
+ * faint vertical wash a dark display gives off and a hairline where its bezel
+ * catches the platform light. It reads as part of the wall rather than as a
+ * hole in it.
+ *
+ * TODO(organizers): when there is a video, put an <AmbientVideo> in here with
+ * an MP4 in public/. Prefer that to an embed: it defers its own fetch, carries
+ * no third-party player, and sets no cookies.
  */
-const YOUTUBE_UPLOADS_PLAYLIST = "UUEM6btSfs7X7Yvv1dLMoyfA";
-
-/**
- * Player parameters for the wall screen. This is set dressing on a platform,
- * not a video anyone came here to operate, so it should read as a screen
- * playing rather than as a YouTube page sitting in the wall.
- *
- * `showinfo` and `modestbranding` are gone, so the title bar, the channel
- * avatar and the watermark cannot be turned off directly. What removes them is
- * playing: YouTube only draws that furniture over a paused or hovered player,
- * so an autoplaying muted loop with no controls shows the picture and nothing
- * else. Muted is not a preference here, it is the only way autoplay is allowed
- * at all.
- *
- *  - controls=0        no scrubber, no play button, no fullscreen chrome
- *  - rel=0             end screen suggestions stay on this channel
- *  - iv_load_policy=3  no annotation cards over the picture
- *  - disablekb=1       the wall does not steal arrow keys from the page
- *  - playsinline=1     iOS plays it in the wall instead of going fullscreen
- */
-const WALL_SCREEN_PARAMS = [
-  "autoplay=1",
-  "mute=1",
-  "loop=1",
-  "controls=0",
-  "rel=0",
-  "iv_load_policy=3",
-  "disablekb=1",
-  "playsinline=1",
-].join("&");
-
 function WallScreen() {
   return (
-    <div className="absolute overflow-hidden bg-black" style={WALL_SCREEN}>
-      {/*
-        `youtube-nocookie.com` so a visitor who never presses play is not
-        handed tracking cookies for it. `loading="lazy"` because this panel is
-        several screens down - the player is well over a megabyte and there is
-        no reason to spend it before the reader gets here.
-      */}
-      {/*
-        The player is laid out four times the size of its box on a phone and
-        scaled back down to fit it.
-      
-        YouTube draws its own chrome - the channel avatar, the title, the play
-        button - at a size it picks from the iframe's own pixel width, and it
-        has a floor. At the ~63px this screen gets on a phone, that chrome came
-        out nearly as large as the picture. Nothing about it can be styled from
-        here: it is a cross-origin document, and the parameters that used to
-        trim it (`showinfo`, `modestbranding`) are gone.
-      
-        So the iframe is given four times the width and height it will occupy
-        and scaled by a quarter from its top-left corner: YouTube sees a 250px
-        player and sizes its furniture for one, while the box on the wall is
-        unchanged. Clicks and fullscreen come through the transform intact.
-      
-        Above `sm` the screen is wide enough that YouTube's own sizing is
-        right, so the scaling is switched off rather than left on at a size it
-        was not needed for.
-      */}
-      <iframe
-        src={`https://www.youtube-nocookie.com/embed/videoseries?list=${YOUTUBE_UPLOADS_PLAYLIST}&${WALL_SCREEN_PARAMS}`}
-        title="HackUTD on YouTube"
-        loading="lazy"
-        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        className="h-[400%] w-[400%] origin-top-left scale-25 border-0 sm:h-full sm:w-full sm:scale-100"
+    <div
+      aria-hidden
+      className="absolute overflow-hidden bg-[#05040a]"
+      style={WALL_SCREEN}
+    >
+      <div
+        className="h-full w-full"
+        style={{
+          background:
+            "linear-gradient(160deg, rgb(255 255 255 / 5%) 0%, rgb(255 255 255 / 1%) 42%, rgb(0 0 0 / 0%) 70%)",
+          boxShadow: "inset 0 0 0 1px rgb(255 255 255 / 8%)",
+        }}
       />
     </div>
   );
