@@ -37,8 +37,10 @@ const linkColumns: { heading: string; links: FooterLink[] }[] = [
   {
     heading: "Resources",
     links: [
-      { label: "Devpost", href: "#" },
-      { label: "Discord", href: "#" },
+      { label: "Devpost", href: "https://devpost.com/" },
+      // Commented out until there is an invite URL to point it at. Restore the
+      // line and give it the invite.
+      // { label: "Discord", href: "#" },
       { label: "Starter kits", href: "#" },
       { label: "Hardware lab", href: "#" },
     ],
