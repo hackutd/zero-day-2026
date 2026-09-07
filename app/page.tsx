@@ -213,7 +213,7 @@ function BillboardWordmark() {
       className="absolute"
       style={{
         left: "4.58%",
-        top: "23.60%",
+        top: "23.62%",
         width: "41.10%",
         // Matches the source exactly, so `object-contain` fits edge to edge.
         aspectRatio: "781 / 307",
@@ -258,7 +258,7 @@ function BillboardWordmark() {
 /**
  * Screens playing on the sides of two buildings in the skyline.
  *
- * Every figure is a fraction of the artwork's own 1920x1089, measured off the
+ * Every figure is a fraction of the artwork's own 1920x1080, measured off the
  * plate rather than eyeballed, so they stay on their buildings at any viewport.
  * Unlike the hero billboard these need no shear: this building's window grid is
  * drawn perfectly axis-aligned, so the screens are plain rectangles.
@@ -272,7 +272,7 @@ const BUILDING_ADS = [
     src: "/ads/ad-gif1.mp4",
     label: "Advertisement screen on a city building",
     left: "30.99%",
-    top: "37.19%",
+    top: "37.50%",
     width: "8.33%",
     aspect: "800 / 600",
   },
@@ -281,7 +281,7 @@ const BUILDING_ADS = [
     src: "/ads/ad-reboot.mp4",
     label: "Reboot advertisement screen on a city building",
     left: "2.86%",
-    top: "18.83%",
+    top: "18.99%",
     width: "7.55%",
     aspect: "600 / 338",
   },
@@ -302,7 +302,7 @@ const BUILDING_ADS = [
     src: "/ads/ad-tmobile.mp4",
     label: "T-Mobile advertisement screen on a city building",
     left: "11.82%",
-    top: "45.00%",
+    top: "45.38%",
     width: "6.46%",
     aspect: "480 / 228",
   },
@@ -791,14 +791,12 @@ function Scene({
       // the reader comes to rest already close to it.
       data-settle={settle ? "" : undefined}
       /*
-       * The panel takes its own plate's shape rather than a fixed 16:9. The
-       * plates are not all the same height - the skyline is 1920x1089, the
-       * billboard 1920x1081, the rest 1920x1080 - so a 16:9 box made
-       * `object-cover` crop each of them by a different amount, 3.5px off the
-       * skyline's foot and none off the street's. In a descent meant to run
-       * unbroken that is exactly where it shows: consecutive plates stopped
-       * meeting on their true edge rows. Sized to the import, nothing is
-       * cropped and the joins land where the art intends.
+       * The panel takes its own plate's shape rather than a fixed 16:9. Every
+       * plate is 1920x1080 today, so this resolves to the same box for all of
+       * them - but it is read from the import rather than hardcoded, so a plate
+       * that comes back a different size sizes its own panel instead of being
+       * silently cropped by `object-cover`, which is how the descent drifted
+       * out of alignment before.
        */
       style={{ aspectRatio: `${src.width} / ${src.height}` }}
       className="relative w-full overflow-hidden"

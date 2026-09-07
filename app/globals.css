@@ -490,6 +490,21 @@ body {
  *
  * From `sm` up the plate covers, pinning is worth it, and the track is tall.
  */
+/*
+ * The prehero is a panel like every other one in the descent: full width, its
+ * own plate's shape, nothing cropped.
+ *
+ * It used to be pinned at 100svh and cover-scaled to fill that, which drew the
+ * plate at whatever scale the viewport height demanded - 0.826x on a 1440x900
+ * window against the 0.75x of the panels under it, and centre-cropped 73px a
+ * side on top of that. The art is one continuous city, so a building crossing
+ * the seam changed size and slid sideways at the boundary. On a true 16:9
+ * window cover happened to crop nothing and it looked right, which is why this
+ * read as fine on some monitors and broken on others.
+ *
+ * Sized to its own aspect instead, every plate in the descent lands at the same
+ * scale at every viewport, and the joins are continuous.
+ */
 .prehero-track {
   position: relative;
 }
@@ -497,41 +512,18 @@ body {
 .prehero-pin {
   position: relative;
   width: 100%;
-  aspect-ratio: 1920 / 1089;
+  aspect-ratio: 1920 / 1080;
   overflow: hidden;
 }
 
-@media (width >= 40rem) {
-  .prehero-track {
-    height: 280svh;
-  }
-
-  .prehero-pin {
-    position: sticky;
-    top: 0;
-    height: 100svh;
-    aspect-ratio: auto;
-  }
-}
-
+/* The panel is the plate's aspect at every width, so this fits it exactly. */
 .prehero-frame {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  aspect-ratio: 1920 / 1089;
-  /* The panel is already the plate's aspect on a phone, so this fits exactly. */
+  aspect-ratio: 1920 / 1080;
   width: 100%;
-}
-
-@media (width >= 40rem) {
-  .prehero-frame {
-    /*
-     * The pinned panel fills the viewport, so the frame has to cover it. The
-     * frame stays centred, which keeps the headline centred on screen.
-     */
-    width: max(100%, calc(100svh * 1920 / 1089));
-  }
 }
 
 /*

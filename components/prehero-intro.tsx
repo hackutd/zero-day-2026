@@ -31,6 +31,17 @@ const OUT_END = 0.9;
 const TRAVEL_PX = 140;
 
 /**
+ * Shortest pin worth treating as one.
+ *
+ * The panel is 1920x1080. On any window near that shape it comes out within a
+ * few pixels of the viewport height - technically a pin, and the whole sequence
+ * would play out over those few pixels as a flash. Anything under this runs as
+ * flow instead, which is the arrangement that suits a panel roughly the height
+ * of the screen anyway.
+ */
+const MIN_PIN_TRAVEL = 240;
+
+/**
  * Darkest the scrim gets at the line's peak, pinned. The reader has scrolled
  * into this deliberately and the city is still legible through the blur.
  */
@@ -90,11 +101,13 @@ export function PreheroIntro() {
 
       let p: number;
       let maxScrim: number;
-      if (pinTravel > 0) {
+      if (pinTravel > MIN_PIN_TRAVEL) {
         maxScrim = MAX_SCRIM;
         // Pinned: the panel is stuck for the track height minus one screen, so
         // that distance is the timeline. `-rect.top` is how far into it we
         // have scrolled, which is 0 on load and starts the sequence at rest.
+        // Nothing pins the prehero today - this is kept for a track that gives
+        // itself the room to.
         p = clamp(-rect.top / pinTravel);
       } else {
         maxScrim = MAX_SCRIM_FLOW;
