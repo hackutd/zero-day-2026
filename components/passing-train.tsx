@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-import train from "@/public/backgrounds/04-subway-train.png";
+import train from "@/public/backgrounds/04-subway-train-2x.webp";
 
 /**
  * A train running through the platform on the far track, behind the stopped

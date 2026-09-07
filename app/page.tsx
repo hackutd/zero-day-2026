@@ -15,13 +15,13 @@ import { SocialMarquee } from "@/components/social-marquee";
 import { getConfigStatus, getFAQs, getSchedule, getSponsors } from "@/lib/api";
 import type { FAQ, ScheduleItem, Sponsor } from "@/lib/types";
 import zeroDay from "@/public/zero_day.png";
-import prehero from "@/public/backgrounds/01-prehero.png";
-import hero from "@/public/backgrounds/02-hero.png";
-import street from "@/public/backgrounds/03-street.png";
-import pipes from "@/public/backgrounds/03b-pipes.jpg";
+import prehero from "@/public/backgrounds/01-prehero-2x.webp";
+import hero from "@/public/backgrounds/02-hero-2x.webp";
+import street from "@/public/backgrounds/03-street-2x.webp";
+import pipes from "@/public/backgrounds/03b-pipes-2x.webp";
 import mascots from "@/public/mascots.png";
-import subwayBackground from "@/public/backgrounds/04-subway-background.png";
-import subwayForefront from "@/public/backgrounds/04-subway-forefront.png";
+import subwayBackground from "@/public/backgrounds/04-subway-background-2x.webp";
+import subwayForefront from "@/public/backgrounds/04-subway-forefront-2x.webp";
 
 /**
  * The opening scenes of the site, stacked in reading order.
@@ -792,7 +792,7 @@ function Scene({
       data-settle={settle ? "" : undefined}
       /*
        * The panel takes its own plate's shape rather than a fixed 16:9. Every
-       * plate is 1920x1080 today, so this resolves to the same box for all of
+       * plate has a 16:9 aspect today, so this resolves to the same box for all of
        * them - but it is read from the import rather than hardcoded, so a plate
        * that comes back a different size sizes its own panel instead of being
        * silently cropped by `object-cover`, which is how the descent drifted
