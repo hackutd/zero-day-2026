@@ -2,6 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * Point the element at the track. Opus where it plays - 1.4MB against the mp3
+ * fallback's 2.1MB - and a no-op once a source is already attached, so the
+ * idle warm-up and a press cannot fetch it twice.
+ */
+function attach(audio: HTMLAudioElement) {
+  if (audio.hasAttribute("src")) return;
+  audio.src = audio.canPlayType('audio/webm; codecs="opus"')
+    ? "/audio/distant-echoes.webm"
+    : "/audio/distant-echoes.mp3";
+}
+
 /** Background music loads on the first gesture, or an explicit button press. */
 export function AudioToggle() {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -11,12 +23,7 @@ export function AudioToggle() {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   function start(audio: HTMLAudioElement) {
-    // No source in the initial markup: even metadata waits for interaction.
-    if (!audio.hasAttribute("src")) {
-      audio.src = audio.canPlayType('audio/webm; codecs="opus"')
-        ? "/audio/distant-echoes.webm"
-        : "/audio/distant-echoes.mp3";
-    }
+    attach(audio);
     void audio.play().catch(() => setPlaying(false));
   }
 
@@ -51,10 +58,47 @@ export function AudioToggle() {
         start(audio);
       }
     };
+    /*
+     * Warm the track once the page has gone quiet.
+     *
+     * The markup ships with no source at all, which is right - nobody should
+     * pay for music they never ask for. But it meant the first press started
+     * from nothing: open a connection, read the container, buffer, then play,
+     * all after the click. Buffering a couple of megabytes at that point is
+     * what the wait was.
+     *
+     * Fetching on idle moves that off the click. It runs after the page has
+     * finished its own work, so it competes with nothing, and it is skipped
+     * for anyone who has asked not to spend the bytes - Data Saver, or a
+     * connection the browser does not call 4g. Those readers get exactly the
+     * behaviour that was here before.
+     */
+    const warm = () => {
+      if (!active || document.hidden || audio.hasAttribute("src")) return;
+      const connection = (
+        navigator as Navigator & {
+          connection?: { saveData?: boolean; effectiveType?: string };
+        }
+      ).connection;
+      if (connection?.saveData) return;
+      if (connection?.effectiveType && connection.effectiveType !== "4g")
+        return;
+      audio.preload = "auto";
+      attach(audio);
+      audio.load();
+    };
+    // requestIdleCallback where it exists; a short timer everywhere else.
+    const canIdle = typeof window.requestIdleCallback === "function";
+    const warmHandle = canIdle
+      ? window.requestIdleCallback(warm, { timeout: 4000 })
+      : window.setTimeout(warm, 2500);
+
     for (const type of events) document.addEventListener(type, onGesture);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       active = false;
+      if (canIdle) window.cancelIdleCallback(warmHandle);
+      else window.clearTimeout(warmHandle);
       teardown();
       document.removeEventListener("visibilitychange", onVisibility);
       resumeWhenVisible.current = false;
