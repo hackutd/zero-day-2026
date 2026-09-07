@@ -846,8 +846,14 @@ function Mascots() {
 
 function PipesBand() {
   return (
+    // Hidden on a phone for now. The band is 360px against the 1080 of the
+    // panels either side of it, so at 390px wide it renders about 68px tall -
+    // too little for the pipework to read as anything but a smudge, and its
+    // two 40% fades leave barely a quarter of that at full strength. With it
+    // out, the street's floor fade meets the platform's ceiling fade directly
+    // and the descent still crosses through black.
     <div
-      className="relative w-full overflow-hidden"
+      className="relative hidden w-full overflow-hidden sm:block"
       style={{ marginTop: "-3.59%", marginBottom: "-0.36%" }}
     >
       <Image
