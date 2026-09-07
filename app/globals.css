@@ -169,7 +169,8 @@ body {
 }
 
 .scene-ceiling-fade-subway {
-  --scene-fade-end: 8%;
+  /* Lengthened with the pipes' fades above it - the two make one crossing. */
+  --scene-fade-end: 26%;
 }
 
 .scene-ceiling-fade-tunnel {
@@ -729,9 +730,34 @@ textarea,
  * shorter run on screen, and it is a transition rather than a place: the
  * pipework should emerge and recede rather than start and stop.
  */
+/*
+ * Both edges of the pipework, and the street above it.
+ *
+ * These were 20% of a 360px band - 72px - which is about as long as the strip
+ * the band overlaps the street by, so the plate went from solid black to fully
+ * lit in roughly the width of the overlap and the join showed as a dark bar
+ * with a hard edge on each side. Measured down the middle of the page it dipped
+ * to 0.37 and was back at 43 sixty pixels later.
+ *
+ * Longer ramps, same shape. Nothing here is darker than it was; it just takes
+ * its time.
+ *
+ * Most of the length has to come from the neighbours. The band is only 360px
+ * tall, so its own two fades eat into each other - at 40% a side they already
+ * cover 288 of it and leave 72px of pipework at full strength, which is about
+ * the floor before the band stops being pipework and becomes a dark gap. The
+ * street and the platform are full 1080px panels either side of it and have
+ * room to spare, so they carry a quarter of their height each. The crossing
+ * ends up roughly 400px of gradient rather than 60, and no single stretch of
+ * it is steep.
+ */
 .scene-ceiling-fade-pipes,
 .scene-floor-fade-pipes {
-  --scene-fade-end: 20%;
+  --scene-fade-end: 40%;
+}
+
+.scene-floor-fade-street {
+  --scene-fade-end: 26%;
 }
 
 /*

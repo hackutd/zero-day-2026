@@ -64,6 +64,7 @@ const scenes: {
   {
     src: street,
     alt: "Silhouetted figures on a rain-slicked street lined with red neon.",
+    seams: <StreetSeams />,
   },
   {
     src: subwayBackground,
@@ -530,6 +531,21 @@ function SubwayOverlays() {
  * zoom must not reach them: their black has to land on the panel's own first
  * and last rows to meet the plates above and below.
  */
+/**
+ * The street's own way down into the pipework.
+ *
+ * The plate already darkens toward its foot - its last row is 0.73 - but it
+ * gets there on the art's schedule, dropping from 41 to 8 over the final
+ * stretch and then meeting the pipes' fade, which took it the rest of the way
+ * to black in a few pixels. Two ramps of very different slopes meeting is what
+ * made the join read as a bar rather than a blend. This carries the street down
+ * on the same gentle slope the pipes come back up on, so the pair reads as one
+ * long crossing.
+ */
+function StreetSeams() {
+  return <div className="scene-floor-fade scene-floor-fade-street" />;
+}
+
 function SubwaySeams() {
   return (
     <>
