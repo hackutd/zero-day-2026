@@ -840,6 +840,53 @@ textarea,
 }
 
 /*
+ * The ground the street section's copy is read against.
+ *
+ * The plate is a crossing seen down a road: the left half carries the lit
+ * buildings, the umbrella and the wet reflections, and the road runs away dark
+ * up the middle-right. That dark road is the only part of the picture with room
+ * for a paragraph, so the copy goes there and this calms it - the same frosted
+ * pane the prehero puts behind its headline, masked so it fades in from
+ * nothing rather than arriving as an edge.
+ *
+ * Masked, not a box. A panel with a boundary sitting on top of the artwork is
+ * exactly what makes copy over illustration read as an interface pasted over a
+ * picture; a wash with no edge reads as the picture getting darker where it
+ * already was. The busy left third is never touched.
+ */
+.street-scrim {
+  background: linear-gradient(
+    to right,
+    rgb(4 2 10 / 0%) 0%,
+    rgb(4 2 10 / 55%) 46%,
+    rgb(4 2 10 / 78%) 72%,
+    rgb(4 2 10 / 82%) 100%
+  );
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  backdrop-filter: blur(14px) saturate(125%);
+  /*
+   * An ellipse, not a column. A mask that only ran left-to-right left the wash
+   * touching the panel's top and bottom edges, so it met the scene fades above
+   * and below as a straight vertical band - a shape, which is the thing this is
+   * meant not to be. Bounded on both axes it closes well inside the plate: full
+   * strength across the middle third where the copy sits, gone by 10% and 90%
+   * of the height, and gone to the left before it reaches the crossing.
+   */
+  -webkit-mask-image: radial-gradient(
+    80% 40% at 72% 50%,
+    #000 0%,
+    #000 38%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    80% 40% at 72% 50%,
+    #000 0%,
+    #000 38%,
+    transparent 100%
+  );
+}
+
+/*
  * A wash over the pipework.
  *
  * The plate is scratchy, and at the size it renders that texture reads as

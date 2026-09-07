@@ -103,7 +103,8 @@ export default async function Home() {
         its backdrop rather than a panel of its own, so the artwork arrives
         under the content instead of ahead of it.
       */}
-      {scenes.slice(1, 3).map(renderScene)}
+      {renderScene(scenes[1])}
+      <StreetScene scene={scenes[2]} />
       <PipesBand />
       {scenes.slice(3).map(renderScene)}
       <SiteCountdown />
@@ -542,6 +543,79 @@ function SubwayOverlays() {
  * on the same gentle slope the pipes come back up on, so the pair reads as one
  * long crossing.
  */
+/**
+ * The street plate, with what the hackathon actually is written on it.
+ *
+ * Where the copy sits was measured off the plate rather than guessed. Sampled
+ * on a 12x12 grid, the left half is the loud half - the lit buildings, the
+ * umbrella, the wet reflections, all high mean and high variance - and the road
+ * running away up the middle-right is the one large region that is both dark
+ * and flat: x 960-1450, y 360-900 of its 1920x1080. That is where this goes,
+ * over `.street-scrim`, which has no edge of its own.
+ *
+ * Below `sm` the copy is not on the picture at all. The panel holds the plate's
+ * aspect, so at 390px wide it is 219px tall - there is no room for a paragraph
+ * on it at any size worth reading, and shrinking type to fit is how this ends
+ * up looking like an interface rather than a page. So it drops into flow
+ * underneath instead, on black, and the scrim turns off with it.
+ *
+ * The wrapper is what the pipes below overlap. On a wide screen the copy is
+ * absolutely positioned, so the wrapper is exactly the panel and the overlap is
+ * unchanged. On a phone the wrapper grows by the copy's height, and the pipes'
+ * 3.59% bite - about 14px there - lands inside this block's bottom padding.
+ */
+function StreetScene({ scene }: { scene: (typeof scenes)[number] }) {
+  return (
+    // A landmark, not just artwork: this is the first place the page says what
+    // the event actually is, so it gets a name a screen reader can jump to.
+    <section id="about" aria-labelledby="about-heading" className="relative">
+      <Scene {...scene} first={false} />
+
+      <div className="bg-background sm:pointer-events-none sm:absolute sm:inset-0 sm:bg-transparent">
+        <div
+          aria-hidden
+          className="street-scrim pointer-events-none absolute inset-0 hidden sm:block"
+        />
+
+        {/*
+          The column sits in the road. `44%` from the left puts its leading edge
+          just past the crossing's last figure; the right inset keeps it clear
+          of the silhouettes standing at the plate's edge.
+        */}
+        <div className="relative px-5 pt-10 pb-16 sm:absolute sm:top-1/2 sm:right-[7%] sm:left-[44%] sm:-translate-y-1/2 sm:px-0 sm:pt-0 sm:pb-0">
+          <p className="reveal font-sans text-accent-soft text-[11px] tracking-[0.18em] uppercase sm:text-[12px]">
+            About the event
+          </p>
+
+          {/*
+            No question mark: Hypik is letters only, and a `?` would silently
+            fall back to another face mid-line. The question reads as a heading
+            without it.
+          */}
+          <h2
+            id="about-heading"
+            className="reveal reveal-1 font-hypik mt-3 leading-none tracking-[-0.02em] text-white uppercase"
+            style={{ fontSize: "clamp(1.75rem, 3.2vw, 3.25rem)" }}
+          >
+            What is HackUTD
+          </h2>
+
+          <p className="reveal reveal-2 font-sans text-text-muted mt-5 max-w-[46ch] text-[14px] leading-[1.8] sm:text-[15px] lg:text-[16px]">
+            HackUTD is the largest 24 hour university hackathon in North
+            America: a weekend-long event where students build apps, hardware
+            and more. It is a venue for self-expression and creativity through
+            technology. People with varying technical backgrounds, from
+            universities all over the US, come together, form teams around a
+            problem or an idea, and build something from scratch. Whether you
+            are a frequent hackathon attendee or just getting started, we would
+            love to see what you can make.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function StreetSeams() {
   return <div className="scene-floor-fade scene-floor-fade-street" />;
 }
