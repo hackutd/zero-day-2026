@@ -212,7 +212,7 @@ const SIGN_SHEAR_DEG = 6.72;
 function BillboardWordmark() {
   return (
     <div
-      className="absolute"
+      className="billboard-sign absolute"
       style={{
         left: "4.58%",
         top: "23.62%",
@@ -229,6 +229,21 @@ function BillboardWordmark() {
         fill
         sizes="(max-width: 639px) 105vw, 42vw"
         className="object-contain"
+      />
+
+      {/*
+        The displaced slice, the same idea as the platform stats' echo. Only a
+        band of it ever shows, and the sign underneath stays legible the whole
+        time - see `.sign-echo`. Decoration on top of an image that already
+        carries the alt text, so it is hidden from the reading order.
+      */}
+      <Image
+        src={zeroDay}
+        alt=""
+        aria-hidden
+        fill
+        sizes="(max-width: 639px) 105vw, 42vw"
+        className="sign-echo object-contain"
       />
     </div>
   );

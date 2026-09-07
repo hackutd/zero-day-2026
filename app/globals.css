@@ -1012,6 +1012,63 @@ textarea,
   }
 }
 
+/*
+ * The same interference the platform stats carry, on the hero's sign.
+ *
+ * Same rhythm exactly - one 6.5s cycle, `steps(1, end)` so the slice snaps in
+ * and out rather than easing, two hits a second and a half apart, the rest of
+ * the cycle quiet. The sign is an image rather than text, so the two things
+ * that were type properties change: the displaced copy is a second <img> and
+ * the fringe is a `drop-shadow` instead of a `text-shadow`.
+ *
+ * The displacement is a percentage, not the stats' `em`. Their offset rides on
+ * a 17cqw font size, so it scales with the platform; an `em` here would resolve
+ * against the inherited 16px and come out about a pixel on a 787px sign, which
+ * is nothing. A percentage on `translateX` resolves against the element's own
+ * width and holds at every size.
+ *
+ * It lives inside the sheared wrapper, so the slice shears with the sign and
+ * stays on the billboard's plane.
+ */
+.sign-echo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  clip-path: inset(36% 0 43%);
+  filter: drop-shadow(-3px 0 #ff2ee6) brightness(1.35) saturate(1.5);
+  animation: sign-signal 5s steps(1, end) infinite paused;
+  /* Offset from the stats so the two are never seen firing together. */
+  animation-delay: 3.1s;
+}
+
+.billboard-sign[data-in-view] .sign-echo {
+  animation-play-state: running;
+}
+
+@keyframes sign-signal {
+  0%,
+  5%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  1% {
+    opacity: 0.85;
+    transform: translateX(1.1%);
+    clip-path: inset(30% 0 40%);
+  }
+  2.5% {
+    opacity: 0;
+  }
+  3.5% {
+    opacity: 0.7;
+    transform: translateX(-0.85%);
+    clip-path: inset(55% 0 20%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal[data-reveal-ready]:not([data-revealed]) {
@@ -1021,7 +1078,8 @@ textarea,
     transition: none;
   }
   :is(h2, h3).reveal[data-revealed],
-  .wall-stat-echo {
+  .wall-stat-echo,
+  .sign-echo {
     animation: none;
   }
 }

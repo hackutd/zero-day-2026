@@ -50,14 +50,15 @@ export function RevealOnScroll() {
       observer.observe(el);
     });
 
-    // Keep the occasional wall interference asleep outside the viewport.
+    // Keep the occasional interference asleep outside the viewport.
     const statsObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         entry.target.toggleAttribute("data-in-view", entry.isIntersecting);
       }
     });
+    // The hero's sign runs the same interference and is gated the same way.
     document
-      .querySelectorAll(".wall-stats")
+      .querySelectorAll(".wall-stats, .billboard-sign")
       .forEach((el) => statsObserver.observe(el));
 
     return () => {
