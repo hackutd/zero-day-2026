@@ -45,8 +45,26 @@ export function RevealOnScroll() {
       { rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
     );
 
-    targets.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    targets.forEach((el) => {
+      el.setAttribute("data-reveal-ready", "");
+      observer.observe(el);
+    });
+
+    // Keep the occasional wall interference asleep outside the viewport.
+    const statsObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        entry.target.toggleAttribute("data-in-view", entry.isIntersecting);
+      }
+    });
+    document
+      .querySelectorAll(".wall-stats")
+      .forEach((el) => statsObserver.observe(el));
+
+    return () => {
+      observer.disconnect();
+      statsObserver.disconnect();
+      targets.forEach((el) => el.removeAttribute("data-reveal-ready"));
+    };
   }, []);
 
   return null;

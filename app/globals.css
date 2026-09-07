@@ -760,46 +760,39 @@ textarea,
   mix-blend-mode: soft-light;
 }
 
-/*
- * The site's one text reveal. Driven by components/reveal-on-scroll.tsx, which
- * sets `data-revealed` when an element reaches the viewport.
- *
- * Deliberately one rule for every heading and lead line on the page. A
- * different entrance per section is what makes a site feel assembled rather
- * than designed, so the distance, the duration and the curve are fixed here and
- * only the delay varies, which is what produces a stagger without inventing a
- * second motion.
- *
- * The curve is an ease-out with a long tail: most of the travel happens
- * immediately and the last few pixels settle slowly, which reads as something
- * arriving and coming to rest rather than sliding into place. Blur is part of
- * it - a pure fade looks like an image loading, where a blur that resolves as
- * it lands reads as focus being found.
- *
- * Only opacity, transform and filter animate, so this stays off layout entirely
- * and the compositor does the work.
- */
-.reveal {
+/* Shared, one-time entrances. Text stays visible until the observer is ready. */
+.reveal[data-reveal-ready]:not([data-revealed]) {
   opacity: 0;
-  transform: translateY(16px);
-  filter: blur(6px);
+  transform: translateY(14px);
+  filter: blur(4px);
+}
+
+.reveal {
   transition:
-    opacity 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
-    transform 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
-    filter 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
+    opacity 650ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    transform 750ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    filter 650ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
 }
 
-.reveal[data-revealed] {
-  opacity: 1;
-  transform: none;
-  filter: none;
-  will-change: auto;
+/* A brief chromatic edge resolves to crisp type, once per heading. */
+:is(h2, h3).reveal[data-revealed] {
+  animation: text-signal-settle 1000ms ease-out var(--reveal-delay, 0ms) both;
 }
 
-/* Steps for staggering a group. The gap is short on purpose: long enough to
-   read as a sequence, short enough that the last item is not still arriving
-   after the reader has moved on. */
+@keyframes text-signal-settle {
+  0% {
+    text-shadow:
+      -2px 0 rgb(115 235 255 / 55%),
+      2px 0 rgb(255 46 230 / 60%);
+  }
+  45% {
+    text-shadow: 0 0 16px rgb(255 46 230 / 28%);
+  }
+  100% {
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
 .reveal-1 {
   --reveal-delay: 90ms;
 }
@@ -810,15 +803,75 @@ textarea,
   --reveal-delay: 270ms;
 }
 
-/*
- * Without JavaScript nothing ever sets `data-revealed`, so the page would be
- * blank text. This puts it all back.
- */
+/* Small offsets within the original inset box preserve the graffiti margin. */
+.wall-stat:nth-child(1) {
+  transform: translateX(-7cqw);
+}
+.wall-stat:nth-child(2) {
+  transform: translateX(8cqw);
+}
+.wall-stat:nth-child(3) {
+  transform: translateX(-3cqw);
+}
+
+.wall-stat-value {
+  position: relative;
+}
+
+/* Only a thin duplicate slice moves; the underlying number remains readable. */
+.wall-stat-echo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  color: #d4faff;
+  text-shadow: -0.06em 0 #ff2ee6;
+  clip-path: inset(36% 0 43%);
+  animation: wall-signal 6.5s steps(1, end) infinite paused;
+}
+.wall-stat:nth-child(2) .wall-stat-echo {
+  animation-delay: 2s;
+}
+.wall-stat:nth-child(3) .wall-stat-echo {
+  animation-delay: 4.2s;
+}
+.wall-stats[data-in-view] .wall-stat-echo {
+  animation-play-state: running;
+}
+
+@keyframes wall-signal {
+  0%,
+  5%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  1% {
+    opacity: 0.85;
+    transform: translateX(0.09em);
+    clip-path: inset(30% 0 40%);
+  }
+  2.5% {
+    opacity: 0;
+  }
+  3.5% {
+    opacity: 0.7;
+    transform: translateX(-0.07em);
+    clip-path: inset(55% 0 20%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal,
+  .reveal[data-reveal-ready]:not([data-revealed]) {
     opacity: 1;
     transform: none;
     filter: none;
     transition: none;
+  }
+  :is(h2, h3).reveal[data-revealed],
+  .wall-stat-echo {
+    animation: none;
   }
 }

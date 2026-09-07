@@ -644,7 +644,7 @@ const WALL_STATS = [
 function WallStats() {
   return (
     <ul
-      className="absolute flex flex-col items-center justify-center text-center"
+      className="wall-stats absolute flex flex-col items-center justify-center text-center"
       style={WALL_STATS_BOX}
     >
       {WALL_STATS.map(({ value, label }) => (
@@ -652,9 +652,9 @@ function WallStats() {
         // `cqw` in a property of the container element itself resolves against
         // the *next* container out, not against itself, so a gap here would be
         // sized off the viewport and throw the block clear of the ring.
-        <li key={label} className="leading-none not-first:mt-[3cqw]">
+        <li key={label} className="wall-stat leading-none not-first:mt-[3cqw]">
           <span
-            className="font-elevon block font-extrabold text-white"
+            className="wall-stat-value font-elevon block font-extrabold text-white"
             style={{
               fontSize: "17cqw",
               // Lets the numbers sit on the tiles as painted light rather than
@@ -663,6 +663,9 @@ function WallStats() {
             }}
           >
             {value}
+            <span aria-hidden="true" className="wall-stat-echo">
+              {value}
+            </span>
           </span>
           <span
             className="font-elevon text-accent-soft mt-[0.35em] block font-medium tracking-[0.12em] uppercase"
