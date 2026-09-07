@@ -28,9 +28,9 @@
 const CHAMFER = "polygon(0 0, 78% 0, 100% 22%, 100% 100%, 0 100%)";
 
 /**
- * Sets per half. With Discord parked a set is four cards, about 1024px, so
- * three would only carry a half to ~3070px and the loop would tear again on an
- * ultrawide. Four sets puts a half past 4000px, back clear of it.
+ * Sets per half. A set is five cards, about 1280px, so four sets carry a half
+ * past 5000px - clear of any display the loop could tear on. Three would still
+ * cover an ultrawide at ~3840px, but not a 4K desktop.
  */
 const REPEATS = 4;
 
@@ -64,6 +64,12 @@ const SOCIALS: Social[] = [
   // Commented out until there is an invite URL to point it at. Restoring this
   // line brings DiscordMark back into use with it.
   // { name: "Discord", href: "#", tone: "ink", icon: <DiscordMark /> },
+  {
+    name: "X",
+    href: "https://x.com/HackUTD",
+    tone: "ink",
+    icon: <XMark />,
+  },
   {
     name: "YouTube",
     href: "https://www.youtube.com/@realhackutd",
@@ -237,6 +243,17 @@ function InstagramMark() {
  *   );
  * }
  */
+
+function XMark() {
+  return (
+    <svg viewBox="0 0 24 24" className={MARK} aria-hidden>
+      <path
+        style={FILL}
+        d="M18.9 1.153h3.682l-8.042 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932zm-1.292 19.482h2.04L6.486 3.24H4.298z"
+      />
+    </svg>
+  );
+}
 
 function YouTubeMark() {
   return (
