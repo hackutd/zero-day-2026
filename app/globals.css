@@ -516,14 +516,20 @@ body {
   overflow: hidden;
 }
 
-/* The panel is the plate's aspect at every width, so this fits it exactly. */
+/*
+ * Simply the panel's box.
+ *
+ * This used to be centred with `left/top: 50%` and `translate(-50%, -50%)`,
+ * which it needed while it was oversized to cover a pinned viewport. It is the
+ * same size as the panel now, and the transform was actively harmful: it puts
+ * the frame on its own compositing layer, so on a display whose width times its
+ * device pixel ratio is not a whole number - 1463 at 1.25x, 1097 at 1.75x - the
+ * left edge landed on a fractional device pixel and antialiased against the
+ * black page behind it. That read as a thin black slice down the left side.
+ */
 .prehero-frame {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  aspect-ratio: 1920 / 1080;
-  width: 100%;
+  inset: 0;
 }
 
 /*
