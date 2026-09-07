@@ -2,92 +2,91 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Background music, with the only control the page has: a speaker in the
- * bottom-left corner.
- *
- * Browsers refuse to autoplay audible media until the visitor has interacted
- * with the page, and that refusal is a silent promise rejection rather than an
- * error. So this tries to play on mount, and if it's blocked, arms a one-shot
- * listener that starts the track on the first click, key, or tap anywhere -
- * which is what makes it feel like it "just started playing" while still
- * obeying the autoplay policy. Once the visitor pauses it, that's final; the
- * fallback listener is torn down and only the button will start it again.
- */
+/** Background music loads on the first gesture, or an explicit button press. */
 export function AudioToggle() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
-  // Mirrors `playing` for the effect below without making it a dependency -
-  // re-running the effect on every toggle would re-arm the gesture listener and
-  // restart audio the visitor had deliberately paused.
   const pausedByUser = useRef(false);
+  const resumeWhenVisible = useRef(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  function start(audio: HTMLAudioElement) {
+    // No source in the initial markup: even metadata waits for interaction.
+    if (!audio.hasAttribute("src")) {
+      audio.src = audio.canPlayType('audio/webm; codecs="opus"')
+        ? "/audio/distant-echoes.webm"
+        : "/audio/distant-echoes.mp3";
+    }
+    void audio.play().catch(() => setPlaying(false));
+  }
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
-    // Background music sitting under the visuals, not the main event.
     audio.volume = 0.22;
-
-    const start = () => {
-      if (pausedByUser.current) return;
-      void audio.play().catch(() => {
-        /* Still blocked, or no supported source - leave the button showing off. */
-      });
-    };
-
-    // The gesture fallback, armed only if the unprompted attempt is refused.
-    const events = ["pointerdown", "keydown", "touchstart"] as const;
-    const onGesture = () => {
-      start();
-      teardown();
-    };
+    let active = true;
+    const events = ["pointerdown", "keydown"] as const;
     const teardown = () => {
-      for (const type of events) {
-        document.removeEventListener(type, onGesture);
+      for (const type of events) document.removeEventListener(type, onGesture);
+    };
+    const onGesture = (event: Event) => {
+      // The music button owns its click; starting on pointerdown would make
+      // that same click immediately pause the track again.
+      if (buttonRef.current?.contains(event.target as Node)) return;
+      if (document.hidden || pausedByUser.current) return;
+      teardown();
+      const connection = (
+        navigator as Navigator & {
+          connection?: { saveData?: boolean };
+        }
+      ).connection;
+      if (!connection?.saveData) start(audio);
+    };
+    const onVisibility = () => {
+      if (document.hidden) {
+        resumeWhenVisible.current = !audio.paused;
+        audio.pause();
+      } else if (resumeWhenVisible.current && !pausedByUser.current && active) {
+        resumeWhenVisible.current = false;
+        start(audio);
       }
     };
-
-    void audio.play().catch(() => {
-      for (const type of events) {
-        document.addEventListener(type, onGesture, { once: true });
-      }
-    });
-
-    return teardown;
+    for (const type of events) document.addEventListener(type, onGesture);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      active = false;
+      teardown();
+      document.removeEventListener("visibilitychange", onVisibility);
+      resumeWhenVisible.current = false;
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+    };
   }, []);
 
   function toggle() {
     const audio = audioRef.current;
     if (!audio) return;
-
     if (audio.paused) {
       pausedByUser.current = false;
-      void audio.play().catch(() => setPlaying(false));
+      start(audio);
     } else {
       pausedByUser.current = true;
+      resumeWhenVisible.current = false;
       audio.pause();
     }
   }
 
   return (
     <>
-      {/*
-        `preload="metadata"` rather than `auto`: the track is ~2MB, and a
-        visitor whose browser blocks autoplay and who never clicks the button
-        should not pay for it. `play()` starts the fetch when it's actually
-        wanted.
-      */}
       <audio
         ref={audioRef}
         loop
-        preload="metadata"
+        preload="none"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
-      >
-        <source src="/audio/distant-echoes.webm" type="audio/webm" />
-        <source src="/audio/distant-echoes.mp3" type="audio/mpeg" />
-      </audio>
+        onError={() => setPlaying(false)}
+      />
 
       {/*
         The notched corners are the same motif as the Register and Explore
@@ -100,6 +99,7 @@ export function AudioToggle() {
         parent showing through 1px around a clipped child.
       */}
       <button
+        ref={buttonRef}
         type="button"
         onClick={toggle}
         aria-pressed={playing}
