@@ -33,10 +33,6 @@ import portrait from "@/public/keynote-placeholder.jpg";
  * the layout the real one will get.
  */
 
-/** The same chamfer as the buttons and the countdown cells, at card size. */
-const NOTCH =
-  "polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px)";
-
 export function KeynoteSpeaker() {
   return (
     <section
@@ -49,18 +45,13 @@ export function KeynoteSpeaker() {
       className="bg-background flex flex-col justify-center px-5 py-14 sm:px-6 sm:py-20"
     >
       {/*
-        The hairline is a clipped parent showing through 1px around a clipped
-        child, the same trick the countdown cells and the marquee cards use:
-        `clip-path` crops a border away, so the border has to be a layer.
+        The decorative frame carries the edge here, so the chamfer and its
+        hairline are gone - the two together read as two borders arguing. It is
+        painted over the card rather than as its border; see `.keynote-frame`
+        for why that is what lets the picture reach the bottom bar.
       */}
-      <div
-        style={{ clipPath: NOTCH }}
-        className="mx-auto w-full max-w-[1200px] bg-white/12 p-px"
-      >
-        <div
-          style={{ clipPath: NOTCH }}
-          className="grid items-stretch bg-[#0b0910] sm:grid-cols-[minmax(0,40%)_1fr]"
-        >
+      <div className="keynote-card mx-auto w-full max-w-[1200px]">
+        <div className="keynote-body grid items-stretch sm:grid-cols-[minmax(0,40%)_1fr]">
           {/*
             Two layers over the picture's half: the still, and a scrim that
             sits it back into the card rather than letting a lit frame punch
@@ -107,6 +98,8 @@ export function KeynoteSpeaker() {
             </p>
           </div>
         </div>
+
+        <div aria-hidden className="keynote-frame" />
       </div>
     </section>
   );

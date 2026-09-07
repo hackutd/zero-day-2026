@@ -761,6 +761,85 @@ textarea,
 }
 
 /*
+ * The decorative frame around the keynote card.
+ *
+ * `border-image` rather than a stretched overlay. The art is 1407x941 with a
+ * hollow middle and a border that is not uniform - 139px along the top, 111 at
+ * the sides, 99 underneath - and its corners carry the shapes that make it read
+ * as a HUD panel. Painting it as one stretched picture would smear those
+ * corners and squash the hatching the moment the card was not the plate's own
+ * 1.495 aspect, which it never is: the copy sets the height.
+ *
+ * Sliced, the four corners are placed at their own size and only the flat runs
+ * between them stretch - the neon rails up the sides, which are uniform, and
+ * the hatched bars top and bottom, which compress a little on a narrower card
+ * and read the same.
+ *
+ * It is an overlay rather than a border on the content's own box, because the
+ * frame's opening is not the rectangle the content box is. Along the bottom the
+ * bar dips away at the left and right - 36 to 54px of clear art - and only the
+ * centre tab comes up to meet the hollow. Content sized to the rectangle left a
+ * strip of bare card under the picture there. Painting the frame over the top
+ * lets the card fill past the hollow's edge into that dip; a border on the
+ * element itself could not, since descendants paint over an element's own
+ * border and the picture would have covered the bar.
+ */
+.keynote-card {
+  position: relative;
+  background-color: #0b0910;
+}
+
+.keynote-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-sizing: border-box;
+  border-style: solid;
+  /*
+   * WebP, and referenced straight from CSS. `border-image` cannot go through
+   * next/image, so nothing converts this on the way out - it ships exactly as
+   * it sits in public/. The PNG was 611KB for a decoration; this is 130KB with
+   * the hollow middle intact.
+   */
+  border-image-source: url("/keynote-frame.webp");
+  border-image-slice: 139 111 99 111;
+  border-image-repeat: stretch;
+  /* 0.26 of the source, so the top bar stays legible on a narrow screen. */
+  border-width: 36px 29px 26px 29px;
+}
+
+/*
+ * The content's inset. Top and sides match the frame's border exactly; the
+ * bottom is short by the depth of the bar's dip at that scale, so the card
+ * runs down into it and the frame closes over the top.
+ */
+.keynote-card > .keynote-body {
+  padding: 36px 29px 12px;
+}
+
+@media (width >= 40rem) {
+  .keynote-frame {
+    /* 0.48 */
+    border-width: 67px 53px 48px 53px;
+  }
+
+  .keynote-card > .keynote-body {
+    padding: 67px 53px 22px;
+  }
+}
+
+@media (width >= 64rem) {
+  .keynote-frame {
+    /* 0.62 - close to the scale a 1200px card gives the 1407px plate. */
+    border-width: 86px 69px 61px 69px;
+  }
+
+  .keynote-card > .keynote-body {
+    padding: 86px 69px 28px;
+  }
+}
+
+/*
  * A wash over the pipework.
  *
  * The plate is scratchy, and at the size it renders that texture reads as
