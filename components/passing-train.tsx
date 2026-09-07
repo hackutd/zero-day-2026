@@ -63,7 +63,7 @@ export function PassingTrain() {
           // exact fit rather than a crop. `250vw` because the box is two and a
           // half panels wide and the panel is the full viewport.
           sizes="250vw"
-          className="object-cover"
+          className="media-fade object-cover"
         />
       </div>
     </div>

@@ -1069,6 +1069,26 @@ textarea,
   }
 }
 
+/*
+ * Media that arrives late (components/media-fade.tsx).
+ *
+ * The transition sits on the element always; the transparency only applies once
+ * the script has claimed it. If the script never runs, nothing here hides.
+ */
+.media-fade {
+  transition: opacity 520ms ease-out;
+}
+
+.media-fade[data-media-ready]:not([data-loaded]) {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-fade {
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal[data-reveal-ready]:not([data-revealed]) {

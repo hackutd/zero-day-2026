@@ -95,7 +95,7 @@ export function AmbientVideo({
       loop
       playsInline
       preload="none"
-      className={className}
+      className={`media-fade${className ? ` ${className}` : ""}`}
     />
   );
 }

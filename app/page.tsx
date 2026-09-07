@@ -228,7 +228,7 @@ function BillboardWordmark() {
         alt="HackUTD's Zero Day"
         fill
         sizes="(max-width: 639px) 105vw, 42vw"
-        className="object-contain"
+        className="media-fade object-contain"
       />
 
       {/*
@@ -501,7 +501,7 @@ function SubwayCar() {
       alt=""
       fill
       sizes="100vw"
-      className="pointer-events-none object-cover"
+      className="media-fade pointer-events-none object-cover"
     />
   );
 }

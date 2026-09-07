@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 
 import { AudioToggle } from "@/components/audio-toggle";
 import { EdgeRails } from "@/components/edge-rails";
+import { MediaFade } from "@/components/media-fade";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { SiteNav } from "@/components/site-nav";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -93,6 +94,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="font-sans min-h-full">
         <SmoothScroll />
         <RevealOnScroll />
+        <MediaFade />
         <EdgeRails />
         <SiteNav />
         {children}
