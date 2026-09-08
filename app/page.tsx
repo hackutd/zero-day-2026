@@ -180,6 +180,87 @@ function BillboardWordmark() {
 }
 
 /**
+ * The application deadline, painted on the billboard under the wordmark.
+ *
+ * Measured off `02-hero.png` the way the wordmark above it was, because the
+ * space this has to live in is bounded on both sides. At the sign's midline the
+ * wordmark's *ink* stops at y 537 of the 1920x1080 plate - its box runs on to
+ * 565, but 28 of those rows are the artwork's own padding, see
+ * BillboardWordmark - and the sign's lit face ends at y 693, its bottom rail
+ * running from (40, 655) to (955, 734). That leaves a 156px band.
+ *
+ * This box takes 135 of it, centred. Being the tighter of the two is the point:
+ * it shears at the wordmark's 6.72 deg while the rail only falls at 4.94, so the
+ * band narrows as you go right, and a box measured to fit at the midline is
+ * what would push through the sign at its right-hand end.
+ *
+ * Two lines rather than one. The sign is 41% of the frame wide, so as a single
+ * line the whole string had to fit that width at every viewport - about 6px of
+ * type on a phone. Split, each line is short enough to hold a legible floor, so
+ * the deadline still reads where the sign is 160px wide and still grows with the
+ * artwork above that.
+ *
+ * Set in Satoshi, not the Elevon the subway stats use. Elevon is deliberately
+ * not preloaded (app/layout.tsx) on the grounds that nothing above the fold is
+ * set in it, and the hero is the second panel on the page - the first Elevon
+ * glyphs here would put ~40KB back in front of the opening artwork for two
+ * lines of type.
+ */
+const BILLBOARD_DEADLINE_BOX = {
+  // Flush with the wordmark's box, so the two centre on the same column and the
+  // shear below pivots both about the same x.
+  left: "4.58%",
+  width: "41.10%",
+  top: "50.69%",
+  height: "12.50%",
+  containerType: "inline-size",
+} as const;
+
+function BillboardDeadline() {
+  return (
+    <div
+      className="absolute flex flex-col items-center justify-center text-center"
+      style={{
+        ...BILLBOARD_DEADLINE_BOX,
+        transform: `skewY(${SIGN_SHEAR_DEG}deg)`,
+        transformOrigin: "center",
+      }}
+    >
+      {/*
+        Dark ink, not neon. This band of the sign is flat #00b8d3, so the deep
+        purple reads as something printed on a lightbox and lands about 8:1;
+        the wordmark's magenta over the same cyan would be 1.3:1 and vanish.
+
+        Sized in `cqw` against this box rather than `vw`, so the type is a
+        fraction of the sign instead of of the window - the sign is a fixed
+        share of a panel that holds 16:9 at every width, so anything measured
+        against the viewport would drift off it as the panel changed shape. The
+        size sits on this element and not on the box above, because `cqw` in a
+        property of the container itself resolves against the *next* container
+        out - the same trap the subway stats' gap had to avoid.
+      */}
+      <p
+        className="font-sans uppercase"
+        style={{ fontSize: "clamp(10px, 3.4cqw, 28px)", lineHeight: 1.25 }}
+      >
+        <span className="text-surface-deep/75 block font-medium tracking-[0.14em]">
+          Priority deadline
+        </span>
+        {/*
+          A <time>, for the same reason the footer's copy of this line carries
+          one: the visible text is uppercased by CSS and written for a US
+          reader, which neither a parser nor a screen reader should have to
+          interpret.
+        */}
+        <span className="text-surface-deep block font-bold tracking-[0.06em]">
+          <time dateTime="2026-10-03">October 3, 2026</time>
+        </span>
+      </p>
+    </div>
+  );
+}
+
+/**
  * The opening scene, pinned.
  *
  * From `sm` up the outer section is pure scroll distance and the panel inside
@@ -392,13 +473,14 @@ function MlhBadge() {
 }
 
 /**
- * Everything laid over the hero plate: the billboard wordmark, and the screen
- * on the building down the alley.
+ * Everything laid over the hero plate: the billboard wordmark and the deadline
+ * under it, and the screen on the building down the alley.
  */
 function HeroOverlays() {
   return (
     <>
       <BillboardWordmark />
+      <BillboardDeadline />
       <BuildingAd
         src="/ads/ad-gif4.mp4"
         label="Screen on a building down the alley"
