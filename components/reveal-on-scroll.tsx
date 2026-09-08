@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { REVEAL_READY_EVENT } from "@/components/reveal-ready";
+
 /**
  * One observer for every `.reveal` on the page.
  *
@@ -19,25 +21,18 @@ import { useEffect } from "react";
  * holds the trigger until the element is properly into the viewport rather than
  * firing on its first pixel.
  *
- * Two rules keep this safe now that the sponsors, FAQ and schedule stream in
+ * Two rules keep this safe now that API-backed sections stream in
  * behind Suspense boundaries (components/api-sections.tsx):
  *
- *  1. Nothing is ever written to an element React renders *before* React has
- *     hydrated it. This used to set `data-reveal-ready` on every `.reveal` it
- *     found, which for a streamed heading meant writing an attribute onto DOM
- *     that had been inserted but not yet hydrated - and React then reported a
- *     hydration mismatch on it. The "script is running" flag now lives once on
- *     the root element, which React leaves alone, and the CSS reads it as an
- *     ancestor. `data-revealed` and `data-in-view` stay per-element, but both
- *     are only ever written from an IntersectionObserver callback, which is
- *     long after hydration.
- *  2. Late arrivals are picked up. A single `querySelectorAll` at mount misses
- *     anything a boundary has not resolved yet, and with the flag on the root
- *     an unobserved `.reveal` would be hidden with nothing left to reveal it.
- *     A MutationObserver catches them as they land.
+ *  1. Initial content is claimed from this component's effect, after the root
+ *     has hydrated. Streamed scopes are skipped by that pass.
+ *  2. Each streamed scope contains a RevealReady marker. Its effect emits an
+ *     event only after that boundary hydrates, at which point this controller
+ *     can safely observe and mutate the scope's elements.
  */
 const REVEAL = ".reveal";
 const GATED = ".wall-stats, .billboard-sign, .social-marquee, .star-field";
+const STREAMED_SCOPE = "[data-reveal-scope]";
 
 export function RevealOnScroll() {
   useEffect(() => {
@@ -73,31 +68,36 @@ export function RevealOnScroll() {
       }
     });
 
-    // Observing twice is harmless - the browser ignores a repeat observe of the
-    // same element - so new nodes can be handed over without bookkeeping.
-    const claim = (scope: ParentNode) => {
-      scope
-        .querySelectorAll(REVEAL)
-        .forEach((el) => revealObserver.observe(el));
-      scope.querySelectorAll(GATED).forEach((el) => motionObserver.observe(el));
+    // Observing twice is harmless. The scope check keeps the initial document
+    // pass out of streamed subtrees until their RevealReady marker fires.
+    const claim = (scope: Document | Element) => {
+      const owns = (el: Element) => {
+        const streamedParent = el.closest(STREAMED_SCOPE);
+        return scope instanceof Document
+          ? streamedParent === null
+          : streamedParent === scope;
+      };
+
+      scope.querySelectorAll(REVEAL).forEach((el) => {
+        if (owns(el)) revealObserver.observe(el);
+      });
+      scope.querySelectorAll(GATED).forEach((el) => {
+        if (owns(el)) motionObserver.observe(el);
+      });
     };
 
     claim(document);
 
-    const arrivals = new MutationObserver((records) => {
-      for (const record of records) {
-        for (const node of record.addedNodes) {
-          if (!(node instanceof Element)) continue;
-          if (node.matches(REVEAL)) revealObserver.observe(node);
-          if (node.matches(GATED)) motionObserver.observe(node);
-          claim(node);
-        }
-      }
-    });
-    arrivals.observe(document.body, { childList: true, subtree: true });
+    const onRevealReady = (event: Event) => {
+      if (!(event instanceof CustomEvent)) return;
+      const scope = (event.detail as { scope?: unknown } | null)?.scope;
+      if (scope instanceof Element && scope.matches(STREAMED_SCOPE))
+        claim(scope);
+    };
+    document.addEventListener(REVEAL_READY_EVENT, onRevealReady);
 
     return () => {
-      arrivals.disconnect();
+      document.removeEventListener(REVEAL_READY_EVENT, onRevealReady);
       revealObserver.disconnect();
       motionObserver.disconnect();
       root.removeAttribute("data-motion-active");

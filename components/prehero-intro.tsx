@@ -205,7 +205,12 @@ export function PreheroIntro() {
           textShadow: "0 0 32px rgba(0,0,0,0.55)",
         }}
       >
-        the city needs <span className="text-accent-soft">you</span>...
+        <span className="block">
+          the city needs <span className="text-accent-soft">you</span>...
+        </span>
+        <span className="mt-2 block text-[clamp(0.875rem,1.8vw,1.5rem)]">
+          on November 7-8
+        </span>
       </p>
     </div>
   );

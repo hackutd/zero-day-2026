@@ -1,22 +1,30 @@
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 
+import { ChallengeTracks } from "@/components/challenge-tracks";
 import { DayOfSchedule } from "@/components/day-of-schedule";
+import { RevealReady } from "@/components/reveal-ready";
 import { SiteFaq } from "@/components/site-faq";
 import { SiteSponsors } from "@/components/site-sponsors";
-import { getConfigStatus, getFAQs, getSchedule, getSponsors } from "@/lib/api";
+import {
+  getConfigStatus,
+  getFAQs,
+  getSchedule,
+  getSponsors,
+  getTracks,
+} from "@/lib/api";
 import { errorMessage } from "@/lib/format";
 
 /**
- * The three sections backed by HARP, each behind its own Suspense boundary.
+ * The four sections backed by HARP, each behind its own Suspense boundary.
  *
  * The page used to await all three at the top of `Home`, which meant the
  * opening artwork - the LCP, and entirely static - could not be sent until a
  * network round trip to the Go service had finished. Boundaries here let React
  * flush the whole descent (skyline down to the platform), the countdown and the
- * keynote immediately, and stream these three in behind it.
+ * keynote immediately, and stream these four in behind it.
  *
- * One boundary each rather than one around all three: they are independent
- * endpoints, and the schedule lives inside the board's tab panel while the
+ * One boundary each rather than one around all four: they are independent
+ * endpoints, the schedule and tracks live in separate board tabs, and the
  * other two are top-level sections. Sharing a boundary would hold the fastest
  * response hostage to the slowest.
  */
@@ -53,17 +61,38 @@ async function load<T>(
 
 async function ScheduleFromApi() {
   const { items, unavailable } = await load(getSchedule, "schedule");
-  return <DayOfSchedule schedule={items} unavailable={unavailable} />;
+  return (
+    <RevealScope phase="schedule-loaded">
+      <DayOfSchedule schedule={items} unavailable={unavailable} />
+    </RevealScope>
+  );
 }
 
 async function SponsorsFromApi() {
   const { items, unavailable } = await load(getSponsors, "sponsors");
-  return <SiteSponsors sponsors={items} unavailable={unavailable} />;
+  return (
+    <RevealScope phase="sponsors-loaded">
+      <SiteSponsors sponsors={items} unavailable={unavailable} />
+    </RevealScope>
+  );
 }
 
 async function FaqsFromApi() {
   const { items, unavailable } = await load(getFAQs, "FAQs");
-  return <SiteFaq faqs={items} unavailable={unavailable} />;
+  return (
+    <RevealScope phase="faqs-loaded">
+      <SiteFaq faqs={items} unavailable={unavailable} />
+    </RevealScope>
+  );
+}
+
+async function TracksFromApi() {
+  const { items, unavailable } = await load(getTracks, "tracks");
+  return (
+    <RevealScope phase="tracks-loaded">
+      <ChallengeTracks tracks={items} unavailable={unavailable} />
+    </RevealScope>
+  );
 }
 
 /*
@@ -75,15 +104,41 @@ async function FaqsFromApi() {
 
 export function ScheduleSection() {
   return (
-    <Suspense fallback={<DayOfSchedule schedule={[]} pending />}>
+    <Suspense
+      fallback={
+        <RevealScope phase="schedule-pending">
+          <DayOfSchedule schedule={[]} pending />
+        </RevealScope>
+      }
+    >
       <ScheduleFromApi />
+    </Suspense>
+  );
+}
+
+export function TracksSection() {
+  return (
+    <Suspense
+      fallback={
+        <RevealScope phase="tracks-pending">
+          <ChallengeTracks tracks={[]} pending />
+        </RevealScope>
+      }
+    >
+      <TracksFromApi />
     </Suspense>
   );
 }
 
 export function SponsorsSection() {
   return (
-    <Suspense fallback={<SiteSponsors sponsors={[]} pending />}>
+    <Suspense
+      fallback={
+        <RevealScope phase="sponsors-pending">
+          <SiteSponsors sponsors={[]} pending />
+        </RevealScope>
+      }
+    >
       <SponsorsFromApi />
     </Suspense>
   );
@@ -91,8 +146,29 @@ export function SponsorsSection() {
 
 export function FaqSection() {
   return (
-    <Suspense fallback={<SiteFaq faqs={[]} pending />}>
+    <Suspense
+      fallback={
+        <RevealScope phase="faqs-pending">
+          <SiteFaq faqs={[]} pending />
+        </RevealScope>
+      }
+    >
       <FaqsFromApi />
     </Suspense>
+  );
+}
+
+function RevealScope({
+  children,
+  phase,
+}: {
+  children: ReactNode;
+  phase: string;
+}) {
+  return (
+    <div data-reveal-scope>
+      {children}
+      <RevealReady phase={phase} />
+    </div>
   );
 }

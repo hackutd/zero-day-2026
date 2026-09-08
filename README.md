@@ -71,6 +71,7 @@ into the browser and expose the key.
 | `GET /v1/public/schedule` | `getSchedule()` | `ScheduleItem[]` |
 | `GET /v1/public/sponsors` | `getSponsors()` | `Sponsor[]`      |
 | `GET /v1/public/faq`      | `getFAQs()`     | `FAQ[]`          |
+| `GET /v1/public/tracks`   | `getTracks()`   | `Track[]`        |
 
 ### Sponsor logos
 
@@ -82,6 +83,11 @@ logo.
 Because logos are inlined rather than linked, this response grows with every
 sponsor — a dozen 50KB logos is a ~600KB payload per revalidation. Fine at the
 5-minute ISR cadence, but worth moving to GCS URLs if logos get large.
+
+Track logos use the same raw-base64 representation. The tracks request caches
+only after its complete response has passed runtime validation, so a malformed
+payload or non-200 response cannot replace the last valid list. Track order is
+made deterministic with `display_order`, `title`, and `id` before rendering.
 
 Responses are wrapped in Harp's envelope (`{"data": ...}`); `lib/api.ts`
 unwraps it. Types in `lib/types.ts` mirror the Go structs in the Harp repo's

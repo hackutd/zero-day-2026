@@ -5,8 +5,8 @@ import {
   FaqSection,
   ScheduleSection,
   SponsorsSection,
+  TracksSection,
 } from "@/components/api-sections";
-import { ChallengeTracks } from "@/components/challenge-tracks";
 import { EventBoard } from "@/components/event-board";
 import { KeynoteSpeaker } from "@/components/keynote-speaker";
 import { PassingTrain } from "@/components/passing-train";
@@ -107,7 +107,7 @@ export default function Home() {
       {scenes.slice(3).map(renderScene)}
       <SiteCountdown />
       <KeynoteSpeaker />
-      <EventBoard schedule={<ScheduleSection />} tracks={<ChallengeTracks />} />
+      <EventBoard schedule={<ScheduleSection />} tracks={<TracksSection />} />
       <SponsorsSection />
       <FaqSection />
       <Mascots />

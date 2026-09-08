@@ -17,8 +17,8 @@ import portrait from "@/public/keynote-placeholder.jpg";
  * says it is a placeholder, so it is the name beside it - "To be announced" -
  * that has to keep carrying that.
  *
- * TODO(organizers): the copy is placeholder too, and deliberately does not name
- * anybody. Last year's entry is the shape to fill:
+ * TODO(organizers): when the speaker is announced, last year's entry is the
+ * shape to use for the bio:
  *
  *   Sonny Li - Founder & Chief Vibes Officer
  *   "Sonny is the founder of Codédex, a new gamified learning platform
@@ -29,8 +29,8 @@ import portrait from "@/public/keynote-placeholder.jpg";
  * So: a name, then two or three sentences of what they have built and where
  * they have been. There is no separate role line - it was cut, and the role
  * belongs in the first clause of the bio the way last year's reads. The
- * placeholder below is written to that length, so the layout it produces is
- * the layout the real one will get.
+ * current card deliberately stops at "To be announced" until that real copy is
+ * ready.
  */
 
 export function KeynoteSpeaker() {
@@ -89,13 +89,6 @@ export function KeynoteSpeaker() {
             >
               To be announced
             </h2>
-
-            <p className="font-sans text-text-muted mt-6 text-[15px] leading-[1.75] sm:text-[17px]">
-              This is where the keynote&rsquo;s bio goes: who they are, what
-              they have built, and why a room of hackers should want to hear it
-              at eleven in the morning. Two or three sentences, the length of
-              this one, is the shape the section is laid out for.
-            </p>
           </div>
         </div>
 
