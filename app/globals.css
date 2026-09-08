@@ -1,19 +1,37 @@
 @import "tailwindcss";
 
 /*
- * Zero Day theme. Dark only, on purpose — the wordmark is neon-on-black and
+ * Zero Day theme. Dark only, on purpose - the wordmark is neon-on-black and
  * `color-scheme: dark` keeps the browser's own UI (scrollbars, form controls)
  * dark to match, rather than half-inverting on a light OS.
  */
 :root {
   color-scheme: dark;
 
-  --background: #07060c;
+  --background: #000000;
   --foreground: #f4f2ff;
   --muted: #948eb4;
   --line: #241f38;
   --magenta: #ff2ee6;
   --cyan: #22e0ff;
+
+  /*
+   * Tokens from the HackUTD 2026 Figma file, kept under their Figma names so
+   * the two stay legible against each other. They are additive on purpose: the
+   * palette above was placeholder colour picked for the coming-soon page, and
+   * the design system will replace it piece by piece as more of the file lands.
+   *
+   * The accent is deliberately NOT the Figma value: the file specifies a pink
+   * (#ff2e88), which was replaced with this purple by request. The name is kept
+   * so the mapping back to Figma's `accent/magenta` variable stays traceable.
+   */
+  --surface-deep: #0e011f;
+  --accent-magenta: #7828ff;
+  /* The pale lavender the hero picks "you" out in, shared with the footer. */
+  --accent-soft: #dbc4ff;
+  --text-muted: #8b93a1;
+  --text-dim: #5a6270;
+  --border-hairline: #232a36;
 }
 
 @theme inline {
@@ -23,8 +41,17 @@
   --color-line: var(--line);
   --color-magenta: var(--magenta);
   --color-cyan: var(--cyan);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface-deep: var(--surface-deep);
+  --color-accent-magenta: var(--accent-magenta);
+  --color-accent-soft: var(--accent-soft);
+  --color-text-muted: var(--text-muted);
+  --color-text-dim: var(--text-dim);
+  --color-border-hairline: var(--border-hairline);
+  --font-sans: var(--font-satoshi);
+  --font-mono: var(--font-satoshi);
+  --font-satoshi: var(--font-satoshi);
+  --font-hypik: var(--font-hypik);
+  --font-elevon: var(--font-elevon);
 }
 
 body {
@@ -32,95 +59,1050 @@ body {
   color: var(--foreground);
 }
 
-/* Ambient neon wash behind the wordmark. */
-body::before {
-  content: "";
-  position: fixed;
+/*
+ * Framing for the scene panels in app/page.tsx.
+ *
+ * The panels hold the art's own 16:9 at every width, so the frame fits them
+ * exactly and needs no offset. It used to crop on mobile - the panel was 62svh
+ * and the frame overflowed sideways, pinned by a `--focus` percentage - which
+ * filled the screen but hid most of each illustration on a phone. Showing the
+ * whole plate was worth more than filling the viewport.
+ */
+.scene-frame {
+  position: absolute;
   inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      60rem 38rem at 50% 40%,
-      color-mix(in oklab, var(--magenta) 15%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      44rem 30rem at 50% 66%,
-      color-mix(in oklab, var(--cyan) 10%, transparent),
-      transparent 70%
-    );
-}
-
-/* Faint grid, masked so it fades out before the edges. */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image:
-    linear-gradient(to right, var(--foreground) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--foreground) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(75% 65% at 50% 50%, #000 25%, transparent 100%);
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes wordmark-pulse {
-  0%,
-  100% {
-    filter: drop-shadow(
-      0 0 20px color-mix(in oklab, var(--magenta) 30%, transparent)
-    );
-  }
-  50% {
-    filter: drop-shadow(
-        0 0 34px color-mix(in oklab, var(--magenta) 50%, transparent)
-      )
-      drop-shadow(0 0 56px color-mix(in oklab, var(--cyan) 22%, transparent));
-  }
-}
-
-.rise {
-  opacity: 0;
-  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  height: 100%;
+  width: 100%;
 }
 
 /*
- * Both animations live in one declaration: `.rise` and `.wordmark` would
- * otherwise each set the `animation` shorthand and the loser's would be
- * dropped, leaving the element stuck at `opacity: 0`.
+ * Sinks the subway platform's floor into the page background so the panel does
+ * not end on a hard line.
+ *
+ * Without it the seam is brutal: the lit floor averages rgb(108, 97, 110) right
+ * up to the plate's last row, and the tunnel panel underneath opens near black.
+ * The fade carries the floor down to black, so the two panels meet on matching
+ * pixels and the join stops reading as an edge. `.scene-ceiling-fade` takes the
+ * other side of this join, and of the one above the platform.
+ *
+ * The stops trace a smoothstep rather than a straight ramp. A linear fade over
+ * this distance shows its own start as a faint horizontal line across the
+ * floor, and bands visibly in the midtones; easing in and out hides both. It
+ * starts at 66%, under the carriage where the plate is already near black, so
+ * the fade has no visible beginning, and finishes at 97% rather than 100% - 
+ * that last strip is solid, which guarantees the boundary row matches even
+ * after the browser rounds the gradient to device pixels.
+ *
+ * Black is written out rather than mixed from `--background`. It is matched to
+ * the tunnel plate's own top edge, which its ceiling fade carries to black,
+ * so it is a property of the images rather than of the theme. Going through
+ * `color-mix` also made this worse, not better: Lightning CSS emits a fallback
+ * for browsers that lack it, and every mixed stop flattens to a fully opaque
+ * colour there - which would drop a hard black band across the entire floor.
  */
-.wordmark {
-  opacity: 0;
-  animation:
-    rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    wordmark-pulse 5s ease-in-out infinite;
+.subway-floor-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0%) 66%,
+    rgb(0 0 0 / 4%) 69.9%,
+    rgb(0 0 0 / 16%) 73.8%,
+    rgb(0 0 0 / 32%) 77.6%,
+    rgb(0 0 0 / 50%) 81.5%,
+    rgb(0 0 0 / 68%) 85.4%,
+    rgb(0 0 0 / 84%) 89.3%,
+    rgb(0 0 0 / 96%) 93.1%,
+    rgb(0 0 0 / 100%) 97%
+  );
+}
+
+/*
+ * The other half of a seam, on the panel below it.
+ *
+ * `.subway-floor-fade` sinks the platform onto black, and the street plate
+ * above it already ends on rgb(1, 1, 1), so every join on the page wants the
+ * same thing: the panel underneath has to arrive at its own top edge black too.
+ * Neither does on its own - the platform opens on its lit ceiling girder at
+ * rgb(69, 50, 70), the tunnel on a dark teal around rgb(0, 17, 22) - so this
+ * runs the floor fade backwards across the top of the plate, and the two panels
+ * meet on matching pixels.
+ *
+ * Same stops and same easing as that fade, mirrored, with the span left to the
+ * caller: the stops are fractions of `--scene-fade-end` rather than fixed
+ * percentages, because each panel can spare a different amount of its own art,
+ * and because a percentage is a share of the panel's height - the same number
+ * covers a different distance on two panels of different aspects.
+ *
+ *  - The tunnel gives 15.5%. That plate is 1920x2160 where the platform above
+ *    it is 16:9, twice as tall for the same width, so half the share of its own
+ *    height is the same distance on screen as the floor fade opposite it.
+ *  - The platform gives 8%, not the 31% that would match the fade at its own
+ *    foot. Its ceiling band is dark for the first ~60px, but the strip lights,
+ *    the neon ring and the station sign all start around 11% down, and a
+ *    full-length ramp would swallow the three of them. It does not need the
+ *    length anyway: the street above ends on black already, so only the girder
+ *    has to be carried down to meet it.
+ */
+.scene-ceiling-fade,
+.scene-floor-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--scene-fade-direction),
+    rgb(0 0 0 / 100%) 0%,
+    rgb(0 0 0 / 96%) calc(var(--scene-fade-end) * 0.126),
+    rgb(0 0 0 / 84%) calc(var(--scene-fade-end) * 0.248),
+    rgb(0 0 0 / 68%) calc(var(--scene-fade-end) * 0.374),
+    rgb(0 0 0 / 50%) calc(var(--scene-fade-end) * 0.5),
+    rgb(0 0 0 / 32%) calc(var(--scene-fade-end) * 0.626),
+    rgb(0 0 0 / 16%) calc(var(--scene-fade-end) * 0.748),
+    rgb(0 0 0 / 4%) calc(var(--scene-fade-end) * 0.874),
+    rgb(0 0 0 / 0%) var(--scene-fade-end)
+  );
+}
+
+.scene-ceiling-fade {
+  --scene-fade-direction: to bottom;
+}
+
+.scene-ceiling-fade-subway {
+  /* Lengthened with the pipes' fades above it - the two make one crossing. */
+  --scene-fade-end: 26%;
+}
+
+.scene-ceiling-fade-tunnel {
+  --scene-fade-end: 15.5%;
+}
+
+/*
+ * The same ramp read from the other end, for the foot of a panel.
+ *
+ * `to top` is the whole difference: the stops are offsets from where the
+ * gradient starts, so pointing it upwards makes 0% the panel's last row and
+ * `--scene-fade-end` the distance up from it. Solid black therefore lands on
+ * the boundary row exactly, without `.subway-floor-fade`'s trick of finishing
+ * a few percent early.
+ *
+ * The tunnel gives 17%. It is the last panel on the page and the FAQ opens on
+ * `--background`, pure black, so this is a fade to the page rather than to
+ * another plate - and it needs the length, because the lit walkway is still
+ * running at rgb(53, 23, 65) at 80% down. 17% of 2160 is 367px, the same
+ * distance the platform's own floor fade covers.
+ *
+ * The platform keeps `.subway-floor-fade` rather than moving here: that one is
+ * measured against the plate below it and documents its own reasons.
+ */
+.scene-floor-fade {
+  --scene-fade-direction: to top;
+}
+
+.scene-floor-fade-tunnel {
+  --scene-fade-end: 17%;
+}
+
+/*
+ * The train crossing the platform on the far track (components/passing-train).
+ *
+ * The plate is two and a half panels wide, so the box is 250% and the whole
+ * animation is one horizontal translate. Percentages on `translate` resolve
+ * against the element's own width, which is what keeps the pass framed the same
+ * at every viewport: 40% of the box is exactly one panel, so `40%` parks it
+ * off the right edge, and `-100%` puts its right edge on the panel's left.
+ *
+ * One service, not a loop. The pass takes 5s and `both` holds the carriage
+ * where it finishes, off the left edge, so the platform is quiet afterwards
+ * rather than having a train through it every fifteen seconds. Linear, because
+ * a train crossing a window does not ease.
+ *
+ * It is declared `paused` and started by the class the component adds when the
+ * panel comes into view, so the first pass happens on arrival instead of having
+ * run its course while the reader was still three panels up.
+ *
+ * The track around it is what the component's observer watches: it covers the
+ * panel and never moves, where the carriage spends most of the cycle parked
+ * outside the panel's own `overflow: hidden` and so is clipped to nothing an
+ * observer could see.
+ */
+.subway-train-track {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.subway-train {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 250%;
+  pointer-events: none;
+  transform: translate3d(40%, 0, 0);
+  animation: subway-train-pass 5s linear 1 both paused;
+}
+
+.subway-train-running {
+  animation-play-state: running;
+}
+
+@keyframes subway-train-pass {
+  from {
+    transform: translate3d(40%, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise {
-    opacity: 1;
+  .subway-train {
+    display: none;
+  }
+}
+
+/*
+ * The clips behind the countdown figures. They are decoration on top of a cell
+ * that already has its own ground, so dropping them for a reader who has asked
+ * for less motion costs nothing but the texture.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .countdown-clip {
+    display: none;
+  }
+}
+
+/*
+ * A single shooting star crossing the skyline panel.
+ *
+ * Adapted from the CodePen pattern, with three changes. That version scatters
+ * twenty stars and rotates the whole sky 45deg; this is one star on a gently
+ * tilted field so it reads as left-to-right. The palette is the site's lavender
+ * rather than the original blue. And the cycle is long with a short visible
+ * burst, so it is an occasional event instead of a constant streak.
+ *
+ * The burst occupies the first fifth of the cycle and the rest is empty sky.
+ * Keeping the flight time in one place matters because prehero-intro.tsx
+ * restarts these animations when the headline lands, which both guarantees a
+ * star on that beat and resets the idle gap so one cannot arrive right behind
+ * it.
+ *
+ * Two animations run together on the same element, as in the original: one
+ * grows and shrinks the tail's width, the other carries it across. They touch
+ * different properties, so they compose.
+ */
+.star-field {
+  /* One flight per cycle; the burst is the first 20%, the rest is empty sky. */
+  --star-cycle: 14s;
+  position: absolute;
+  inset: -20% -15%;
+  z-index: 1;
+  /* The star travels straight; the field's tilt is what angles its path. */
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+
+.shooting-star {
+  position: absolute;
+  top: 26%;
+  left: 0;
+  height: 2px;
+  border-radius: 999px;
+  /* Bright at the right-hand end, because that end leads. */
+  background: linear-gradient(
+    90deg,
+    rgba(219, 196, 255, 0) 0%,
+    rgba(219, 196, 255, 0.85) 65%,
+    #ffffff 100%
+  );
+  filter: drop-shadow(0 0 6px rgba(190, 150, 255, 0.95));
+  animation:
+    star-tail var(--star-cycle) ease-in-out infinite,
+    star-shoot var(--star-cycle) ease-in-out infinite;
+}
+
+/* The cross-glint at the head, mirrored to make an X. */
+.shooting-star::before,
+.shooting-star::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 1px);
+  right: 0;
+  height: 2px;
+  border-radius: 100%;
+  background: linear-gradient(
+    -45deg,
+    rgba(219, 196, 255, 0),
+    rgba(233, 220, 255, 1),
+    rgba(219, 196, 255, 0)
+  );
+  animation: star-glint var(--star-cycle) ease-in-out infinite;
+}
+
+.shooting-star::before {
+  transform: translateX(50%) rotateZ(45deg);
+}
+
+.shooting-star::after {
+  transform: translateX(50%) rotateZ(-45deg);
+}
+
+@keyframes star-shoot {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(130vw);
+  }
+  100% {
+    transform: translateX(130vw);
+  }
+}
+
+@keyframes star-tail {
+  0% {
+    width: 0;
+  }
+  4% {
+    width: 180px;
+  }
+  17% {
+    width: 180px;
+  }
+  20% {
+    width: 0;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes star-glint {
+  0%,
+  100% {
+    width: 0;
+  }
+  5% {
+    width: 30px;
+  }
+  16% {
+    width: 30px;
+  }
+  20% {
+    width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-field {
+    display: none;
+  }
+}
+
+/*
+ * Cover-frame for the pinned opening panel (PinnedPrehero).
+ *
+ * That panel fills the viewport rather than holding 16:9, so anything pinned to
+ * a point in the artwork - the building ads - needs a box that tracks where the
+ * art actually lands. `max()` picks whichever dimension has to overflow: the
+ * frame is at least as wide as the panel, and at least wide enough that its
+ * 16:9 height covers the panel's. `aspect-ratio` derives the other side, and
+ * the centring matches `object-position: 50% 50%`.
+ *
+ * The image inside is then an exact fit, and the ads can be positioned in
+ * percentages of the artwork itself.
+ */
+/*
+ * The opening scene's scroll track and the panel pinned inside it.
+ *
+ * Phone: neither. Pinning only earns its keep when the plate fills the screen;
+ * a 16:9 plate on a 9:19.5 viewport is ~221px of art in ~844px of viewport, so
+ * pinning it strands the reader in a mostly empty screen, and spreading the
+ * sequence over 280svh means the headline needs most of a screen of scrolling
+ * before it even begins. So the panel simply scrolls, at the plate's own
+ * aspect, and the headline plays as it crosses the viewport.
+ *
+ * From `sm` up the plate covers, pinning is worth it, and the track is tall.
+ */
+/*
+ * The prehero is a panel like every other one in the descent: full width, its
+ * own plate's shape, nothing cropped.
+ *
+ * It used to be pinned at 100svh and cover-scaled to fill that, which drew the
+ * plate at whatever scale the viewport height demanded - 0.826x on a 1440x900
+ * window against the 0.75x of the panels under it, and centre-cropped 73px a
+ * side on top of that. The art is one continuous city, so a building crossing
+ * the seam changed size and slid sideways at the boundary. On a true 16:9
+ * window cover happened to crop nothing and it looked right, which is why this
+ * read as fine on some monitors and broken on others.
+ *
+ * Sized to its own aspect instead, every plate in the descent lands at the same
+ * scale at every viewport, and the joins are continuous.
+ */
+.prehero-track {
+  position: relative;
+}
+
+.prehero-pin {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1920 / 1080;
+  overflow: hidden;
+}
+
+/*
+ * Simply the panel's box.
+ *
+ * This used to be centred with `left/top: 50%` and `translate(-50%, -50%)`,
+ * which it needed while it was oversized to cover a pinned viewport. It is the
+ * same size as the panel now, and the transform was actively harmful: it puts
+ * the frame on its own compositing layer, so on a display whose width times its
+ * device pixel ratio is not a whole number - 1463 at 1.25x, 1097 at 1.75x - the
+ * left edge landed on a fractional device pixel and antialiased against the
+ * black page behind it. That read as a thin black slice down the left side.
+ */
+.prehero-frame {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * Cyberpunk 2077 cursor set (vsthemes.org), extracted from the .cur files.
+ *
+ * Only the three a web page uses were taken out of the archive - the installer
+ * script, its PDFs and the shortcut were left in it. Nothing was installed
+ * system-wide; these are just images the page references.
+ *
+ * The hotspots are the ones baked into the .cur headers, not guesses, and they
+ * are not 0 0: the arrow's tip sits 8px down its bitmap, the hand's at (6,5),
+ * the beam's centred at (17,15). Getting these wrong makes clicks land off
+ * where the cursor appears to point.
+ *
+ * They are 32px pixel art, so the 2x copies are NEAREST-doubled - a smooth
+ * upscale would just blur them, where doubling keeps the pixels crisp on a
+ * hi-dpi screen. Each rule keeps its native keyword as the final fallback, so
+ * a failed image degrades to the right cursor rather than to nothing.
+ */
+body {
+  cursor:
+    image-set(
+        url("/cursors/cp-arrow.png") 1x,
+        url("/cursors/cp-arrow@2x.png") 2x
+      )
+      0 8,
+    auto;
+}
+
+a,
+button,
+summary,
+label,
+[role="button"] {
+  cursor:
+    image-set(url("/cursors/cp-link.png") 1x, url("/cursors/cp-link@2x.png") 2x)
+      6 5,
+    pointer;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  cursor:
+    image-set(url("/cursors/cp-beam.png") 1x, url("/cursors/cp-beam@2x.png") 2x)
+      17 15,
+    text;
+}
+
+/*
+ * Social card marquee (components/social-marquee.tsx).
+ *
+ * The track carries the card set twice and travels exactly -50%, so at the end
+ * of a cycle the second copy sits precisely where the first started and the
+ * restart is invisible. Any other distance would visibly jump.
+ *
+ * Animating `transform` keeps it on the compositor; animating `left` or a
+ * scroll offset would relayout every frame.
+ *
+ * The mask fades both ends so cards arrive and leave rather than being sliced
+ * off square at the viewport edge.
+ */
+.social-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 7%,
+    #000 93%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 7%,
+    #000 93%,
+    transparent 100%
+  );
+}
+
+.social-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: social-marquee 24s linear infinite;
+}
+
+/* Stop it so a card can be read and clicked rather than chased. */
+.social-marquee:hover .social-marquee__track,
+.social-marquee:focus-within .social-marquee__track {
+  animation-play-state: paused;
+}
+
+@keyframes social-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-marquee__track {
     animation: none;
+  }
+  /* Without the animation the row is unreachable, so hand it back to the user. */
+  .social-marquee {
+    overflow-x: auto;
+  }
+}
+
+/*
+ * Card hover. No lift - the fill drops toward the page black and the rim
+ * brightens, so the card reads as glass catching light rather than as a tile
+ * being picked up. The fill is a separate layer precisely so this can fade
+ * without dimming the mark and label sitting on top of it.
+ */
+.social-card {
+  background: rgba(255, 255, 255, 0.14);
+  transition: background 300ms ease;
+}
+
+.social-card:hover {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.social-card__fill {
+  position: absolute;
+  inset: 0;
+  transition: opacity 300ms ease;
+}
+
+.social-card:hover .social-card__fill {
+  opacity: 0.45;
+}
+
+/*
+ * The pane behind the opening headline.
+ *
+ * A flat black wash reads as a sheet laid over the art. What makes it glass is
+ * blurring the city *through* it, so the buildings stay legible as shape and
+ * colour while losing their detail, and the type sits on a surface rather than
+ * on a dimmer.
+ *
+ * The tint is a radial falloff rather than a uniform fill - heaviest behind the
+ * line where contrast is needed, thinning toward the edges so the frame never
+ * looks like it has a rectangle sitting on it. Saturation is pushed slightly as
+ * it blurs, because blurring averages neon toward grey and the city should not
+ * go muddy.
+ *
+ * The element's opacity is animated by prehero-intro.tsx; opacity composites
+ * the backdrop result too, so the blur fades up and out with the tint rather
+ * than snapping on.
+ */
+.prehero-scrim {
+  background: radial-gradient(
+    125% 95% at 50% 50%,
+    rgba(4, 2, 10, 0.97) 0%,
+    rgba(4, 2, 10, 0.87) 42%,
+    rgba(4, 2, 10, 0.55) 100%
+  );
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+/*
+ * FAQ disclosure (components/site-faq.tsx).
+ *
+ * Safari still paints its own triangle on `<summary>` unless the WebKit
+ * pseudo-element is cleared too, so both are removed - `list-none` alone leaves
+ * a marker there.
+ */
+/*
+ * Shared by every native disclosure on the page: the FAQ's questions and the
+ * challenge-track briefs. Both hide the browser's own marker and rotate a
+ * chevron of their own instead.
+ */
+.disclosure summary::-webkit-details-marker,
+.disclosure summary::marker {
+  display: none;
+}
+
+.disclosure-chevron {
+  transition: transform 200ms ease;
+}
+
+.disclosure[open] .disclosure-chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure-chevron {
+    transition: none;
+  }
+}
+
+/*
+ * The pipes band gives 20% at each end, far more than the scene panels do.
+ * It is only 360px tall against their 1080, so the same share is a much
+ * shorter run on screen, and it is a transition rather than a place: the
+ * pipework should emerge and recede rather than start and stop.
+ */
+/*
+ * Both edges of the pipework, and the street above it.
+ *
+ * These were 20% of a 360px band - 72px - which is about as long as the strip
+ * the band overlaps the street by, so the plate went from solid black to fully
+ * lit in roughly the width of the overlap and the join showed as a dark bar
+ * with a hard edge on each side. Measured down the middle of the page it dipped
+ * to 0.37 and was back at 43 sixty pixels later.
+ *
+ * Longer ramps, same shape. Nothing here is darker than it was; it just takes
+ * its time.
+ *
+ * Most of the length has to come from the neighbours. The band is only 360px
+ * tall, so its own two fades eat into each other - at 40% a side they already
+ * cover 288 of it and leave 72px of pipework at full strength, which is about
+ * the floor before the band stops being pipework and becomes a dark gap. The
+ * street and the platform are full 1080px panels either side of it and have
+ * room to spare, so they carry a quarter of their height each. The crossing
+ * ends up roughly 400px of gradient rather than 60, and no single stretch of
+ * it is steep.
+ */
+.scene-ceiling-fade-pipes,
+.scene-floor-fade-pipes {
+  --scene-fade-end: 40%;
+}
+
+.scene-floor-fade-street {
+  --scene-fade-end: 26%;
+}
+
+/*
+ * The decorative frame around the keynote card.
+ *
+ * `border-image` rather than a stretched overlay. The art is 1407x941 with a
+ * hollow middle and a border that is not uniform - 139px along the top, 111 at
+ * the sides, 99 underneath - and its corners carry the shapes that make it read
+ * as a HUD panel. Painting it as one stretched picture would smear those
+ * corners and squash the hatching the moment the card was not the plate's own
+ * 1.495 aspect, which it never is: the copy sets the height.
+ *
+ * Sliced, the four corners are placed at their own size and only the flat runs
+ * between them stretch - the neon rails up the sides, which are uniform, and
+ * the hatched bars top and bottom, which compress a little on a narrower card
+ * and read the same.
+ *
+ * It is an overlay rather than a border on the content's own box, because the
+ * frame's opening is not the rectangle the content box is. Along the bottom the
+ * bar dips away at the left and right - 36 to 54px of clear art - and only the
+ * centre tab comes up to meet the hollow. Content sized to the rectangle left a
+ * strip of bare card under the picture there. Painting the frame over the top
+ * lets the card fill past the hollow's edge into that dip; a border on the
+ * element itself could not, since descendants paint over an element's own
+ * border and the picture would have covered the bar.
+ */
+.keynote-card {
+  position: relative;
+  background-color: #0b0910;
+}
+
+.keynote-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-sizing: border-box;
+  border-style: solid;
+  /*
+   * WebP, and referenced straight from CSS. `border-image` cannot go through
+   * next/image, so nothing converts this on the way out - it ships exactly as
+   * it sits in public/. The PNG was 611KB for a decoration; this is 130KB with
+   * the hollow middle intact.
+   */
+  border-image-source: url("/keynote-frame.webp");
+  border-image-slice: 139 111 99 111;
+  border-image-repeat: stretch;
+  /* 0.26 of the source, so the top bar stays legible on a narrow screen. */
+  border-width: 36px 29px 26px 29px;
+}
+
+/*
+ * The content's inset. Top and sides match the frame's border exactly; the
+ * bottom is short by the depth of the bar's dip at that scale, so the card
+ * runs down into it and the frame closes over the top.
+ */
+.keynote-card > .keynote-body {
+  padding: 36px 29px 12px;
+}
+
+@media (width >= 40rem) {
+  .keynote-frame {
+    /* 0.48 */
+    border-width: 67px 53px 48px 53px;
   }
 
-  .wordmark {
-    opacity: 1;
-    animation: none;
-    filter: drop-shadow(
-      0 0 22px color-mix(in oklab, var(--magenta) 32%, transparent)
-    );
+  .keynote-card > .keynote-body {
+    padding: 67px 53px 22px;
   }
+}
+
+@media (width >= 64rem) {
+  .keynote-frame {
+    /* 0.62 - close to the scale a 1200px card gives the 1407px plate. */
+    border-width: 86px 69px 61px 69px;
+  }
+
+  .keynote-card > .keynote-body {
+    padding: 86px 69px 28px;
+  }
+}
+
+/*
+ * The ground the street section's copy is read against.
+ *
+ * The plate is a crossing seen down a road: the left half carries the lit
+ * buildings, the umbrella and the wet reflections, and the road runs away dark
+ * up the middle-right. That dark road is the only part of the picture with room
+ * for a paragraph, so the copy goes there and this calms it - the same frosted
+ * pane the prehero puts behind its headline, masked so it fades in from
+ * nothing rather than arriving as an edge.
+ *
+ * Masked, not a box. A panel with a boundary sitting on top of the artwork is
+ * exactly what makes copy over illustration read as an interface pasted over a
+ * picture; a wash with no edge reads as the picture getting darker where it
+ * already was. The busy left third is never touched.
+ */
+.street-scrim {
+  background: linear-gradient(
+    to right,
+    rgb(4 2 10 / 0%) 0%,
+    rgb(4 2 10 / 55%) 46%,
+    rgb(4 2 10 / 78%) 72%,
+    rgb(4 2 10 / 82%) 100%
+  );
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  backdrop-filter: blur(14px) saturate(125%);
+  /*
+   * An ellipse, not a column. A mask that only ran left-to-right left the wash
+   * touching the panel's top and bottom edges, so it met the scene fades above
+   * and below as a straight vertical band - a shape, which is the thing this is
+   * meant not to be. Bounded on both axes it closes well inside the plate: full
+   * strength across the middle third where the copy sits, gone by 10% and 90%
+   * of the height, and gone to the left before it reaches the crossing.
+   */
+  -webkit-mask-image: radial-gradient(
+    80% 40% at 72% 50%,
+    #000 0%,
+    #000 38%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    80% 40% at 72% 50%,
+    #000 0%,
+    #000 38%,
+    transparent 100%
+  );
+}
+
+/*
+ * A wash over the pipework.
+ *
+ * The plate is scratchy, and at the size it renders that texture reads as
+ * noise rather than detail. Laying the brand violet over it pulls the whole
+ * band onto one hue, which lets the shapes carry it instead of the grain, and
+ * ties a piece of stock-looking art to the rest of the page.
+ *
+ * `soft-light` rather than a flat overlay: a flat wash at this strength greys
+ * the plate off, where soft-light tints the midtones and leaves the darks
+ * alone, so the edges stay the black the seams above and below depend on.
+ */
+.pipes-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(120 40 255 / 55%),
+    rgb(90 30 190 / 45%)
+  );
+  mix-blend-mode: soft-light;
+}
+
+/*
+ * Shared, one-time entrances. Text stays visible until the observer is ready:
+ * the root flag is set by components/reveal-on-scroll.tsx, so with no script
+ * this never matches and every heading simply renders.
+ *
+ * The flag is on the root rather than on each element because these headings
+ * are not all in the initial HTML any more - the sponsors and FAQ stream in -
+ * and writing an attribute onto a streamed node before React hydrates it is a
+ * hydration mismatch.
+ */
+[data-motion-active] .reveal:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(4px);
+}
+
+.reveal {
+  transition:
+    opacity 650ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    transform 750ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    filter 650ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
+}
+
+/* A brief chromatic edge resolves to crisp type, once per heading. */
+:is(h2, h3).reveal[data-revealed] {
+  animation: text-signal-settle 1000ms ease-out var(--reveal-delay, 0ms) both;
+}
+
+@keyframes text-signal-settle {
+  0% {
+    text-shadow:
+      -2px 0 rgb(115 235 255 / 55%),
+      2px 0 rgb(255 46 230 / 60%);
+  }
+  45% {
+    text-shadow: 0 0 16px rgb(255 46 230 / 28%);
+  }
+  100% {
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+.reveal-1 {
+  --reveal-delay: 90ms;
+}
+.reveal-2 {
+  --reveal-delay: 180ms;
+}
+.reveal-3 {
+  --reveal-delay: 270ms;
+}
+
+/* Small offsets within the original inset box preserve the graffiti margin. */
+.wall-stat:nth-child(1) {
+  transform: translateX(-7cqw);
+}
+.wall-stat:nth-child(2) {
+  transform: translateX(8cqw);
+}
+.wall-stat:nth-child(3) {
+  transform: translateX(-3cqw);
+}
+
+.wall-stat-value {
+  position: relative;
+}
+
+/* Only a thin duplicate slice moves; the underlying number remains readable. */
+.wall-stat-echo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  color: #d4faff;
+  text-shadow: -0.06em 0 #ff2ee6;
+  clip-path: inset(36% 0 43%);
+  animation: wall-signal 6.5s steps(1, end) infinite paused;
+}
+.wall-stat:nth-child(2) .wall-stat-echo {
+  animation-delay: 2s;
+}
+.wall-stat:nth-child(3) .wall-stat-echo {
+  animation-delay: 4.2s;
+}
+.wall-stats[data-in-view] .wall-stat-echo {
+  animation-play-state: running;
+}
+
+@keyframes wall-signal {
+  0%,
+  5%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  1% {
+    opacity: 0.85;
+    transform: translateX(0.09em);
+    clip-path: inset(30% 0 40%);
+  }
+  2.5% {
+    opacity: 0;
+  }
+  3.5% {
+    opacity: 0.7;
+    transform: translateX(-0.07em);
+    clip-path: inset(55% 0 20%);
+  }
+}
+
+/*
+ * The same interference the platform stats carry, on the hero's sign.
+ *
+ * Same rhythm exactly - one 6.5s cycle, `steps(1, end)` so the slice snaps in
+ * and out rather than easing, two hits a second and a half apart, the rest of
+ * the cycle quiet. The sign is an image rather than text, so the two things
+ * that were type properties change: the displaced copy is a second <img> and
+ * the fringe is a `drop-shadow` instead of a `text-shadow`.
+ *
+ * The displacement is a percentage, not the stats' `em`. Their offset rides on
+ * a 17cqw font size, so it scales with the platform; an `em` here would resolve
+ * against the inherited 16px and come out about a pixel on a 787px sign, which
+ * is nothing. A percentage on `translateX` resolves against the element's own
+ * width and holds at every size.
+ *
+ * It lives inside the sheared wrapper, so the slice shears with the sign and
+ * stays on the billboard's plane.
+ */
+.sign-echo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  clip-path: inset(36% 0 43%);
+  filter: drop-shadow(-3px 0 #ff2ee6) brightness(1.35) saturate(1.5);
+  animation: sign-signal 5s steps(1, end) infinite paused;
+  /* Offset from the stats so the two are never seen firing together. */
+  animation-delay: 3.1s;
+}
+
+.billboard-sign[data-in-view] .sign-echo {
+  animation-play-state: running;
+}
+
+@keyframes sign-signal {
+  0%,
+  5%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  1% {
+    opacity: 0.85;
+    transform: translateX(1.1%);
+    clip-path: inset(30% 0 40%);
+  }
+  2.5% {
+    opacity: 0;
+  }
+  3.5% {
+    opacity: 0.7;
+    transform: translateX(-0.85%);
+    clip-path: inset(55% 0 20%);
+  }
+}
+
+/*
+ * Media that arrives late (components/media-fade.tsx).
+ *
+ * The transition sits on the element always; the transparency only applies once
+ * the script has claimed it. If the script never runs, nothing here hides.
+ */
+.media-fade {
+  transition: opacity 520ms ease-out;
+}
+
+.media-fade[data-media-ready]:not([data-loaded]) {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-fade {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  [data-motion-active] .reveal:not([data-revealed]) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  :is(h2, h3).reveal[data-revealed],
+  .wall-stat-echo,
+  .sign-echo {
+    animation: none;
+  }
+}
+
+/*
+ * Sections waiting on HARP (components/skeleton.tsx).
+ *
+ * The shimmer is one gradient wider than the box, slid across by
+ * `background-position` - a compositor-only property, so a page full of these
+ * costs nothing to animate while the response is in flight. Under reduced
+ * motion the sweep stops and the block stays as the flat tint underneath,
+ * which still reads as "something belongs here".
+ */
+.skeleton {
+  background-color: var(--surface-deep);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.045) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  border: 1px solid var(--border-hairline);
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background-image: none;
+  }
+}
+
+/*
+ * Decoration that only runs while it is on screen
+ * (components/reveal-on-scroll.tsx).
+ *
+ * The marquee and the shooting star are both infinite, and both used to tick
+ * for the life of the page - the marquee sits near the footer, the star in the
+ * prehero, so between them one of the two is almost always off screen and
+ * animating for nobody. `animation-play-state` is free to toggle: the
+ * compositor simply stops advancing the timeline, no repaint, no reflow.
+ *
+ * `[data-motion-active]` is the root flag set by the observer that gates them,
+ * so the pause only applies once something is actually watching. If the script
+ * never runs, neither rule matches and both keep moving.
+ */
+[data-motion-active] .social-marquee:not([data-in-view]) .social-marquee__track,
+[data-motion-active] .star-field:not([data-in-view]) .shooting-star,
+[data-motion-active] .star-field:not([data-in-view]) .shooting-star::before,
+[data-motion-active] .star-field:not([data-in-view]) .shooting-star::after {
+  animation-play-state: paused;
 }

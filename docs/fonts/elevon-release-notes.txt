@@ -1,0 +1,27 @@
+==Release notes_Elevon==
+
+Compiler of release notes: Dalton Maag
+Designer: Dalton Maag
+Designer URL: daltonmaag.com
+
+Date of creation: 2021-06-02
+
+Change log:
+- v1.311: Updated vertical metrics.
+- v1.310: Added level 1 hinting.
+          Updated vertical metrics.
+
+Basic information
+1 Font name: Elevon
+2 TrueType Version record: 1.311
+3 Character set: Western European, Cyrillic, Greek
+4 Supported scripts: Latin, Cyrillic, Greek
+5 Number of glyphs: 778
+6 Weights/Styles: ZeroG, OneG, TwoG, ThreeG, FourG
+7 Usage: Display
+
+Technology
+1 File formats: The files have been delivered in the TrueType-based OpenType format, for use in all major Operating Systems, and also as TTF for use in apps, and in web font format: WOFF; WOFF2.
+2 Embedding settings: Editing of the document is allowed (editable mode), subsetting is allowed.
+3 Screen optimization information: All glyphs are manually hinted for optimized rasterization in Microsoft ClearType or for other LCD devices.
+4 Default numerals: Proportional. Tabular figures accessible via OpenType features.

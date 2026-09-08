@@ -1,10 +1,11 @@
 /**
  * Response shapes for the HARP public API (`/v1/public/*`).
  *
- * These mirror the Go structs in `internal/store/` — keep them in sync:
+ * These mirror the Go structs in `internal/store/` - keep them in sync:
  *   ScheduleItem -> internal/store/schedule.go
  *   Sponsor      -> internal/store/sponsors.go
  *   FAQ          -> internal/store/faqs.go
+ *   Track        -> internal/store/tracks.go
  *
  * Timestamps arrive as RFC 3339 strings, not Date objects.
  */
@@ -42,6 +43,28 @@ export type FAQ = {
   created_at: string;
   updated_at: string;
 };
+
+export interface TrackPrize {
+  place: string;
+  prize: string;
+}
+
+export interface Track {
+  id: string;
+  title: string;
+  sponsor_name: string;
+  description: string;
+  prizes: TrackPrize[];
+  logo_data: string;
+  logo_content_type: string;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TracksResponse {
+  data: { tracks: Track[] };
+}
 
 /** Every HARP response is wrapped: success `{"data": ...}`, error `{"error": "..."}`. */
 export type Envelope<T> = { data: T };
