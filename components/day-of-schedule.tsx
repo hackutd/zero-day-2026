@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Skeleton, SkeletonRows } from "@/components/skeleton";
 import type { ScheduleItem } from "@/lib/types";
 
 /** All event dates and times are displayed in the hackathon's local zone. */
@@ -55,9 +56,12 @@ type ScheduleDay = {
 export function DayOfSchedule({
   schedule,
   unavailable = false,
+  pending = false,
 }: {
   schedule: ScheduleItem[];
   unavailable?: boolean;
+  /** The HARP request is still in flight; see components/api-sections.tsx. */
+  pending?: boolean;
 }) {
   const [filter, setFilter] = useState<string | null>(null);
   const tags = scheduleTags(schedule);
@@ -66,12 +70,14 @@ export function DayOfSchedule({
   return (
     // No heading of its own: this is a tab panel, and the tab that opens it is
     // the heading. See components/event-board.tsx.
-    <div className="mx-auto max-w-[1000px]">
+    <div className="mx-auto max-w-[1000px]" aria-busy={pending || undefined}>
       <p className="font-sans text-text-muted text-center text-[13px] leading-[1.6] tracking-[0.04em]">
         Day-of schedule, all times CT. Events are subject to change.
       </p>
 
-      {schedule.length === 0 ? (
+      {pending ? (
+        <SchedulePending />
+      ) : schedule.length === 0 ? (
         <EmptySchedule unavailable={unavailable} />
       ) : (
         <>
@@ -149,6 +155,27 @@ export function DayOfSchedule({
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+/*
+ * Two days of rows, which is the shape the board settles into. The day heading
+ * rules are real rather than skeletoned - they are chrome, not data, and drawing
+ * them keeps the column widths identical across the swap.
+ */
+function SchedulePending() {
+  return (
+    <div className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2">
+      {[0, 1].map((column) => (
+        <div key={column}>
+          <div className="border-border-hairline flex items-baseline gap-3 border-b pb-3">
+            <Skeleton className="h-[15px] w-[68px]" />
+            <Skeleton className="h-[12px] w-[132px]" />
+          </div>
+          <SkeletonRows count={4} className="mt-2" />
+        </div>
+      ))}
     </div>
   );
 }

@@ -26,7 +26,7 @@ const satoshi = localFont({
 /*
  * Hypik, by Matt Cole Wilson (mattcolewilson.com) - the brand wordmark face in
  * the Figma nav. Self-hosted because it isn't on Google Fonts; the licence
- * (app/fonts/hypik-LICENSE.txt) allows commercial use and free redistribution
+ * (docs/fonts/hypik-LICENSE.txt) allows commercial use and free redistribution
  * with a link back, so the credit belongs in the footer's Info column.
  *
  * Heads up: this font is letters only. It has no digits and no punctuation at
@@ -34,7 +34,11 @@ const satoshi = localFont({
  * mid-word. Keep it to alphabetic display text.
  */
 const hypik = localFont({
-  src: "./fonts/hypik.otf",
+  // woff2, converted from the shipped OTF with fontTools: same 72 glyphs and
+  // the same CFF outlines, 4.1KB against 12.8KB. An OTF has no font-specific
+  // compression, and this face is preloaded - it sets the prehero headline and
+  // the nav wordmark, so it is on the critical path and the 8.6KB is real.
+  src: "./fonts/hypik.woff2",
   variable: "--font-hypik",
   display: "swap",
 });
@@ -47,7 +51,7 @@ const hypik = localFont({
  *
  * These are the TRIAL files, converted from the shipped TTFs to woff2 (same
  * outlines, ~40KB each instead of ~155KB). The trial licence in
- * app/fonts/elevon-TRIAL-LICENCE.pdf is for evaluation, so before this face
+ * docs/fonts/elevon-TRIAL-LICENCE.pdf is for evaluation, so before this face
  * goes out on the live site it needs a purchased licence and the retail files
  * dropped in over these. The filenames say `trial` so that stays obvious.
  */
@@ -73,6 +77,21 @@ const elevon = localFont({
   ],
   variable: "--font-elevon",
   display: "swap",
+  /*
+   * Not preloaded. next/font preloads every declared face by default, which put
+   * all five of these in the head - ~200KB bidding against the prehero plate,
+   * the LCP, on the same connection. Nothing above the fold is set in Elevon:
+   * its first use is the subway wall stats four panels down (app/page.tsx),
+   * then the countdown and the board below that. `display: swap` means they
+   * still arrive and still render; they just stop racing the artwork for the
+   * opening bandwidth.
+   *
+   * Worth knowing while in here: only 500, 700 and 800 are actually asked for
+   * by any component today. ZeroG (300) and OneG (400) are declared for the
+   * completeness of the gravity axis and cost nothing now that none of this
+   * group preloads.
+   */
+  preload: false,
 });
 
 export const metadata: Metadata = {

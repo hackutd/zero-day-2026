@@ -108,6 +108,7 @@ export function EventBoard({
           alt=""
           sizes="100vw"
           placeholder="blur"
+          quality={65}
           className="h-auto w-full"
         />
         <div className="scene-ceiling-fade scene-ceiling-fade-tunnel" />

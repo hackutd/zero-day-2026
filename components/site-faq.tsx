@@ -1,3 +1,4 @@
+import { SkeletonRows } from "@/components/skeleton";
 import type { FAQ } from "@/lib/types";
 
 /**
@@ -10,9 +11,12 @@ const CONTACT_EMAIL = "hello@hackutd.co";
 export function SiteFaq({
   faqs,
   unavailable = false,
+  pending = false,
 }: {
   faqs: FAQ[];
   unavailable?: boolean;
+  /** The HARP request is still in flight; see components/api-sections.tsx. */
+  pending?: boolean;
 }) {
   const midpoint = Math.ceil(faqs.length / 2);
 
@@ -21,6 +25,7 @@ export function SiteFaq({
       id="faq"
       aria-labelledby="faq-heading"
       className="bg-background px-5 py-20 sm:px-6 sm:py-28"
+      aria-busy={pending || undefined}
     >
       <div className="mx-auto max-w-[820px]">
         <h2
@@ -46,7 +51,12 @@ export function SiteFaq({
           <AskButton />
         </div>
 
-        {faqs.length === 0 ? (
+        {pending ? (
+          <div className="mt-14 lg:grid lg:grid-cols-2 lg:gap-x-12">
+            <SkeletonRows count={4} />
+            <SkeletonRows count={4} className="mt-2 lg:mt-0" />
+          </div>
+        ) : faqs.length === 0 ? (
           <p className="font-sans text-text-dim mt-14 text-center text-[13px] leading-relaxed">
             {unavailable
               ? "The live FAQ is temporarily unavailable. Please check back soon."

@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/skeleton";
 import { SponsorLogo } from "@/components/sponsor-logo";
 import type { Sponsor } from "@/lib/types";
 
@@ -7,9 +8,12 @@ type SponsorTier = { name: string; sponsors: Sponsor[] };
 export function SiteSponsors({
   sponsors,
   unavailable = false,
+  pending = false,
 }: {
   sponsors: Sponsor[];
   unavailable?: boolean;
+  /** The HARP request is still in flight; see components/api-sections.tsx. */
+  pending?: boolean;
 }) {
   const tiers = groupByTier(sponsors);
 
@@ -18,6 +22,7 @@ export function SiteSponsors({
       id="sponsors"
       aria-labelledby="sponsors-heading"
       className="bg-background px-5 py-20 sm:px-6 sm:py-28"
+      aria-busy={pending || undefined}
     >
       <div className="mx-auto max-w-[1000px]">
         <h2
@@ -32,7 +37,9 @@ export function SiteSponsors({
           and their ideas.
         </p>
 
-        {sponsors.length === 0 ? (
+        {pending ? (
+          <SponsorsPending />
+        ) : sponsors.length === 0 ? (
           <p className="font-sans text-text-dim mt-14 text-center text-[13px] leading-relaxed">
             {unavailable
               ? "Our live sponsor list is temporarily unavailable. Please check back soon."
@@ -47,6 +54,20 @@ export function SiteSponsors({
         )}
       </div>
     </section>
+  );
+}
+
+/* One tier of logo tiles, on the grid the real wall uses. */
+function SponsorsPending() {
+  return (
+    <div className="mt-14">
+      <Skeleton className="mx-auto h-[12px] w-[104px]" />
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        {Array.from({ length: 8 }, (_, i) => (
+          <Skeleton key={i} className="h-16 w-full rounded-[3px]" />
+        ))}
+      </div>
+    </div>
   );
 }
 

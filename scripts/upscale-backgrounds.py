@@ -22,9 +22,29 @@ for source in sorted(BACKGROUNDS.iterdir()):
             # Sharpen only color; the resampled transparency stays untouched.
             sharpened.putalpha(enlarged.getchannel("A"))
         destination = source.with_name(f"{source.stem}-2x.webp")
-        sharpened.save(destination, "WEBP", lossless=True, method=6)
+        # Lossy, not lossless. These are LANCZOS upscales of 1920px art - there
+        # is no detail here that q=90 can lose, and next/image re-encodes them
+        # lossily on the way out regardless, so a lossless master only ever cost
+        # repo and deploy weight (~23 MiB across the eight plates, against ~3).
+        # `alpha_quality=100` keeps the cutouts exact: the forefront car and the
+        # carriage are composited over the scene behind them, and a soft alpha
+        # edge there shows as a halo.
+        sharpened.save(
+            destination, "WEBP", quality=90, alpha_quality=100, method=6
+        )
         with Image.open(destination) as result:
             assert result.size == size
-            if "A" in enlarged.getbands():
-                assert result.convert("RGBA").getchannel("A").tobytes() == enlarged.getchannel("A").tobytes()
+            # Most plates are full-frame and their alpha is all-255; libwebp
+            # drops a channel like that, which is free and changes nothing. Only
+            # a plate with a real cutout - the forefront car, the carriage - has
+            # to come back with its alpha intact, and at alpha_quality=100 it
+            # comes back byte-exact.
+            source_alpha = (
+                enlarged.getchannel("A") if "A" in enlarged.getbands() else None
+            )
+            if source_alpha and source_alpha.getextrema()[0] < 255:
+                assert "A" in result.getbands(), f"{destination.name} lost alpha"
+                assert (
+                    result.getchannel("A").tobytes() == source_alpha.tobytes()
+                ), f"{destination.name} alpha changed"
         print(f"{destination.name}: {size[0]} x {size[1]}, {destination.stat().st_size / 1024 / 1024:.2f} MiB", flush=True)

@@ -13,10 +13,17 @@ import { useEffect } from "react";
  * 80ms or four seconds.
  *
  * The opacity is not in the stylesheet unconditionally. It is gated behind
- * `data-media-ready`, which only this effect sets - the same shape
- * `.reveal[data-reveal-ready]` uses - so if the script never runs, every one of
- * these paints normally instead of staying invisible forever. Hiding content
- * behind a script that may not arrive is how a fade becomes a blank page.
+ * `data-media-ready`, which only this effect sets - the same shape the reveals
+ * use, via the root flag in components/reveal-on-scroll.tsx - so if the script
+ * never runs, every one of these paints normally instead of staying invisible
+ * forever. Hiding content behind a script that may not arrive is how a fade
+ * becomes a blank page.
+ *
+ * Unlike the reveals, this still marks the elements themselves, which is safe
+ * only because every `.media-fade` is in the static shell. If a plate or a clip
+ * ever moves inside a Suspense boundary it will need the same treatment the
+ * reveals got: a flag React does not hydrate, and a MutationObserver to catch
+ * what arrives late.
  *
  * Anything already decoded when this mounts is marked in the same tick, which
  * covers the cached second visit: no fade, no flash, just there.

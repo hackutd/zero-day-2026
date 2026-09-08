@@ -61,8 +61,14 @@ export function PassingTrain() {
           fill
           // The box holds the plate's own 4800x1080 aspect, so `cover` is an
           // exact fit rather than a crop. `250vw` because the box is two and a
-          // half panels wide and the panel is the full viewport.
-          sizes="250vw"
+          // half panels wide and the panel is the full viewport - but capped in
+          // px above the phone breakpoint, because 250vw on a desktop resolves
+          // past 3600 and picked the largest candidate on the list for a
+          // clipped carriage that is moving the whole time it is on screen.
+          // `sizes` only drives which candidate is chosen, never the rendered
+          // size, so the layout is untouched.
+          sizes="(max-width: 639px) 250vw, 2048px"
+          quality={65}
           className="media-fade object-cover"
         />
       </div>

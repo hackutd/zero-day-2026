@@ -33,12 +33,53 @@ const TARGET = new Date("2026-11-08T09:00:00-06:00");
  */
 let cachedNow = Date.now();
 
+/*
+ * Tick once a second, but only while the tab is actually being looked at.
+ *
+ * Every tick re-renders this whole section - the heading, four cells of chrome
+ * and scrim, and the four `AmbientVideo` children under them - so leaving it
+ * running in a background tab was a second-by-second reconcile that nobody
+ * could see, for as long as the tab stayed open. `AmbientVideo` already pauses
+ * its own playback on `visibilitychange`, so this matches how the rest of the
+ * page behaves when it goes out of sight.
+ *
+ * The resync on the way back matters: the clock is a cached snapshot, so
+ * without it the countdown would come back showing the time the tab was hidden
+ * and then jump. Resyncing before restarting the interval means the first
+ * repaint after the tab is foregrounded is already correct.
+ */
 function subscribeToClock(onStoreChange: () => void) {
-  const id = setInterval(() => {
+  let id: ReturnType<typeof setInterval> | undefined;
+
+  const tick = () => {
     cachedNow = Date.now();
     onStoreChange();
-  }, 1000);
-  return () => clearInterval(id);
+  };
+
+  const start = () => {
+    if (id === undefined) id = setInterval(tick, 1000);
+  };
+  const stop = () => {
+    clearInterval(id);
+    id = undefined;
+  };
+
+  const onVisibility = () => {
+    if (document.hidden) {
+      stop();
+      return;
+    }
+    tick();
+    start();
+  };
+
+  if (!document.hidden) start();
+  document.addEventListener("visibilitychange", onVisibility);
+
+  return () => {
+    stop();
+    document.removeEventListener("visibilitychange", onVisibility);
+  };
 }
 
 function useNow(): number | null {

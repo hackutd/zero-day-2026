@@ -76,8 +76,27 @@ export function SmoothScroll() {
     let running = false;
     let frameId = 0;
 
-    const maxScroll = () => Math.max(0, root.scrollHeight - window.innerHeight);
-    const clamp = (value: number) => Math.max(0, Math.min(value, maxScroll()));
+    /*
+     * The scroll ceiling, cached rather than measured.
+     *
+     * `clamp` runs on every wheel event, and reading `scrollHeight` forces the
+     * browser to flush layout - while the rAF loop below is writing scroll
+     * position on the other side of the same frame. That read/write pair is a
+     * synchronous reflow per wheel tick, which is exactly the thing that makes
+     * a hijacked scroll feel worse than the native one it replaced.
+     *
+     * So measure on the events that can actually change it instead: resize, and
+     * the document growing under us. The latter matters more than it used to -
+     * the schedule, sponsors and FAQ now stream in behind Suspense boundaries
+     * (components/api-sections.tsx), so the page is materially shorter for the
+     * first moments after it loads.
+     */
+    let ceiling = Math.max(0, root.scrollHeight - window.innerHeight);
+    const measure = () => {
+      ceiling = Math.max(0, root.scrollHeight - window.innerHeight);
+    };
+    const maxScroll = () => ceiling;
+    const clamp = (value: number) => Math.max(0, Math.min(value, ceiling));
 
     let settleTimer: ReturnType<typeof setTimeout> | undefined;
     // Set while the settle drives the loop, so its own scrolling is not read
@@ -243,8 +262,28 @@ export function SmoothScroll() {
       armSettle();
     };
     const onResize = () => {
+      measure();
       target = clamp(target);
     };
+
+    /*
+     * Re-measure when the document itself changes height, which a resize
+     * listener never sees: a Suspense boundary resolving, an accordion in the
+     * FAQ opening, the board switching to a taller tab panel.
+     *
+     * Body, not `root`. The root element carries `h-full` (app/layout.tsx), so
+     * its box is pinned to the viewport and only ever changes on a resize -
+     * which the resize listener above already covers. Body is `min-h-full`, so
+     * it is the box that actually grows with the content.
+     */
+    const growth =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            measure();
+            target = clamp(target);
+          })
+        : null;
+    growth?.observe(document.body);
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKeyDown);
@@ -258,6 +297,7 @@ export function SmoothScroll() {
       document.removeEventListener("click", onClick);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      growth?.disconnect();
       if (frameId) cancelAnimationFrame(frameId);
       clearTimeout(settleTimer);
       root.style.scrollBehavior = previousBehavior;

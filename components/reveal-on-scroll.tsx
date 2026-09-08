@@ -18,53 +18,95 @@ import { useEffect } from "react";
  * does not replay every time it is scrolled past. `-12%` on the bottom margin
  * holds the trigger until the element is properly into the viewport rather than
  * firing on its first pixel.
+ *
+ * Two rules keep this safe now that the sponsors, FAQ and schedule stream in
+ * behind Suspense boundaries (components/api-sections.tsx):
+ *
+ *  1. Nothing is ever written to an element React renders *before* React has
+ *     hydrated it. This used to set `data-reveal-ready` on every `.reveal` it
+ *     found, which for a streamed heading meant writing an attribute onto DOM
+ *     that had been inserted but not yet hydrated - and React then reported a
+ *     hydration mismatch on it. The "script is running" flag now lives once on
+ *     the root element, which React leaves alone, and the CSS reads it as an
+ *     ancestor. `data-revealed` and `data-in-view` stay per-element, but both
+ *     are only ever written from an IntersectionObserver callback, which is
+ *     long after hydration.
+ *  2. Late arrivals are picked up. A single `querySelectorAll` at mount misses
+ *     anything a boundary has not resolved yet, and with the flag on the root
+ *     an unobserved `.reveal` would be hidden with nothing left to reveal it.
+ *     A MutationObserver catches them as they land.
  */
+const REVEAL = ".reveal";
+const GATED = ".wall-stats, .billboard-sign, .social-marquee, .star-field";
+
 export function RevealOnScroll() {
   useEffect(() => {
-    const targets = document.querySelectorAll<HTMLElement>(".reveal");
-    if (!targets.length) return;
+    const root = document.documentElement;
 
-    const revealAll = () =>
-      targets.forEach((el) => el.setAttribute("data-revealed", ""));
+    // The gate every rule in globals.css hangs off. Set before anything is
+    // observed, removed on teardown, and never touched on a hydrated element.
+    root.setAttribute("data-motion-active", "");
 
-    // Anything already on screen at load reveals on the next frame rather than
-    // waiting for a scroll that may never come on a short page.
     if (!("IntersectionObserver" in window)) {
-      revealAll();
+      // No observer: reveal everything and leave the decoration running.
+      root.removeAttribute("data-motion-active");
       return;
     }
 
-    const observer = new IntersectionObserver(
+    const revealObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           entry.target.setAttribute("data-revealed", "");
-          observer.unobserve(entry.target);
+          revealObserver.unobserve(entry.target);
         }
       },
       { rootMargin: "0px 0px -12% 0px", threshold: 0.05 },
     );
 
-    targets.forEach((el) => {
-      el.setAttribute("data-reveal-ready", "");
-      observer.observe(el);
-    });
-
-    // Keep the occasional interference asleep outside the viewport.
-    const statsObserver = new IntersectionObserver((entries) => {
+    // Keep the occasional interference asleep outside the viewport - the wall
+    // stats, the hero's sign, and the two that used to run for the life of the
+    // page: the marquee's 24s translate and the prehero's shooting star.
+    const motionObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         entry.target.toggleAttribute("data-in-view", entry.isIntersecting);
       }
     });
-    // The hero's sign runs the same interference and is gated the same way.
-    document
-      .querySelectorAll(".wall-stats, .billboard-sign")
-      .forEach((el) => statsObserver.observe(el));
+
+    // Observing twice is harmless - the browser ignores a repeat observe of the
+    // same element - so new nodes can be handed over without bookkeeping.
+    const claim = (scope: ParentNode) => {
+      scope
+        .querySelectorAll(REVEAL)
+        .forEach((el) => revealObserver.observe(el));
+      scope.querySelectorAll(GATED).forEach((el) => motionObserver.observe(el));
+    };
+
+    claim(document);
+
+    const arrivals = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (!(node instanceof Element)) continue;
+          if (node.matches(REVEAL)) revealObserver.observe(node);
+          if (node.matches(GATED)) motionObserver.observe(node);
+          claim(node);
+        }
+      }
+    });
+    arrivals.observe(document.body, { childList: true, subtree: true });
 
     return () => {
-      observer.disconnect();
-      statsObserver.disconnect();
-      targets.forEach((el) => el.removeAttribute("data-reveal-ready"));
+      arrivals.disconnect();
+      revealObserver.disconnect();
+      motionObserver.disconnect();
+      root.removeAttribute("data-motion-active");
+      document
+        .querySelectorAll("[data-revealed], [data-in-view]")
+        .forEach((el) => {
+          el.removeAttribute("data-revealed");
+          el.removeAttribute("data-in-view");
+        });
     };
   }, []);
 

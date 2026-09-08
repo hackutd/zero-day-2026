@@ -1,35 +1,3 @@
-/**
- * The backend returns RFC 3339 timestamps in UTC. Formatting is pinned to the
- * event's own timezone rather than the server's, so output doesn't depend on
- * where it renders (local machine vs. Vercel's build region).
- */
-const EVENT_TIME_ZONE = "America/Chicago";
-
-const dayFormatter = new Intl.DateTimeFormat("en-US", {
-  weekday: "short",
-  month: "short",
-  day: "numeric",
-  timeZone: EVENT_TIME_ZONE,
-});
-
-const timeFormatter = new Intl.DateTimeFormat("en-US", {
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: EVENT_TIME_ZONE,
-});
-
-export function formatEventRange(startISO: string, endISO: string): string {
-  const start = new Date(startISO);
-  const end = new Date(endISO);
-
-  if (Number.isNaN(start.getTime())) return "TBA";
-  const day = dayFormatter.format(start);
-  const from = timeFormatter.format(start);
-
-  if (Number.isNaN(end.getTime())) return `${day} · ${from}`;
-  return `${day} · ${from} – ${timeFormatter.format(end)}`;
-}
-
 /** Narrows an unknown thrown value to a displayable message. */
 export function errorMessage(reason: unknown): string {
   return reason instanceof Error ? reason.message : String(reason);

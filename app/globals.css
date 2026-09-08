@@ -274,72 +274,6 @@ body {
 }
 
 /*
- * The page background is flat. A neon wash and a faint grid used to sit behind
- * everything, both left over from the coming-soon page, whose content was a
- * wordmark on an empty field. This page is full-bleed art on black, so they had
- * nothing to lift and only showed through wherever a section was not painted
- * over them.
- */
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes wordmark-pulse {
-  0%,
-  100% {
-    filter: drop-shadow(
-      0 0 20px color-mix(in oklab, var(--magenta) 30%, transparent)
-    );
-  }
-  50% {
-    filter: drop-shadow(
-        0 0 34px color-mix(in oklab, var(--magenta) 50%, transparent)
-      )
-      drop-shadow(0 0 56px color-mix(in oklab, var(--cyan) 22%, transparent));
-  }
-}
-
-.rise {
-  opacity: 0;
-  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/*
- * Both animations live in one declaration: `.rise` and `.wordmark` would
- * otherwise each set the `animation` shorthand and the loser's would be
- * dropped, leaving the element stuck at `opacity: 0`.
- */
-.wordmark {
-  opacity: 0;
-  animation:
-    rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    wordmark-pulse 5s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rise {
-    opacity: 1;
-    animation: none;
-  }
-
-  .wordmark {
-    opacity: 1;
-    animation: none;
-    filter: drop-shadow(
-      0 0 22px color-mix(in oklab, var(--magenta) 32%, transparent)
-    );
-  }
-}
-
-/*
  * A single shooting star crossing the skyline panel.
  *
  * Adapted from the CodePen pattern, with three changes. That version scatters
@@ -910,8 +844,17 @@ textarea,
   mix-blend-mode: soft-light;
 }
 
-/* Shared, one-time entrances. Text stays visible until the observer is ready. */
-.reveal[data-reveal-ready]:not([data-revealed]) {
+/*
+ * Shared, one-time entrances. Text stays visible until the observer is ready:
+ * the root flag is set by components/reveal-on-scroll.tsx, so with no script
+ * this never matches and every heading simply renders.
+ *
+ * The flag is on the root rather than on each element because these headings
+ * are not all in the initial HTML any more - the sponsors and FAQ stream in -
+ * and writing an attribute onto a streamed node before React hydrates it is a
+ * hydration mismatch.
+ */
+[data-motion-active] .reveal:not([data-revealed]) {
   opacity: 0;
   transform: translateY(14px);
   filter: blur(4px);
@@ -1091,7 +1034,7 @@ textarea,
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .reveal[data-reveal-ready]:not([data-revealed]) {
+  [data-motion-active] .reveal:not([data-revealed]) {
     opacity: 1;
     transform: none;
     filter: none;
@@ -1102,4 +1045,64 @@ textarea,
   .sign-echo {
     animation: none;
   }
+}
+
+/*
+ * Sections waiting on HARP (components/skeleton.tsx).
+ *
+ * The shimmer is one gradient wider than the box, slid across by
+ * `background-position` - a compositor-only property, so a page full of these
+ * costs nothing to animate while the response is in flight. Under reduced
+ * motion the sweep stops and the block stays as the flat tint underneath,
+ * which still reads as "something belongs here".
+ */
+.skeleton {
+  background-color: var(--surface-deep);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.045) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  border: 1px solid var(--border-hairline);
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background-image: none;
+  }
+}
+
+/*
+ * Decoration that only runs while it is on screen
+ * (components/reveal-on-scroll.tsx).
+ *
+ * The marquee and the shooting star are both infinite, and both used to tick
+ * for the life of the page - the marquee sits near the footer, the star in the
+ * prehero, so between them one of the two is almost always off screen and
+ * animating for nobody. `animation-play-state` is free to toggle: the
+ * compositor simply stops advancing the timeline, no repaint, no reflow.
+ *
+ * `[data-motion-active]` is the root flag set by the observer that gates them,
+ * so the pause only applies once something is actually watching. If the script
+ * never runs, neither rule matches and both keep moving.
+ */
+[data-motion-active] .social-marquee:not([data-in-view]) .social-marquee__track,
+[data-motion-active] .star-field:not([data-in-view]) .shooting-star,
+[data-motion-active] .star-field:not([data-in-view]) .shooting-star::before,
+[data-motion-active] .star-field:not([data-in-view]) .shooting-star::after {
+  animation-play-state: paused;
 }

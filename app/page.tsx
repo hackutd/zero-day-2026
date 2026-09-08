@@ -1,19 +1,19 @@
 import Image, { type StaticImageData } from "next/image";
 
 import { AmbientVideo } from "@/components/ambient-video";
+import {
+  FaqSection,
+  ScheduleSection,
+  SponsorsSection,
+} from "@/components/api-sections";
 import { ChallengeTracks } from "@/components/challenge-tracks";
-import { DayOfSchedule } from "@/components/day-of-schedule";
 import { EventBoard } from "@/components/event-board";
 import { KeynoteSpeaker } from "@/components/keynote-speaker";
 import { PassingTrain } from "@/components/passing-train";
 import { PreheroIntro } from "@/components/prehero-intro";
 import { SiteCountdown } from "@/components/site-countdown";
-import { SiteFaq } from "@/components/site-faq";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteSponsors } from "@/components/site-sponsors";
 import { SocialMarquee } from "@/components/social-marquee";
-import { getConfigStatus, getFAQs, getSchedule, getSponsors } from "@/lib/api";
-import type { FAQ, ScheduleItem, Sponsor } from "@/lib/types";
 import zeroDay from "@/public/zero_day.png";
 import prehero from "@/public/backgrounds/01-prehero-2x.webp";
 import hero from "@/public/backgrounds/02-hero-2x.webp";
@@ -89,9 +89,7 @@ function renderScene(scene: (typeof scenes)[number]) {
   return <Scene key={scene.src.src} {...scene} first={false} />;
 }
 
-export default async function Home() {
-  const content = await getPublicContent();
-
+export default function Home() {
   return (
     <main>
       <PinnedPrehero {...scenes[0]} />
@@ -109,82 +107,14 @@ export default async function Home() {
       {scenes.slice(3).map(renderScene)}
       <SiteCountdown />
       <KeynoteSpeaker />
-      <EventBoard
-        schedule={
-          <DayOfSchedule
-            schedule={content.schedule.items}
-            unavailable={content.schedule.unavailable}
-          />
-        }
-        tracks={<ChallengeTracks />}
-      />
-      <SiteSponsors
-        sponsors={content.sponsors.items}
-        unavailable={content.sponsors.unavailable}
-      />
-      <SiteFaq
-        faqs={content.faqs.items}
-        unavailable={content.faqs.unavailable}
-      />
+      <EventBoard schedule={<ScheduleSection />} tracks={<ChallengeTracks />} />
+      <SponsorsSection />
+      <FaqSection />
       <Mascots />
       <SocialMarquee />
       <SiteFooter />
     </main>
   );
-}
-
-/**
- * Starts the three independent HARP requests together. A temporary failure in
- * one public endpoint should empty only its own section, not take down the
- * rest of the marketing site.
- */
-type PublicContent = {
-  schedule: { items: ScheduleItem[]; unavailable: boolean };
-  sponsors: { items: Sponsor[]; unavailable: boolean };
-  faqs: { items: FAQ[]; unavailable: boolean };
-};
-
-async function getPublicContent(): Promise<PublicContent> {
-  const status = getConfigStatus();
-
-  if (!status.configured) {
-    return {
-      schedule: { items: [], unavailable: true },
-      sponsors: { items: [], unavailable: true },
-      faqs: { items: [], unavailable: true },
-    };
-  }
-
-  const [schedule, sponsors, faqs] = await Promise.allSettled([
-    getSchedule(),
-    getSponsors(),
-    getFAQs(),
-  ]);
-
-  if (schedule.status === "rejected") {
-    console.error("Could not load the public HARP schedule", schedule.reason);
-  }
-  if (sponsors.status === "rejected") {
-    console.error("Could not load public HARP sponsors", sponsors.reason);
-  }
-  if (faqs.status === "rejected") {
-    console.error("Could not load public HARP FAQs", faqs.reason);
-  }
-
-  return {
-    schedule:
-      schedule.status === "fulfilled"
-        ? { items: schedule.value, unavailable: false }
-        : { items: [], unavailable: true },
-    sponsors:
-      sponsors.status === "fulfilled"
-        ? { items: sponsors.value, unavailable: false }
-        : { items: [], unavailable: true },
-    faqs:
-      faqs.status === "fulfilled"
-        ? { items: faqs.value, unavailable: false }
-        : { items: [], unavailable: true },
-  };
 }
 
 /**
@@ -434,15 +364,28 @@ function MlhBadge() {
       className="absolute top-0 right-3 z-40 block w-[60px] sm:right-6 sm:w-[74px]"
     >
       {/*
-        A plain img, not next/image: it is a remote SVG, so there is nothing to
-        resize or re-encode, and routing it through the optimizer would only add
-        a hop and a remote-host allowlist entry.
+        A plain img, not next/image: it is an SVG, so there is nothing to resize
+        or re-encode and the optimizer would only add a hop.
+
+        Served from public/ rather than from MLH's S3 bucket. The badge sits in
+        the prehero, so a remote src put a DNS lookup, a TCP connect and a TLS
+        handshake to a third-party origin on the opening critical path for a
+        21KB static file. The URL was already season-pinned by hand, so nothing
+        auto-updated anyway - when the season rolls over, drop the new file in
+        beside this one and change the name here and in next.config.ts.
+
+        The intrinsic size is the artwork's own viewBox (392.79 x 688, rounded).
+        It is only there to reserve the box: the width is set in CSS, and
+        without a ratio the badge used to land after layout and shift the
+        corner it sits in.
       */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="https://logged-assets.s3.amazonaws.com/trust-badge/2027/mlh-trust-badge-2027-black.svg"
+        src="/mlh-trust-badge-2027-black.svg"
         alt="Major League Hacking 2027 Hackathon Season"
-        className="block w-full"
+        width={393}
+        height={688}
+        className="block h-auto w-full"
       />
     </a>
   );
@@ -501,6 +444,7 @@ function SubwayCar() {
       alt=""
       fill
       sizes="100vw"
+      quality={65}
       className="media-fade pointer-events-none object-cover"
     />
   );
@@ -926,6 +870,10 @@ function Scene({
           fill
           sizes="100vw"
           placeholder="blur"
+          // Flat illustrated art with broad gradients: 65 is indistinguishable
+          // from the default 75 here and lands ~25% smaller. Allowlisted in
+          // next.config.ts, without which the optimizer answers 400.
+          quality={65}
           // Only the first panel is above the fold; the rest lazy-load by
           // default. `preload`, not `priority` - the latter is deprecated as of
           // Next 16.
