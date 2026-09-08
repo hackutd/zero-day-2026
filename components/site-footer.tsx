@@ -135,6 +135,21 @@ export function SiteFooter() {
           <RegisterButton />
         </div>
 
+        {/*
+          Under the button rather than above it: the heading says applications
+          are open, this says how long that stays true, and it is the last thing
+          read before the click. In the accent rather than the muted grey the
+          line above it uses, because a deadline is the one date on this block
+          that expires.
+
+          A <time> so the date is machine-readable - the visible text is
+          uppercased by CSS and written for a US reader, which neither a parser
+          nor a screen reader should have to interpret.
+        */}
+        <p className="font-sans text-accent-soft mt-6 text-center text-[12px] leading-[1.55] tracking-[0.1em] uppercase">
+          Priority deadline · <time dateTime="2026-10-03">October 3, 2026</time>
+        </p>
+
         <nav
           aria-label="Footer"
           className="mt-20 grid grid-cols-2 gap-x-6 gap-y-10 sm:mt-24 sm:grid-cols-4"
