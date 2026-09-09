@@ -80,11 +80,9 @@ const elevon = localFont({
   /*
    * Not preloaded. next/font preloads every declared face by default, which put
    * all five of these in the head - ~200KB bidding against the prehero plate,
-   * the LCP, on the same connection. Nothing above the fold is set in Elevon:
-   * its first use is the subway wall stats four panels down (app/page.tsx),
-   * then the countdown and the board below that. `display: swap` means they
-   * still arrive and still render; they just stop racing the artwork for the
-   * opening bandwidth.
+   * the LCP, on the same connection. The prehero date uses the 500 face, while
+   * the larger display uses sit farther down the page. `display: swap` lets
+   * the date render while its face loads without preloading all five styles.
    *
    * Worth knowing while in here: only 500, 700 and 800 are actually asked for
    * by any component today. ZeroG (300) and OneG (400) are declared for the
