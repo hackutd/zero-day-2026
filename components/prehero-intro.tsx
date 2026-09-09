@@ -208,7 +208,8 @@ export function PreheroIntro() {
         <span className="block">
           the city needs <span className="text-accent-soft">you</span>...
         </span>
-        <span className="mt-2 block text-[clamp(0.875rem,1.8vw,1.5rem)]">
+        {/* Hypik has no digits or hyphen; keep the entire date in one face. */}
+        <span className="font-elevon mt-2 block text-[clamp(0.875rem,1.8vw,1.5rem)] font-medium">
           on November 7-8
         </span>
       </p>
