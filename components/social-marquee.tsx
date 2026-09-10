@@ -61,9 +61,6 @@ const SOCIALS: Social[] = [
     tone: "violet",
     icon: <InstagramMark />,
   },
-  // Commented out until there is an invite URL to point it at. Restoring this
-  // line brings DiscordMark back into use with it.
-  // { name: "Discord", href: "#", tone: "ink", icon: <DiscordMark /> },
   {
     name: "X",
     href: "https://x.com/HackUTD",
@@ -82,10 +79,7 @@ export function SocialMarquee() {
   return (
     <section
       aria-label="Follow HackUTD"
-      // Raised above the mascots block, and deliberately without a background:
-      // an opaque one paints page black over whatever sits behind it, which is
-      // exactly what the mascots need to show through. The page is that same
-      // black, so this looks identical everywhere else.
+      // Kept transparent so the page's ambient art can pass behind the cards.
       className="relative z-10 py-14 sm:py-20"
     >
       <div className="social-marquee">
@@ -228,21 +222,6 @@ function InstagramMark() {
     </svg>
   );
 }
-
-/*
- * Parked with its card above. Uncomment both together.
- *
- * function DiscordMark() {
- *   return (
- *     <svg viewBox="0 0 24 24" className={MARK} aria-hidden>
- *       <path
- *         style={FILL}
- *         d="M20.32 4.37a19.8 19.8 0 0 0-4.89-1.51.07.07 0 0 0-.7.03c-.22.38-.45.87-.61 1.25a18.3 18.3 0 0 0-5.49 0c-.16-.39-.4-.87-.62-1.25a.08.08 0 0 0-.08-.03 19.7 19.7 0 0 0-4.88 1.51.07.07 0 0 0-.4.03C.53 9.05-.32 13.58.1 18.06a.08.08 0 0 0 .3.06 19.9 19.9 0 0 0 6 3.03.08.08 0 0 0 .08-.03c.46-.63.87-1.3 1.23-1.99a.08.08 0 0 0-.05-.11 13.1 13.1 0 0 1-1.87-.89.08.08 0 0 1 0-.13l.37-.29a.07.07 0 0 1 .08-.01c3.93 1.79 8.18 1.79 12.06 0a.07.07 0 0 1 .8.01l.37.29a.08.08 0 0 1 0 .13c-.6.36-1.22.66-1.87.89a.08.08 0 0 0-.5.11c.37.7.78 1.36 1.23 1.99a.08.08 0 0 0 .8.03 19.8 19.8 0 0 0 6-3.03.08.08 0 0 0 .04-.05c.5-5.18-.84-9.68-3.55-13.66a.06.06 0 0 0-.03-.03zM8.02 15.33c-1.18 0-2.16-1.09-2.16-2.42s.96-2.42 2.16-2.42c1.21 0 2.18 1.1 2.16 2.42 0 1.33-.96 2.42-2.16 2.42zm7.97 0c-1.18 0-2.16-1.09-2.16-2.42s.96-2.42 2.16-2.42c1.21 0 2.18 1.1 2.16 2.42 0 1.33-.95 2.42-2.16 2.42z"
- *       />
- *     </svg>
- *   );
- * }
- */
 
 function XMark() {
   return (

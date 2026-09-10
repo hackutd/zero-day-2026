@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import portrait from "@/public/keynote-placeholder.jpg";
+import portrait from "@/assets/images/keynote-placeholder.jpg";
 
 /**
  * The keynote speaker, one card: the portrait and the copy inside a single

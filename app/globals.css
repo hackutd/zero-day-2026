@@ -60,6 +60,151 @@ body {
 }
 
 /*
+ * Four small mascots wander independently over the page. The layer is fixed
+ * so their routes belong to the screen rather than to one section, and it sits
+ * beneath the site's navigation/edge rails while allowing every click through.
+ */
+.roaming-mascots {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.roaming-mascot {
+  position: absolute;
+  filter: drop-shadow(0 0 8px rgb(69 224 255 / 24%));
+  will-change: transform;
+}
+
+.roaming-mascot--dragonfly {
+  top: 12%;
+  left: 12%;
+  width: clamp(44px, 4.75vw, 68px);
+  animation: mascot-dragonfly-roam 17s ease-in-out infinite;
+}
+
+.roaming-mascot--octopus {
+  top: 55%;
+  right: 8%;
+  width: clamp(48px, 5vw, 72px);
+  animation: mascot-octopus-roam 14s ease-in-out infinite;
+}
+
+.roaming-mascot--raccoon {
+  bottom: 8%;
+  left: 8%;
+  width: clamp(44px, 4.75vw, 68px);
+  animation: mascot-raccoon-roam 18s ease-in-out infinite;
+}
+
+.roaming-mascot--jaguar {
+  top: 72%;
+  left: 0;
+  width: clamp(88px, 9.75vw, 140px);
+  animation: mascot-jaguar-run 11s linear infinite;
+}
+
+.roaming-mascot__jaguar {
+  animation: mascot-jaguar-gallop 220ms ease-in-out infinite alternate;
+}
+
+@keyframes mascot-dragonfly-roam {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-5deg);
+  }
+  28% {
+    transform: translate3d(24vw, 8vh, 0) rotate(5deg);
+  }
+  58% {
+    transform: translate3d(43vw, -3vh, 0) rotate(-2deg);
+  }
+  80% {
+    transform: translate3d(16vw, 15vh, 0) rotate(7deg);
+  }
+}
+
+@keyframes mascot-octopus-roam {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(3deg);
+  }
+  35% {
+    transform: translate3d(-18vw, -10vh, 0) rotate(-6deg);
+  }
+  68% {
+    transform: translate3d(-31vw, 8vh, 0) rotate(5deg);
+  }
+}
+
+@keyframes mascot-raccoon-roam {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-2deg);
+  }
+  24% {
+    transform: translate3d(12vw, -5vh, 0) rotate(3deg);
+  }
+  52% {
+    transform: translate3d(29vw, 1vh, 0) rotate(-2deg);
+  }
+  76% {
+    transform: translate3d(18vw, -13vh, 0) rotate(4deg);
+  }
+}
+
+/* The jaguar faces left in the art, so its pass runs right-to-left. */
+@keyframes mascot-jaguar-run {
+  0% {
+    transform: translate3d(calc(100vw + 100%), 0, 0);
+  }
+  42%,
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes mascot-jaguar-gallop {
+  from {
+    transform: translateY(-2px) rotate(-1deg);
+  }
+  to {
+    transform: translateY(2px) rotate(1deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roaming-mascots {
+    display: none;
+  }
+}
+
+/* Draw footer underlines from left to right without changing text layout. */
+.footer-link {
+  background-image: linear-gradient(currentcolor, currentcolor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0 1px;
+  transition:
+    color 180ms ease,
+    opacity 180ms ease,
+    background-size 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.footer-link:is(:hover, :focus-visible) {
+  background-size: 100% 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-link {
+    transition-duration: 0ms;
+  }
+}
+
+/*
  * Framing for the scene panels in app/page.tsx.
  *
  * The panels hold the art's own 16:9 at every width, so the frame fits them

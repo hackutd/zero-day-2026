@@ -39,6 +39,21 @@ and the SuperTokens `WebsiteDomain`).
 Open the page. If the env vars aren't set it renders setup instructions; once
 they are, it renders live schedule, sponsor, and FAQ data.
 
+## Asset layout
+
+Images rendered through `next/image` live in `assets/images/` and are imported
+from TypeScript so Next can emit content-hashed files with their intrinsic
+dimensions. Audio, video, cursors, and other files that components or CSS load
+by URL stay in `public/`.
+
+The original background artwork lives in `design-sources/backgrounds/`, outside
+the publicly served tree. After changing a source plate, regenerate the
+importable WebP files with:
+
+```bash
+python3 scripts/upscale-backgrounds.py
+```
+
 ## Environment
 
 | Variable              | Purpose                                       |

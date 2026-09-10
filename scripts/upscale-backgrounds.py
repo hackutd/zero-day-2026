@@ -1,4 +1,4 @@
-"""Create faithful 2x background assets. Requires Pillow: pip install pillow."""
+"""Create build-ready 2x backgrounds from design sources. Requires Pillow."""
 
 from pathlib import Path
 
@@ -6,9 +6,12 @@ from PIL import Image, ImageFilter
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BACKGROUNDS = ROOT / "public" / "backgrounds"
+SOURCE_BACKGROUNDS = ROOT / "design-sources" / "backgrounds"
+OUTPUT_BACKGROUNDS = ROOT / "assets" / "images" / "backgrounds"
 
-for source in sorted(BACKGROUNDS.iterdir()):
+OUTPUT_BACKGROUNDS.mkdir(parents=True, exist_ok=True)
+
+for source in sorted(SOURCE_BACKGROUNDS.iterdir()):
     if source.suffix.lower() not in {".png", ".jpg"}:
         continue
     with Image.open(source) as original:
@@ -21,7 +24,7 @@ for source in sorted(BACKGROUNDS.iterdir()):
         if "A" in enlarged.getbands():
             # Sharpen only color; the resampled transparency stays untouched.
             sharpened.putalpha(enlarged.getchannel("A"))
-        destination = source.with_name(f"{source.stem}-2x.webp")
+        destination = OUTPUT_BACKGROUNDS / f"{source.stem}-2x.webp"
         # Lossy, not lossless. These are LANCZOS upscales of 1920px art - there
         # is no detail here that q=90 can lose, and next/image re-encodes them
         # lossily on the way out regardless, so a lossless master only ever cost

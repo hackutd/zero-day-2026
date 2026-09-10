@@ -11,17 +11,17 @@ import { EventBoard } from "@/components/event-board";
 import { KeynoteSpeaker } from "@/components/keynote-speaker";
 import { PassingTrain } from "@/components/passing-train";
 import { PreheroIntro } from "@/components/prehero-intro";
+import { RoamingMascots } from "@/components/roaming-mascots";
 import { SiteCountdown } from "@/components/site-countdown";
 import { SiteFooter } from "@/components/site-footer";
 import { SocialMarquee } from "@/components/social-marquee";
-import zeroDay from "@/public/zero_day.png";
-import prehero from "@/public/backgrounds/01-prehero-2x.webp";
-import hero from "@/public/backgrounds/02-hero-2x.webp";
-import street from "@/public/backgrounds/03-street-2x.webp";
-import pipes from "@/public/backgrounds/03b-pipes-2x.webp";
-import mascots from "@/public/mascots.png";
-import subwayBackground from "@/public/backgrounds/04-subway-background-2x.webp";
-import subwayForefront from "@/public/backgrounds/04-subway-forefront-2x.webp";
+import hero from "@/assets/images/backgrounds/02-hero-2x.webp";
+import prehero from "@/assets/images/backgrounds/01-prehero-2x.webp";
+import street from "@/assets/images/backgrounds/03-street-2x.webp";
+import pipes from "@/assets/images/backgrounds/03b-pipes-2x.webp";
+import subwayBackground from "@/assets/images/backgrounds/04-subway-background-2x.webp";
+import subwayForefront from "@/assets/images/backgrounds/04-subway-forefront-2x.webp";
+import zeroDay from "@/assets/images/zero_day.png";
 
 /**
  * The opening scenes of the site, stacked in reading order.
@@ -110,7 +110,7 @@ export default function Home() {
       <EventBoard schedule={<ScheduleSection />} tracks={<TracksSection />} />
       <SponsorsSection />
       <FaqSection />
-      <Mascots />
+      <RoamingMascots />
       <SocialMarquee />
       <SiteFooter />
     </main>
@@ -842,34 +842,6 @@ function WallStats() {
  * would also count the scrollbar and over-pull by its width. 69/1920 = 3.59%
  * and 7/1920 = 0.36%.
  */
-/**
- * The mascots, standing under the FAQ with the marquee crossing in front of
- * their feet.
- *
- * The overlap is a negative bottom margin here rather than a pull on the
- * marquee, so the marquee keeps its own spacing and only this block reaches
- * under it. The marquee is raised above this in the stack and had to give up
- * its opaque background to do it: it was painting page black over anything
- * behind it, so the cards would have crossed a black bar instead of the
- * mascots. The page is that same black underneath, so nothing else changes.
- *
- * The plate is trimmed to its ink and carries no padding of its own, so the
- * overlap below is a share of the art rather than of empty pixels.
- */
-function Mascots() {
-  return (
-    <div className="relative -mb-[7%] px-5 pt-[4%] sm:px-6">
-      <Image
-        src={mascots}
-        alt="The HackUTD mascots: an octopus cat, a masked raccoon, a winged messenger, a hooded pig and a spotted panther."
-        sizes="(max-width: 940px) 100vw, 880px"
-        placeholder="blur"
-        className="mx-auto block h-auto w-full max-w-[880px]"
-      />
-    </div>
-  );
-}
-
 function PipesBand() {
   return (
     // Hidden on a phone for now. The band is 360px against the 1080 of the

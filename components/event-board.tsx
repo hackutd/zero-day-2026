@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
 
-import tracksPrizesFaq from "@/public/backgrounds/05-tracks-prizes-faq-2x.webp";
+import tracksPrizesFaq from "@/assets/images/backgrounds/05-tracks-prizes-faq-2x.webp";
 
 /**
  * The schedule and the challenge tracks, over the tunnel plate.

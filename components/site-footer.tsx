@@ -20,7 +20,6 @@ import { APPLY_URL } from "@/lib/links";
  */
 const REGISTER_URL = APPLY_URL;
 
-/** A `#` here is still a placeholder nobody has supplied a URL for yet. */
 type FooterLink = { label: string; href: string };
 
 const linkColumns: { heading: string; links: FooterLink[] }[] = [
@@ -36,14 +35,7 @@ const linkColumns: { heading: string; links: FooterLink[] }[] = [
   },
   {
     heading: "Resources",
-    links: [
-      { label: "Devpost", href: "https://devpost.com/" },
-      // Commented out until there is an invite URL to point it at. Restore the
-      // line and give it the invite.
-      // { label: "Discord", href: "#" },
-      { label: "Starter kits", href: "#" },
-      { label: "Hardware lab", href: "#" },
-    ],
+    links: [{ label: "Devpost", href: "https://devpost.com/" }],
   },
   {
     heading: "Socials",
@@ -62,7 +54,6 @@ const linkColumns: { heading: string; links: FooterLink[] }[] = [
         label: "MLH Code of Conduct",
         href: "https://static.mlh.io/docs/mlh-code-of-conduct.pdf",
       },
-      { label: "Privacy", href: "#" },
       { label: "Contact", href: "mailto:hello@hackutd.co" },
     ],
   },
@@ -166,7 +157,7 @@ export function SiteFooter() {
                       href={href}
                       target={isExternal(href) ? "_blank" : undefined}
                       rel={isExternal(href) ? "noreferrer" : undefined}
-                      className="font-sans text-text-muted focus-visible:outline-accent-magenta inline-block text-[12px] leading-[1.4] font-medium tracking-[0.08em] uppercase transition-colors hover:text-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                      className="footer-link font-sans text-text-muted focus-visible:outline-accent-magenta inline-block text-[12px] leading-[1.4] font-medium tracking-[0.08em] uppercase hover:text-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                     >
                       {label}
                     </a>
@@ -250,7 +241,7 @@ function LearnMore() {
                 href={href}
                 target="_blank"
                 rel="noreferrer"
-                className="font-sans text-text-muted focus-visible:outline-accent-magenta inline-block text-[12px] leading-[1.4] font-medium tracking-[0.08em] uppercase transition-colors hover:text-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                className="footer-link font-sans text-text-muted focus-visible:outline-accent-magenta inline-block text-[12px] leading-[1.4] font-medium tracking-[0.08em] uppercase hover:text-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
               >
                 {label}
               </a>
@@ -274,7 +265,7 @@ function CreditLink({
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="focus-visible:outline-accent-magenta text-white underline underline-offset-2 transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-4"
+      className="footer-link focus-visible:outline-accent-magenta text-white hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-4"
     >
       {children}
     </a>
