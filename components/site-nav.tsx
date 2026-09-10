@@ -1,17 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 
+import logo from "@/app/icon.png";
 import { APPLY_URL } from "@/lib/links";
 
 /**
  * The hero navbar, from the Figma Hero frame (node 1994:101).
  *
- * It is deliberately absent over the opening skyline panel and slides in once
- * that panel has scrolled away, so the first thing on screen is the art rather
- * than chrome. An IntersectionObserver watches the prehero panel; the extra
- * `boundingClientRect.top < 0` test distinguishes "scrolled past it" from "not
- * yet reached it", since both read as not intersecting.
+ * It stays fixed over the page, fading in as soon as the reader leaves the very
+ * top of the opening skyline and fading out again only when they return there.
  *
  * The bar runs the full width of the site rather than the Figma's centred
  * 1440 column, so the wordmark and the Apply button sit in the actual
@@ -32,29 +31,21 @@ import { APPLY_URL } from "@/lib/links";
  * a one-line swap. The wordmark's Hypik is the real thing.
  */
 export function SiteNav() {
-  const [past, setPast] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const prehero = document.getElementById("scene-prehero");
-    if (!prehero) return;
+    const syncVisibility = () => {
+      const nextVisible = window.scrollY > 12;
+      setVisible(nextVisible);
+      if (!nextVisible) setOpen(false);
+    };
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const isPast =
-          !entry.isIntersecting && entry.boundingClientRect.top < 0;
-        setPast(isPast);
-        // The bar hides itself over the opening scene. Closing here rather than
-        // in an effect keeps it to this one subscription callback: a panel left
-        // open would be invisible but still in the tab order.
-        if (!isPast) setOpen(false);
-      },
-      { threshold: 0 },
-    );
-    observer.observe(prehero);
-    return () => observer.disconnect();
+    syncVisibility();
+    window.addEventListener("scroll", syncVisibility, { passive: true });
+    return () => window.removeEventListener("scroll", syncVisibility);
   }, []);
 
   // Escape closes and hands focus back to the button that opened it, so a
@@ -72,20 +63,23 @@ export function SiteNav() {
 
   return (
     <header
-      // `invisible` rather than opacity alone, so the links leave the tab order
-      // entirely while the bar is hidden.
-      className={`fixed inset-x-0 top-4 z-50 transition-[opacity,transform,visibility] duration-500 ease-out ${
-        past
-          ? "visible translate-y-0 opacity-100"
-          : "invisible -translate-y-4 opacity-0"
+      className={`fixed inset-x-0 top-4 z-50 transition-[opacity,visibility] duration-500 ease-out motion-reduce:transition-none ${
+        visible ? "visible opacity-100" : "invisible opacity-0"
       }`}
     >
       <div className="relative flex h-12 w-full items-center px-5 sm:px-6">
         <a
           href="#scene-prehero"
-          className="font-hypik text-[20px] leading-none tracking-[-0.01em] text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:text-[24px]"
+          className="font-hypik inline-flex items-center gap-2 text-[20px] leading-none tracking-[-0.01em] text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:gap-2.5 sm:text-[24px]"
         >
-          HackUTD
+          <span>HackUTD</span>
+          <Image
+            src={logo}
+            alt=""
+            aria-hidden
+            sizes="(max-width: 639px) 32px, 40px"
+            className="size-8 shrink-0 object-contain sm:size-10"
+          />
         </a>
 
         <NavPill className="absolute left-1/2 hidden -translate-x-1/2 lg:block" />
