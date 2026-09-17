@@ -56,12 +56,13 @@ python3 scripts/upscale-backgrounds.py
 
 ## Environment
 
-| Variable              | Purpose                                       |
-| --------------------- | --------------------------------------------- |
-| `HARP_API_BASE_URL`   | Go service base URL, no trailing slash        |
-| `HARP_PUBLIC_API_KEY` | Must match `PUBLIC_API_KEY` on the Go service |
+| Variable              | Purpose                                                                                                                                               |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `HARP_API_BASE_URL`   | Go service base URL, no trailing slash                                                                                                                |
+| `HARP_PUBLIC_API_KEY` | Must match `PUBLIC_API_KEY` on the Go service                                                                                                         |
+| `SITE_URL`            | Canonical origin for metadata, sitemap and OG image, no trailing slash. Optional: falls back to Vercel's production URL, then `http://localhost:3001` |
 
-Neither is prefixed `NEXT_PUBLIC_`, and that is deliberate.
+The HARP pair is not prefixed `NEXT_PUBLIC_`, and that is deliberate.
 
 ## Why the API calls are server-only
 
