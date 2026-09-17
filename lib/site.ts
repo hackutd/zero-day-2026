@@ -6,8 +6,7 @@
 
 export const SITE_NAME = "HackUTD Zero Day";
 
-export const SITE_TITLE =
-  "HackUTD 2026: Zero Day — North America's Largest 24-Hour University Hackathon";
+export const SITE_TITLE = "HackUTD 2026: Zero Day";
 
 export const SITE_DESCRIPTION =
   "HackUTD 2026: Zero Day is a free 24-hour hackathon at The University of Texas at Dallas on November 7-8, 2026. 1200+ hackers, 30+ universities, sponsor challenge tracks, workshops and prizes. Applications are open.";
