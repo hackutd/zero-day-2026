@@ -91,6 +91,10 @@ function renderScene(scene: (typeof scenes)[number]) {
 export default function Home() {
   return (
     <main>
+      <h1 className="sr-only">
+        HackUTD 2026: Zero Day, a 24-hour hackathon at The University of Texas
+        at Dallas, November 7-8, 2026
+      </h1>
       <PinnedPrehero {...scenes[0]} />
       {/*
         The descent runs unbroken from the skyline down to the platform, then

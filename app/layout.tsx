@@ -7,6 +7,14 @@ import { MediaFade } from "@/components/media-fade";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { SiteNav } from "@/components/site-nav";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { StructuredData } from "@/components/structured-data";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+  TWITTER_HANDLE,
+} from "@/lib/site";
 
 import "./globals.css";
 
@@ -93,8 +101,58 @@ const elevon = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "HackUTD Zero Day",
-  description: "HackUTD 2026: Zero Day is coming soon.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "HackUTD",
+    "HackUTD 2026",
+    "Zero Day",
+    "hackathon",
+    "UT Dallas hackathon",
+    "UTD hackathon",
+    "Dallas hackathon",
+    "Texas hackathon",
+    "college hackathon",
+    "student hackathon",
+    "MLH",
+  ],
+  authors: [{ name: "HackUTD", url: "https://hackutd.co" }],
+  creator: "HackUTD",
+  publisher: "HackUTD",
+  category: "technology",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  formatDetection: { telephone: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -108,6 +166,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         viewport corner and should survive any route added later.
       */}
       <body className="font-sans min-h-full">
+        <StructuredData />
         <SmoothScroll />
         <RevealOnScroll />
         <MediaFade />
