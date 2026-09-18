@@ -11,7 +11,6 @@ import { EventBoard } from "@/components/event-board";
 import { KeynoteSpeaker } from "@/components/keynote-speaker";
 import { PassingTrain } from "@/components/passing-train";
 import { PreheroIntro } from "@/components/prehero-intro";
-import { RoamingMascots } from "@/components/roaming-mascots";
 import { SiteCountdown } from "@/components/site-countdown";
 import { SiteFooter } from "@/components/site-footer";
 import { SocialMarquee } from "@/components/social-marquee";
@@ -110,7 +109,6 @@ export default function Home() {
       <EventBoard schedule={<ScheduleSection />} tracks={<TracksSection />} />
       <SponsorsSection />
       <FaqSection />
-      <RoamingMascots />
       <SocialMarquee />
       <SiteFooter />
     </main>

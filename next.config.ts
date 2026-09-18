@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
      * the optimizer. 65 is for the full-bleed decorative plates, which are flat
      * illustrated art with broad gradients and hold up where a photograph
      * would not; 75 stays the default for anything the reader actually looks
-     * at (the mascots, the wordmark, the keynote portrait).
+     * at (the wordmark, the keynote portrait).
      */
     qualities: [65, 75],
   },
