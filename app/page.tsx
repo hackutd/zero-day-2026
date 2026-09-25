@@ -177,6 +177,49 @@ function BillboardWordmark() {
         sizes="(max-width: 639px) 105vw, 42vw"
         className="sign-echo object-contain"
       />
+
+      <BillboardPresenter />
+    </div>
+  );
+}
+
+/**
+ * The title sponsor's credit, tucked under the wordmark's right-hand ring the
+ * way the event's own lockup sets it.
+ *
+ * It lives inside the wordmark's box so it inherits the same shear and scales
+ * with the artwork. Measured off `zero_day.png`: below row 222 the art is
+ * empty from x 100 to 690, save the barbed wire at x 734, so the line hangs
+ * from row ~240 and stops well short of the wire. That keeps it clear of the
+ * glitch slice (`.sign-echo`, rows 36%-57%) and above the deadline's box.
+ *
+ * Set in Elevon's heaviest cut, matching the lockup. `cqw` against this box for
+ * the same reason as the deadline: the type is a fraction of the sign.
+ */
+function BillboardPresenter() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0"
+      style={{ containerType: "inline-size" }}
+    >
+      <p
+        className="font-elevon absolute flex items-center gap-[0.55em] leading-none font-extrabold whitespace-nowrap text-white"
+        style={{
+          right: "12.5%",
+          top: "78%",
+          fontSize: "clamp(7px, 2.6cqw, 22px)",
+        }}
+      >
+        Presented by
+        <Image
+          src="/tmobile-logo.svg"
+          alt="T-Mobile"
+          width={7936}
+          height={1632}
+          unoptimized
+          className="h-[1.35em] w-auto"
+        />
+      </p>
     </div>
   );
 }
