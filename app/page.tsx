@@ -81,12 +81,14 @@ function Descent() {
     <div className="relative">
       <ParallaxScene className="descent">
         {/*
-          The sky starts pulled up and ends pushed down, rather than running
-          from rest: its top row is painted, and on a phone the clamped pass is
-          already half over on load, so a one-way slide would show the canvas
-          above it before the reader touched anything.
+          Every layer starts from rest, so on load the four read as the one
+          flattened picture, and each slides down the canvas as the page scrolls
+          - the further back, the further it slides. The sky ends up half a
+          canvas down, which is to say it scrolls at half the speed of the
+          street. Nothing ever shows past a layer's top edge: the section's own
+          top leaves the viewport faster than any layer descends.
         */}
-        <DescentLayer parallaxFromY={-20} parallaxY={20} drift={2.2}>
+        <DescentLayer parallaxY={50} drift={2.8}>
           <Image
             src={sky}
             alt=""
@@ -99,11 +101,11 @@ function Descent() {
         </DescentLayer>
 
         <DescentLayer
-          parallaxY={28}
-          parallaxX={6}
-          parallaxScale={1.16}
+          parallaxY={36}
+          parallaxX={8}
+          parallaxScale={1.22}
           parallaxOrigin="63% 8%"
-          drift={3}
+          drift={3.8}
         >
           {/*
             Cropped to its glow in the build script and hung back at the crop's
@@ -121,7 +123,7 @@ function Descent() {
           />
         </DescentLayer>
 
-        <DescentLayer parallaxY={15} drift={1.3}>
+        <DescentLayer parallaxY={20} drift={1.7}>
           <Image
             src={backBuildings}
             alt=""
@@ -136,7 +138,7 @@ function Descent() {
           ))}
         </DescentLayer>
 
-        <DescentLayer drift={0.4}>
+        <DescentLayer drift={0.5}>
           <Image
             src={frontBuildings}
             alt="A neon city at night: a skyline under a full moon, a glowing billboard strung between the towers, and a rain-slicked street lined with red neon below."
@@ -186,7 +188,6 @@ function Descent() {
  */
 function DescentLayer({
   parallaxY,
-  parallaxFromY,
   parallaxX,
   parallaxScale,
   parallaxOrigin,
@@ -194,7 +195,6 @@ function DescentLayer({
   children,
 }: {
   parallaxY?: number;
-  parallaxFromY?: number;
   parallaxX?: number;
   parallaxScale?: number;
   parallaxOrigin?: string;
@@ -205,7 +205,6 @@ function DescentLayer({
     <div
       className="descent-layer"
       data-parallax-y={parallaxY}
-      data-parallax-from-y={parallaxFromY}
       data-parallax-x={parallaxX}
       data-parallax-scale={parallaxScale}
       data-parallax-origin={parallaxOrigin}
@@ -629,8 +628,8 @@ function SubwayScene() {
         */}
         <div
           className="absolute inset-0"
-          data-parallax-from-y={-5}
-          data-parallax-y={5}
+          data-parallax-from-y={-7}
+          data-parallax-y={7}
         >
           <Image
             src={subwayBackground}

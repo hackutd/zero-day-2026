@@ -23,8 +23,9 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
  *   data-drift="1.4"            pointer lean, in % of the scene's width
  *
  * The pass runs from the scene's top meeting the bottom of the viewport to its
- * bottom meeting the top, clamped to the page - so the first scene on the page
- * starts at its resting composition on load instead of part-way through.
+ * bottom meeting the top, clamped to the page - so for the first scene on the
+ * page the pass begins at scroll 0, and every layer is at its start value on
+ * load rather than part-way along.
  *
  * Every value is a transform on its own element. Layers that both scroll and
  * lean use two nested elements, the scroll one outside, so the two tweens
