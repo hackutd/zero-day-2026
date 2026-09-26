@@ -18,6 +18,7 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
  *   data-parallax-from-y="100"  yPercent at the start, for things that rise in
  *   data-parallax-x="6"         xPercent at the end
  *   data-parallax-scale="1.08"  scale at the end
+ *   data-parallax-origin="63% 8%" transform origin for the scale (default centre)
  *   data-parallax-end="0.55"    finish this layer at a fraction of the pass
  *   data-drift="1.4"            pointer lean, in % of the scene's width
  *
@@ -76,8 +77,13 @@ export function ParallaxScene({
             });
 
             for (const layer of layers) {
-              const { parallaxY, parallaxFromY, parallaxX, parallaxScale } =
-                layer.dataset;
+              const {
+                parallaxY,
+                parallaxFromY,
+                parallaxX,
+                parallaxScale,
+                parallaxOrigin,
+              } = layer.dataset;
               const end = Number(layer.dataset.parallaxEnd ?? 1);
               timeline.fromTo(
                 layer,
@@ -85,6 +91,7 @@ export function ParallaxScene({
                   yPercent: Number(parallaxFromY ?? 0),
                   xPercent: 0,
                   scale: 1,
+                  transformOrigin: parallaxOrigin ?? "50% 50%",
                 },
                 {
                   yPercent: Number(parallaxY ?? 0),

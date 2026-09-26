@@ -9,13 +9,17 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_BACKGROUNDS = ROOT / "design-sources" / "backgrounds"
 OUTPUT_BACKGROUNDS = ROOT / "assets" / "images" / "backgrounds"
 
-# The descent's separated layers (components/descent-parallax.tsx). Each is
-# painted on the same 1920x3240 canvas as the flattened plates it replaces, so
-# the four line up with no offset when stacked. Most of that canvas is empty
-# for the far layers - the sky is black below the skyline and the back
-# buildings end at row 2326 - so each is cropped to the rows (or the box) that
-# carry paint, and the component positions the crop back at its origin. The
-# front layer keeps the full canvas; it is what gives the section its shape.
+# The descent's separated layers (`Descent` in app/page.tsx). Each is painted
+# on the same 1920x3240 canvas as the flattened plates it replaces, so the
+# four line up with no offset when stacked. Most of that canvas is empty for
+# the far layers - the sky is black below the skyline and the back buildings
+# end at row 2326 - so each is cropped to the rows (or the box) that carry
+# paint, and the component positions the crop back at its origin. The front
+# layer keeps the full canvas; it is what gives the section its shape.
+#
+# sky.png has the moon painted out (the export still carried a copy of it
+# under moon.png); the layers move at different rates, so a second moon in
+# the sky would drift away from the real one as soon as the page scrolls.
 DESCENT_LAYERS = {
     "sky.png": (0, 0, 1920, 1250),
     "moon.png": (773, 0, 1641, 626),
@@ -23,7 +27,7 @@ DESCENT_LAYERS = {
     "front-buildings.png": None,
 }
 
-# Poyo, seen through the stopped car's window (components/subway-poyo.tsx).
+# Poyo, seen through the stopped car's window (`SubwayPoyo` in app/page.tsx).
 # The source is already cropped to its ink; it only needs to come down to a
 # size worth shipping - it is drawn ~20% of the plate wide, never larger.
 POYO_SOURCE = ROOT / "design-sources" / "poyo-metro-window.png"

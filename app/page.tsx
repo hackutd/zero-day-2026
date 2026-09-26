@@ -80,7 +80,13 @@ function Descent() {
     // hangs off on a phone - see StreetCopy.
     <div className="relative">
       <ParallaxScene className="descent">
-        <DescentLayer parallaxY={22} drift={1.6}>
+        {/*
+          The sky starts pulled up and ends pushed down, rather than running
+          from rest: its top row is painted, and on a phone the clamped pass is
+          already half over on load, so a one-way slide would show the canvas
+          above it before the reader touched anything.
+        */}
+        <DescentLayer parallaxFromY={-20} parallaxY={20} drift={2.2}>
           <Image
             src={sky}
             alt=""
@@ -93,10 +99,11 @@ function Descent() {
         </DescentLayer>
 
         <DescentLayer
-          parallaxY={17}
-          parallaxX={3}
-          parallaxScale={1.08}
-          drift={2.1}
+          parallaxY={28}
+          parallaxX={6}
+          parallaxScale={1.16}
+          parallaxOrigin="63% 8%"
+          drift={3}
         >
           {/*
             Cropped to its glow in the build script and hung back at the crop's
@@ -114,7 +121,7 @@ function Descent() {
           />
         </DescentLayer>
 
-        <DescentLayer parallaxY={9} drift={0.9}>
+        <DescentLayer parallaxY={15} drift={1.3}>
           <Image
             src={backBuildings}
             alt=""
@@ -129,7 +136,7 @@ function Descent() {
           ))}
         </DescentLayer>
 
-        <DescentLayer drift={0.25}>
+        <DescentLayer drift={0.4}>
           <Image
             src={frontBuildings}
             alt="A neon city at night: a skyline under a full moon, a glowing billboard strung between the towers, and a rain-slicked street lined with red neon below."
@@ -179,14 +186,18 @@ function Descent() {
  */
 function DescentLayer({
   parallaxY,
+  parallaxFromY,
   parallaxX,
   parallaxScale,
+  parallaxOrigin,
   drift,
   children,
 }: {
   parallaxY?: number;
+  parallaxFromY?: number;
   parallaxX?: number;
   parallaxScale?: number;
+  parallaxOrigin?: string;
   drift?: number;
   children: React.ReactNode;
 }) {
@@ -194,8 +205,10 @@ function DescentLayer({
     <div
       className="descent-layer"
       data-parallax-y={parallaxY}
+      data-parallax-from-y={parallaxFromY}
       data-parallax-x={parallaxX}
       data-parallax-scale={parallaxScale}
+      data-parallax-origin={parallaxOrigin}
     >
       <div className="descent-drift" data-drift={drift}>
         {children}
@@ -616,8 +629,8 @@ function SubwayScene() {
         */}
         <div
           className="absolute inset-0"
-          data-parallax-from-y={-3}
-          data-parallax-y={3}
+          data-parallax-from-y={-5}
+          data-parallax-y={5}
         >
           <Image
             src={subwayBackground}
