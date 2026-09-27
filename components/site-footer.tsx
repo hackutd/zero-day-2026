@@ -12,6 +12,7 @@
  * once the sizes start scaling with the viewport.
  */
 
+import { CrewPosts } from "@/components/crew-posts";
 import { APPLY_URL } from "@/lib/links";
 
 /**
@@ -140,6 +141,8 @@ export function SiteFooter() {
         <p className="font-sans text-accent-soft mt-6 text-center text-[12px] leading-[1.55] tracking-[0.1em] uppercase">
           Priority deadline · <time dateTime="2026-10-03">October 3, 2026</time>
         </p>
+
+        <CrewPosts />
 
         <nav
           aria-label="Footer"
