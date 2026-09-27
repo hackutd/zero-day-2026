@@ -12,7 +12,12 @@
  * once the sizes start scaling with the viewport.
  */
 
-import { APPLY_URL } from "@/lib/links";
+import {
+  APPLY_URL,
+  JUDGE_INTEREST_URL,
+  MENTOR_INTEREST_URL,
+  VOLUNTEER_INTEREST_URL,
+} from "@/lib/links";
 
 /**
  * Registration is HARP, the same portal the nav's Apply button opens - the two
@@ -30,12 +35,18 @@ const linkColumns: { heading: string; links: FooterLink[] }[] = [
       { label: "Home", href: "#scene-prehero" },
       { label: "Tracks", href: "#tracks" },
       { label: "Sponsors", href: "#sponsors" },
+      { label: "Get involved", href: "#get-involved" },
       { label: "FAQ", href: "#faq" },
     ],
   },
   {
     heading: "Resources",
-    links: [{ label: "Devpost", href: "https://devpost.com/" }],
+    links: [
+      { label: "Devpost", href: "https://devpost.com/" },
+      { label: "Mentor interest form", href: MENTOR_INTEREST_URL },
+      { label: "Judge interest form", href: JUDGE_INTEREST_URL },
+      { label: "Volunteer interest form", href: VOLUNTEER_INTEREST_URL },
+    ],
   },
   {
     heading: "Socials",

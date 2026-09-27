@@ -621,6 +621,76 @@ textarea,
 }
 
 /*
+ * Recruitment posts (components/get-involved.tsx). The social cards' hover,
+ * on a card that is a link in its own right: the fill drops toward the page
+ * black and the rim brightens. Keyboard focus lands on the rim too, because
+ * the clip-path would cut an outline off at the chamfer.
+ */
+.crew-card {
+  background: rgba(255, 255, 255, 0.14);
+  transition: background 300ms ease;
+}
+
+.crew-card:is(:hover, :focus-visible) {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.crew-card:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.crew-card__fill {
+  position: absolute;
+  inset: 0;
+  transition: opacity 300ms ease;
+}
+
+.crew-card:is(:hover, :focus-visible) .crew-card__fill {
+  opacity: 0.45;
+}
+
+.crew-card__arrow {
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.crew-card:is(:hover, :focus-visible) .crew-card__arrow {
+  transform: translateX(4px);
+}
+
+/* The "open" light: a slow neon breathe, not a blink. */
+.crew-card__light {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentcolor;
+  box-shadow: 0 0 8px currentcolor;
+  animation: crew-light 2.6s ease-in-out infinite;
+}
+
+@keyframes crew-light {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crew-card,
+  .crew-card__fill,
+  .crew-card__arrow {
+    transition-duration: 0ms;
+  }
+  .crew-card__light {
+    animation: none;
+  }
+}
+
+/*
  * The pane behind the opening headline.
  *
  * A flat black wash reads as a sheet laid over the art. What makes it glass is

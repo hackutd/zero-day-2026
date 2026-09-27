@@ -8,6 +8,7 @@ import {
   TracksSection,
 } from "@/components/api-sections";
 import { EventBoard } from "@/components/event-board";
+import { GetInvolved } from "@/components/get-involved";
 import { KeynoteSpeaker } from "@/components/keynote-speaker";
 import { PassingTrain } from "@/components/passing-train";
 import { PreheroIntro } from "@/components/prehero-intro";
@@ -112,6 +113,7 @@ export default function Home() {
       <KeynoteSpeaker />
       <EventBoard schedule={<ScheduleSection />} tracks={<TracksSection />} />
       <SponsorsSection />
+      <GetInvolved />
       <FaqSection />
       <SocialMarquee />
       <SiteFooter />
