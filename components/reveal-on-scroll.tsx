@@ -31,7 +31,8 @@ import { REVEAL_READY_EVENT } from "@/components/reveal-ready";
  *     can safely observe and mutate the scope's elements.
  */
 const REVEAL = ".reveal";
-const GATED = ".wall-stats, .billboard-sign, .social-marquee, .star-field";
+const GATED =
+  ".wall-stats, .billboard-sign, .social-marquee, .star-field, .subway-poyo";
 const STREAMED_SCOPE = "[data-reveal-scope]";
 
 export function RevealOnScroll() {

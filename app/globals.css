@@ -423,70 +423,90 @@ body {
 }
 
 /*
- * Cover-frame for the pinned opening panel (PinnedPrehero).
+ * The descent: skyline, billboard and street as one 1920x3240 canvas, drawn as
+ * four separated layers (components/parallax-scene.tsx moves them apart).
  *
- * That panel fills the viewport rather than holding 16:9, so anything pinned to
- * a point in the artwork - the building ads - needs a box that tracks where the
- * art actually lands. `max()` picks whichever dimension has to overflow: the
- * frame is at least as wide as the panel, and at least wide enough that its
- * 16:9 height covers the panel's. `aspect-ratio` derives the other side, and
- * the centring matches `object-position: 50% 50%`.
+ * `--descent-zoom` is the only knob. At 1 the canvas is the page's width and
+ * the scene is 27:16 tall. Below `lg` the layers are drawn wider than the page
+ * and cropped, so the towers and the sign hold a size worth looking at on a
+ * phone rather than shrinking to a strip; the section grows taller by the same
+ * factor, which is what keeps the layers' thirds lined up with the prehero,
+ * hero and street bands positioned on the section itself.
  *
- * The image inside is then an exact fit, and the ads can be positioned in
- * percentages of the artwork itself.
+ * The crop is anchored near the left rather than centred. The billboard hangs
+ * off the left edge of the canvas and the moon sits ~62% across, so a centred
+ * crop would take the sign's edge and a left-aligned one would lose the moon;
+ * on a phone the sign is the wider of the two, so the anchor moves in.
  */
-/*
- * The opening scene's scroll track and the panel pinned inside it.
- *
- * Phone: neither. Pinning only earns its keep when the plate fills the screen;
- * a 16:9 plate on a 9:19.5 viewport is ~221px of art in ~844px of viewport, so
- * pinning it strands the reader in a mostly empty screen, and spreading the
- * sequence over 280svh means the headline needs most of a screen of scrolling
- * before it even begins. So the panel simply scrolls, at the plate's own
- * aspect, and the headline plays as it crosses the viewport.
- *
- * From `sm` up the plate covers, pinning is worth it, and the track is tall.
- */
-/*
- * The prehero is a panel like every other one in the descent: full width, its
- * own plate's shape, nothing cropped.
- *
- * It used to be pinned at 100svh and cover-scaled to fill that, which drew the
- * plate at whatever scale the viewport height demanded - 0.826x on a 1440x900
- * window against the 0.75x of the panels under it, and centre-cropped 73px a
- * side on top of that. The art is one continuous city, so a building crossing
- * the seam changed size and slid sideways at the boundary. On a true 16:9
- * window cover happened to crop nothing and it looked right, which is why this
- * read as fine on some monitors and broken on others.
- *
- * Sized to its own aspect instead, every plate in the descent lands at the same
- * scale at every viewport, and the joins are continuous.
- */
-.prehero-track {
-  position: relative;
-}
-
-.prehero-pin {
+.descent {
+  --descent-zoom: 1;
+  --descent-anchor: 12%;
   position: relative;
   width: 100%;
-  aspect-ratio: 1920 / 1080;
+  aspect-ratio: 1920 / calc(3240 * var(--descent-zoom));
   overflow: hidden;
+  background: #000;
+}
+
+@media (max-width: 1023px) {
+  .descent {
+    --descent-zoom: 1.2;
+  }
+}
+
+@media (max-width: 639px) {
+  .descent {
+    --descent-zoom: 1.35;
+    --descent-anchor: 5%;
+  }
+}
+
+.descent-layer {
+  position: absolute;
+  top: 0;
+  left: calc((1 - var(--descent-zoom)) * var(--descent-anchor));
+  width: calc(100% * var(--descent-zoom));
+  height: 100%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* The pointer-driven half of a layer; the scroll transform is on its parent. */
+.descent-drift {
+  position: absolute;
+  inset: 0;
+}
+
+/* A layer's plate: full width, its own height, hung from the layer's top. */
+.descent-plate {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
 }
 
 /*
- * Simply the panel's box.
- *
- * This used to be centred with `left/top: 50%` and `translate(-50%, -50%)`,
- * which it needed while it was oversized to cover a pinned viewport. It is the
- * same size as the panel now, and the transform was actively harmful: it puts
- * the frame on its own compositing layer, so on a display whose width times its
- * device pixel ratio is not a whole number - 1463 at 1.25x, 1097 at 1.75x - the
- * left edge landed on a fractional device pixel and antialiased against the
- * black page behind it. That read as a thin black slice down the left side.
+ * The three bands the site's content is pinned to, each a third of the canvas.
+ * Positioned on the section, not on a layer, so they hold still while the art
+ * behind them drifts.
  */
-.prehero-frame {
+.descent-band {
   position: absolute;
-  inset: 0;
+  inset-inline: 0;
+  height: calc(100% / 3);
+}
+
+.descent-band-prehero {
+  top: 0;
+}
+
+.descent-band-hero {
+  top: calc(100% / 3);
+}
+
+.descent-band-street {
+  top: calc(200% / 3);
 }
 
 /*
@@ -709,6 +729,7 @@ textarea,
  * than snapping on.
  */
 .prehero-scrim {
+  mask-image: linear-gradient(to bottom, #000 78%, transparent);
   background: radial-gradient(
     125% 95% at 50% 50%,
     rgba(4, 2, 10, 0.97) 0%,
@@ -782,8 +803,14 @@ textarea,
   --scene-fade-end: 40%;
 }
 
+/*
+ * The street is the bottom third of the descent's 3240px canvas, so 13% of the
+ * canvas is ~420 rows of it - the quarter-panel share above, plus enough to
+ * carry the foot of the near layer, where the separated art thins to loose
+ * paint, down to black before the pipes.
+ */
 .scene-floor-fade-street {
-  --scene-fade-end: 26%;
+  --scene-fade-end: 13%;
 }
 
 /*
@@ -1023,6 +1050,29 @@ textarea,
 }
 .wall-stats[data-in-view] .wall-stat-echo {
   animation-play-state: running;
+}
+
+/*
+ * Poyo's idle at the window. The rise into frame is scroll-driven
+ * (components/parallax-scene.tsx) on the element outside this one; this is
+ * just a slow breath on top of it, paused until the panel is on screen.
+ */
+.subway-poyo-bob {
+  animation: poyo-bob 3.6s ease-in-out infinite paused;
+}
+
+.subway-poyo[data-in-view] .subway-poyo-bob {
+  animation-play-state: running;
+}
+
+@keyframes poyo-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-2.5%) rotate(-1.2deg);
+  }
 }
 
 @keyframes wall-signal {
