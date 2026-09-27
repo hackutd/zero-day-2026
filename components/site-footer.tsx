@@ -12,12 +12,8 @@
  * once the sizes start scaling with the viewport.
  */
 
-import {
-  APPLY_URL,
-  JUDGE_INTEREST_URL,
-  MENTOR_INTEREST_URL,
-  VOLUNTEER_INTEREST_URL,
-} from "@/lib/links";
+import { CrewPosts } from "@/components/crew-posts";
+import { APPLY_URL } from "@/lib/links";
 
 /**
  * Registration is HARP, the same portal the nav's Apply button opens - the two
@@ -35,18 +31,12 @@ const linkColumns: { heading: string; links: FooterLink[] }[] = [
       { label: "Home", href: "#scene-prehero" },
       { label: "Tracks", href: "#tracks" },
       { label: "Sponsors", href: "#sponsors" },
-      { label: "Get involved", href: "#get-involved" },
       { label: "FAQ", href: "#faq" },
     ],
   },
   {
     heading: "Resources",
-    links: [
-      { label: "Devpost", href: "https://devpost.com/" },
-      { label: "Mentor interest form", href: MENTOR_INTEREST_URL },
-      { label: "Judge interest form", href: JUDGE_INTEREST_URL },
-      { label: "Volunteer interest form", href: VOLUNTEER_INTEREST_URL },
-    ],
+    links: [{ label: "Devpost", href: "https://devpost.com/" }],
   },
   {
     heading: "Socials",
@@ -151,6 +141,8 @@ export function SiteFooter() {
         <p className="font-sans text-accent-soft mt-6 text-center text-[12px] leading-[1.55] tracking-[0.1em] uppercase">
           Priority deadline · <time dateTime="2026-10-03">October 3, 2026</time>
         </p>
+
+        <CrewPosts />
 
         <nav
           aria-label="Footer"

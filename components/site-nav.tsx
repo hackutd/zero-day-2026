@@ -110,7 +110,6 @@ const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Home", href: "#scene-prehero" },
   { label: "Tracks", href: "#tracks" },
   { label: "Sponsors", href: "#sponsors" },
-  { label: "Get involved", href: "#get-involved" },
   { label: "FAQ", href: "#faq" },
 ];
 

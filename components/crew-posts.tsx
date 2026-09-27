@@ -8,19 +8,16 @@ import {
  * The three ways into the weekend that are not hacking: mentor, judge,
  * volunteer. Each is a Typeform interest form, run by the organizing team.
  *
- * It sits between the sponsors and the FAQ. Mentors and judges mostly come
- * from the companies on the wall above, and the FAQ below is where anyone
- * asking "can I help without competing?" would otherwise end up.
+ * Rendered in the footer directly under the Register button, so the one
+ * place that says "registration is open" also answers "and if I'm not
+ * competing?" without sending the reader anywhere else.
  *
- * The heading picks the opening line back up - "the city needs you" - which is
- * what the skyline said before the reader knew what for. Here it gets its
- * answer, so the three cards are set as recruitment posts: a numbered posting,
- * an "open" light, the role in the display face and the form as the action.
- *
- * The cards borrow the social marquee's chamfer and glass-on-hover, in px
- * rather than the marquee's percentages because these are not square - a
- * percentage cut would come out at a different angle on every breakpoint.
- * Violet and near-black alternate, as they do there.
+ * The three cards are set as recruitment posts: a numbered posting, an "open"
+ * light, the role in the display face and the form as the action. They borrow
+ * the social marquee's chamfer and glass-on-hover, in px rather than the
+ * marquee's percentages because these are not square - a percentage cut would
+ * come out at a different angle on every breakpoint. Violet and near-black
+ * alternate, as they do there.
  */
 type Post = {
   role: string;
@@ -56,44 +53,21 @@ const POSTS: Post[] = [
 const CHAMFER =
   "polygon(0 0, calc(100% - 40px) 0, 100% 40px, 100% 100%, 0 100%)";
 
-export function GetInvolved() {
+export function CrewPosts() {
   return (
-    <section
-      id="get-involved"
-      aria-labelledby="get-involved-heading"
-      className="bg-background px-5 py-20 sm:px-6 sm:py-28"
-    >
-      <div className="mx-auto max-w-[1100px]">
-        <p className="reveal font-sans text-accent-soft text-center text-[11px] tracking-[0.18em] uppercase sm:text-[12px]">
-          Now recruiting
-        </p>
+    <div id="get-involved" className="mt-16 sm:mt-20">
+      <p className="font-sans text-text-muted text-center text-[12px] leading-[1.55] tracking-[0.1em] uppercase">
+        Not hacking? The city still needs you
+      </p>
 
-        {/*
-          Hypik is letters only, so the line drops the ellipsis the skyline
-          draws with its fallback face. It reads as a heading without it.
-        */}
-        <h2
-          id="get-involved-heading"
-          className="reveal reveal-1 font-hypik mt-4 text-center leading-none tracking-[-0.02em] text-white uppercase"
-          style={{ fontSize: "clamp(2.25rem, 7vw, 4.5rem)" }}
-        >
-          The city needs you
-        </h2>
-
-        <p className="reveal reveal-2 font-sans text-text-muted mx-auto mt-5 max-w-xl text-center text-[13px] leading-[1.6] tracking-[0.04em]">
-          Not building this year? Zero Day still runs on the people behind it.
-          Pick a post and the team will be in touch.
-        </p>
-
-        <ul className="mt-14 grid gap-4 md:grid-cols-3 md:gap-5">
-          {POSTS.map((post, i) => (
-            <li key={post.role} className={`reveal reveal-${i + 1}`}>
-              <PostCard index={i + 1} {...post} />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+      <ul className="mt-8 grid gap-4 md:grid-cols-3 md:gap-5">
+        {POSTS.map((post, i) => (
+          <li key={post.role} className={`reveal reveal-${i + 1}`}>
+            <PostCard index={i + 1} {...post} />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -113,7 +87,7 @@ function PostCard({
       style={{ clipPath: CHAMFER }}
     >
       <span
-        className="relative flex h-full min-h-[300px] flex-col p-6 sm:min-h-[340px] sm:p-7"
+        className="relative flex h-full min-h-[260px] flex-col p-6 sm:min-h-[300px] sm:p-7"
         style={{ clipPath: CHAMFER }}
       >
         {/* Its own layer, so hover can fade it without dimming the copy. */}
@@ -141,7 +115,7 @@ function PostCard({
 
         <span
           className="font-hypik relative mt-9 block leading-none tracking-[-0.02em] text-white uppercase"
-          style={{ fontSize: "clamp(2rem, 3.2vw, 2.75rem)" }}
+          style={{ fontSize: "clamp(1.75rem, 2.8vw, 2.5rem)" }}
         >
           {role}
         </span>
