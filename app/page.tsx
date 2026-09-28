@@ -8,7 +8,6 @@ import {
   TracksSection,
 } from "@/components/api-sections";
 import { EventBoard } from "@/components/event-board";
-import { KeynoteSpeaker } from "@/components/keynote-speaker";
 import { ParallaxScene } from "@/components/parallax-scene";
 import { PassingTrain } from "@/components/passing-train";
 import { PreheroIntro } from "@/components/prehero-intro";
@@ -22,7 +21,6 @@ import sky from "@/assets/images/backgrounds/descent/sky-2x.webp";
 import pipes from "@/assets/images/backgrounds/03b-pipes-2x.webp";
 import subwayBackground from "@/assets/images/backgrounds/04-subway-background-2x.webp";
 import subwayForefront from "@/assets/images/backgrounds/04-subway-forefront-2x.webp";
-import poyo from "@/assets/images/poyo-metro-window.webp";
 import zeroDay from "@/assets/images/zero_day.png";
 
 export default function Home() {
@@ -34,8 +32,8 @@ export default function Home() {
       </h1>
       {/*
         The descent runs unbroken from the skyline down to the platform, then
-        stops there. The countdown and the keynote open on the page
-        background, which is what the platform above them fades down to, and
+        stops there. The countdown opens on the page background, which is
+        what the platform above it fades down to, and
         the board below carries the descent's last plate itself - the tunnel is
         its backdrop rather than a panel of its own, so the artwork arrives
         under the content instead of ahead of it.
@@ -44,7 +42,6 @@ export default function Home() {
       <PipesBand />
       <SubwayScene />
       <SiteCountdown />
-      <KeynoteSpeaker />
       <EventBoard schedule={<ScheduleSection />} tracks={<TracksSection />} />
       <SponsorsSection />
       <FaqSection />
@@ -60,10 +57,10 @@ export default function Home() {
  * the billboard - stacked so that at rest they read as the single flattened
  * illustration they were cut from.
  *
- * ParallaxScene pulls them apart as the reader scrolls. The near layer moves
- * with the page; the far ones lag behind it by a share of the canvas height, so
- * the skyline sinks behind the elevated road and the sky shows down the alley
- * as the camera drops. On a pointer device the far layers also lean with the
+ * ParallaxScene pulls them apart as the reader scrolls. The buildings - far
+ * and near together - move with the page; the sky and the moon lag behind
+ * them by a share of the canvas height, so the sky shows down the alley as
+ * the camera drops. On a pointer device the sky and moon also lean with the
  * cursor. Every value is a percentage of the layer itself, so it holds at every
  * viewport and under the phone zoom (`.descent` in globals.css).
  *
@@ -81,12 +78,12 @@ function Descent() {
     <div className="relative">
       <ParallaxScene className="descent">
         {/*
-          Every layer starts from rest, so on load the four read as the one
-          flattened picture, and each slides down the canvas as the page scrolls
-          - the further back, the further it slides. The sky ends up half a
-          canvas down, which is to say it scrolls at half the speed of the
-          street. Nothing ever shows past a layer's top edge: the section's own
-          top leaves the viewport faster than any layer descends.
+          Every layer starts from rest, so on load the three read as the one
+          flattened picture, and the sky and moon slide down the canvas as the
+          page scrolls - the further back, the further it slides. The sky ends
+          up half a canvas down, which is to say it scrolls at half the speed
+          of the street. Nothing ever shows past a layer's top edge: the
+          section's own top leaves the viewport faster than any layer descends.
         */}
         <DescentLayer parallaxY={50} drift={2.8}>
           <Image
@@ -123,7 +120,13 @@ function Descent() {
           />
         </DescentLayer>
 
-        <DescentLayer parallaxY={20} drift={1.7}>
+        {/*
+          The far towers ride in the same layer as the near buildings rather
+          than lagging behind them: the cables strung down the alley are
+          painted on the far plate but anchor to the near one, so any offset
+          between the two leaves them hanging in mid-air.
+        */}
+        <DescentLayer drift={0.5}>
           <Image
             src={backBuildings}
             alt=""
@@ -136,9 +139,6 @@ function Descent() {
           {BUILDING_ADS.map((ad) => (
             <BuildingAd key={ad.src} {...ad} />
           ))}
-        </DescentLayer>
-
-        <DescentLayer drift={0.5}>
           <Image
             src={frontBuildings}
             alt="A neon city at night: a skyline under a full moon, a glowing billboard strung between the towers, and a rain-slicked street lined with red neon below."
@@ -418,32 +418,32 @@ function BillboardDeadline() {
  */
 const BUILDING_ADS = [
   {
-    // The tower left of centre with the dense white window grid, x 575-715
-    // by y 175-400 of the canvas.
+    // The tower left of centre with the dense white window grid, x 560-770
+    // by y 215-720 of the canvas.
     src: "/ads/ad-gif1.mp4",
     label: "Advertisement screen on a city building",
-    left: "30.20%",
+    left: "31.80%",
     top: "7.40%",
     width: "7.00%",
     aspect: "800 / 600",
   },
   {
-    // High on the dark tower in the top-left corner, x 5-165 by y 20-330.
+    // High on the dark tower in the top-left corner, x 50-200 by y 20-170.
     src: "/ads/ad-reboot.mp4",
     label: "Reboot advertisement screen on a city building",
-    left: "0.80%",
-    top: "2.50%",
-    width: "7.40%",
+    left: "3.40%",
+    top: "1.85%",
+    width: "6.25%",
     aspect: "600 / 338",
   },
   {
-    // The purple-windowed block right of the MMXXVI tower, x 405-560 by
-    // y 320-700, just under its roofline.
+    // The purple-windowed block right of the MMXXVI tower, x 480-640 by
+    // y 370-640, just under its roofline.
     src: "/ads/ad-tmobile.mp4",
     label: "T-Mobile advertisement screen on a city building",
-    left: "21.60%",
-    top: "12.30%",
-    width: "6.90%",
+    left: "26.80%",
+    top: "12.60%",
+    width: "6.46%",
     aspect: "480 / 228",
   },
   {
@@ -622,9 +622,8 @@ function SubwayScene() {
           the screen's rectangle and the ring's interior are 100% alpha there,
           so they read through the windows with the car's mullions framing them.
           The passing train runs in front of the tiles, so it covers the screen
-          and the stats while it is across them; Poyo sits at the glass, in
-          front of the train; and the car is painted last so it occludes
-          everything correctly.
+          and the stats while it is across them, and the car is painted last so
+          it occludes everything correctly.
         */}
         <div
           className="absolute inset-0"
@@ -647,7 +646,6 @@ function SubwayScene() {
           <WallStats />
         </div>
         <PassingTrain />
-        <SubwayPoyo />
         <SubwayCar />
       </div>
 
@@ -682,43 +680,6 @@ function SubwayCar() {
       quality={65}
       className="media-fade pointer-events-none object-cover"
     />
-  );
-}
-
-/**
- * Poyo, the mascot, rising into the car's right-hand window as the platform
- * scrolls into view.
- *
- * The window's opening is x 1394-1786 by y 105-588 of the 1920x1080 plate; the
- * box's bottom sits on the sill, so at the start of the pass - a full box
- * height down - Poyo is entirely behind the car's body, and the rise brings
- * the head up over the sill. It finishes at a little over half the pass, which
- * is about when the panel is centred on the screen, so a reader who stops
- * there sees the whole face.
- *
- * The box is placed in the plate's own coordinates, before SUBWAY_ZOOM: that
- * scale runs from 37% across, so the opening's right half is pushed off the
- * frame and the box stops at 84.8% of the plate, which lands at 99% of it
- * zoomed. Poyo therefore sits at the window's left, against the mullion.
- *
- * The bob runs on an inner element, so it never fights the rise's transform,
- * and only while the panel is on screen (`.subway-poyo` is gated by
- * components/reveal-on-scroll.tsx like the wall stats).
- */
-function SubwayPoyo() {
-  return (
-    <div
-      aria-hidden
-      className="subway-poyo absolute"
-      style={{ left: "72.8%", top: "39.1%", width: "12%" }}
-      data-parallax-from-y={100}
-      data-parallax-y={0}
-      data-parallax-end={0.55}
-    >
-      <div className="subway-poyo-bob">
-        <Image src={poyo} alt="" sizes="16vw" className="block h-auto w-full" />
-      </div>
-    </div>
   );
 }
 

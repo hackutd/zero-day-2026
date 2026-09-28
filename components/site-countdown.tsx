@@ -8,9 +8,9 @@ import { AmbientVideo } from "@/components/ambient-video";
  * Countdown to the hackathon.
  *
  * TODO(design): a decorative border is coming for this section. The chamfered
- * cells below are the interim treatment - the same notch as the buttons and
- * the keynote portrait above - so the section reads as finished chrome until
- * the real frame arrives and wraps it.
+ * cells below are the interim treatment - the same notch as the buttons - so
+ * the section reads as finished chrome until the real frame arrives and wraps
+ * it.
  *
  * TODO(organizers): confirm this. It is taken from the FAQ's "November 8th and
  * 9th", which is copy carried over from the 2025 site, so the day is a

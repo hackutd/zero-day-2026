@@ -27,13 +27,6 @@ DESCENT_LAYERS = {
     "front-buildings.png": None,
 }
 
-# Poyo, seen through the stopped car's window (`SubwayPoyo` in app/page.tsx).
-# The source is already cropped to its ink; it only needs to come down to a
-# size worth shipping - it is drawn ~20% of the plate wide, never larger.
-POYO_SOURCE = ROOT / "design-sources" / "poyo-metro-window.png"
-POYO_OUTPUT = ROOT / "assets" / "images" / "poyo-metro-window.webp"
-POYO_WIDTH = 1600
-
 OUTPUT_BACKGROUNDS.mkdir(parents=True, exist_ok=True)
 (OUTPUT_BACKGROUNDS / "descent").mkdir(exist_ok=True)
 
@@ -108,8 +101,3 @@ for name, box in DESCENT_LAYERS.items():
             OUTPUT_BACKGROUNDS / "descent" / f"{Path(name).stem}-2x.webp",
             exact_alpha=False,
         )
-
-with Image.open(POYO_SOURCE) as original:
-    height = round(original.height * POYO_WIDTH / original.width)
-    resized = original.resize((POYO_WIDTH, height), Image.Resampling.LANCZOS)
-    save(resized, POYO_OUTPUT, exact_alpha=False)

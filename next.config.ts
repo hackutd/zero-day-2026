@@ -9,15 +9,14 @@ import type { NextConfig } from "next";
  * files means changing its filename, or a returning visitor keeps the old one.
  *
  * Worth it here. It covers the ambient audio bed (1.4-2.1MB), eight decorative
- * MP4s, the six cursor bitmaps and the keynote's border art - all long-lived,
- * and all currently revalidated on every repeat visit.
+ * MP4s and the six cursor bitmaps - all long-lived, and all currently
+ * revalidated on every repeat visit.
  */
 const IMMUTABLE_PUBLIC_PATHS = [
   "/audio/:path*",
   "/ads/:path*",
   "/countdown/:path*",
   "/cursors/:path*",
-  "/keynote-frame.webp",
   "/button-accent.svg",
   // Season-pinned by filename, so it versions itself the way a hash would.
   "/mlh-trust-badge-2027-black.svg",
@@ -42,7 +41,7 @@ const nextConfig: NextConfig = {
      * the optimizer. 65 is for the full-bleed decorative plates, which are flat
      * illustrated art with broad gradients and hold up where a photograph
      * would not; 75 stays the default for anything the reader actually looks
-     * at (the wordmark, the keynote portrait).
+     * at (the wordmark).
      */
     qualities: [65, 75],
   },
