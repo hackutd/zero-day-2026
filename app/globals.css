@@ -1052,29 +1052,6 @@ textarea,
   animation-play-state: running;
 }
 
-/*
- * Poyo's idle at the window. The rise into frame is scroll-driven
- * (components/parallax-scene.tsx) on the element outside this one; this is
- * just a slow breath on top of it, paused until the panel is on screen.
- */
-.subway-poyo-bob {
-  animation: poyo-bob 3.6s ease-in-out infinite paused;
-}
-
-.subway-poyo[data-in-view] .subway-poyo-bob {
-  animation-play-state: running;
-}
-
-@keyframes poyo-bob {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-2.5%) rotate(-1.2deg);
-  }
-}
-
 @keyframes wall-signal {
   0%,
   5%,
