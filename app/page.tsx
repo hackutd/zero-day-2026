@@ -8,7 +8,6 @@ import {
   TracksSection,
 } from "@/components/api-sections";
 import { EventBoard } from "@/components/event-board";
-import { KeynoteSpeaker } from "@/components/keynote-speaker";
 import { ParallaxScene } from "@/components/parallax-scene";
 import { PassingTrain } from "@/components/passing-train";
 import { PreheroIntro } from "@/components/prehero-intro";
@@ -33,8 +32,8 @@ export default function Home() {
       </h1>
       {/*
         The descent runs unbroken from the skyline down to the platform, then
-        stops there. The countdown and the keynote open on the page
-        background, which is what the platform above them fades down to, and
+        stops there. The countdown opens on the page background, which is
+        what the platform above it fades down to, and
         the board below carries the descent's last plate itself - the tunnel is
         its backdrop rather than a panel of its own, so the artwork arrives
         under the content instead of ahead of it.
@@ -43,7 +42,6 @@ export default function Home() {
       <PipesBand />
       <SubwayScene />
       <SiteCountdown />
-      <KeynoteSpeaker />
       <EventBoard schedule={<ScheduleSection />} tracks={<TracksSection />} />
       <SponsorsSection />
       <FaqSection />

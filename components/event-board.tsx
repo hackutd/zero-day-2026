@@ -15,7 +15,7 @@ import tracksPrizesFaq from "@/assets/images/backgrounds/05-tracks-prizes-faq-2x
  * onto the page background. The plate's floor fade is what makes that work:
  * the artwork is already black by its last row, so there is no edge to see.
  *
- * Both fades come with it. The ceiling fade still meets the keynote section
+ * Both fades come with it. The ceiling fade still meets the countdown section
  * above, and the floor fade still lands on the background, exactly as they did
  * when this was a panel in the descent.
  *

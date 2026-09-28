@@ -20,8 +20,8 @@ import { errorMessage } from "@/lib/format";
  * The page used to await all three at the top of `Home`, which meant the
  * opening artwork - the LCP, and entirely static - could not be sent until a
  * network round trip to the Go service had finished. Boundaries here let React
- * flush the whole descent (skyline down to the platform), the countdown and the
- * keynote immediately, and stream these four in behind it.
+ * flush the whole descent (skyline down to the platform) and the countdown
+ * immediately, and stream these four in behind it.
  *
  * One boundary each rather than one around all four: they are independent
  * endpoints, the schedule and tracks live in separate board tabs, and the
