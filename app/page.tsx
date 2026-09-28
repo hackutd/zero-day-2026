@@ -441,7 +441,7 @@ const BUILDING_ADS = [
     // y 370-640, just under its roofline.
     src: "/ads/ad-tmobile.mp4",
     label: "T-Mobile advertisement screen on a city building",
-    left: "25.50%",
+    left: "26.80%",
     top: "12.60%",
     width: "6.46%",
     aspect: "480 / 228",
