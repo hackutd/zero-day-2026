@@ -191,8 +191,8 @@ body {
 }
 
 .scene-ceiling-fade-subway {
-  /* Lengthened with the pipes' fades above it - the two make one crossing. */
-  --scene-fade-end: 26%;
+  /* Half the old 26%: still black where it meets the pipes, but lit sooner. */
+  --scene-fade-end: 13%;
 }
 
 .scene-ceiling-fade-tunnel {
@@ -423,90 +423,70 @@ body {
 }
 
 /*
- * The descent: skyline, billboard and street as one 1920x3240 canvas, drawn as
- * four separated layers (components/parallax-scene.tsx moves them apart).
+ * Cover-frame for the pinned opening panel (PinnedPrehero).
  *
- * `--descent-zoom` is the only knob. At 1 the canvas is the page's width and
- * the scene is 27:16 tall. Below `lg` the layers are drawn wider than the page
- * and cropped, so the towers and the sign hold a size worth looking at on a
- * phone rather than shrinking to a strip; the section grows taller by the same
- * factor, which is what keeps the layers' thirds lined up with the prehero,
- * hero and street bands positioned on the section itself.
+ * That panel fills the viewport rather than holding 16:9, so anything pinned to
+ * a point in the artwork - the building ads - needs a box that tracks where the
+ * art actually lands. `max()` picks whichever dimension has to overflow: the
+ * frame is at least as wide as the panel, and at least wide enough that its
+ * 16:9 height covers the panel's. `aspect-ratio` derives the other side, and
+ * the centring matches `object-position: 50% 50%`.
  *
- * The crop is anchored near the left rather than centred. The billboard hangs
- * off the left edge of the canvas and the moon sits ~62% across, so a centred
- * crop would take the sign's edge and a left-aligned one would lose the moon;
- * on a phone the sign is the wider of the two, so the anchor moves in.
+ * The image inside is then an exact fit, and the ads can be positioned in
+ * percentages of the artwork itself.
  */
-.descent {
-  --descent-zoom: 1;
-  --descent-anchor: 12%;
+/*
+ * The opening scene's scroll track and the panel pinned inside it.
+ *
+ * Phone: neither. Pinning only earns its keep when the plate fills the screen;
+ * a 16:9 plate on a 9:19.5 viewport is ~221px of art in ~844px of viewport, so
+ * pinning it strands the reader in a mostly empty screen, and spreading the
+ * sequence over 280svh means the headline needs most of a screen of scrolling
+ * before it even begins. So the panel simply scrolls, at the plate's own
+ * aspect, and the headline plays as it crosses the viewport.
+ *
+ * From `sm` up the plate covers, pinning is worth it, and the track is tall.
+ */
+/*
+ * The prehero is a panel like every other one in the descent: full width, its
+ * own plate's shape, nothing cropped.
+ *
+ * It used to be pinned at 100svh and cover-scaled to fill that, which drew the
+ * plate at whatever scale the viewport height demanded - 0.826x on a 1440x900
+ * window against the 0.75x of the panels under it, and centre-cropped 73px a
+ * side on top of that. The art is one continuous city, so a building crossing
+ * the seam changed size and slid sideways at the boundary. On a true 16:9
+ * window cover happened to crop nothing and it looked right, which is why this
+ * read as fine on some monitors and broken on others.
+ *
+ * Sized to its own aspect instead, every plate in the descent lands at the same
+ * scale at every viewport, and the joins are continuous.
+ */
+.prehero-track {
+  position: relative;
+}
+
+.prehero-pin {
   position: relative;
   width: 100%;
-  aspect-ratio: 1920 / calc(3240 * var(--descent-zoom));
+  aspect-ratio: 1920 / 1080;
   overflow: hidden;
-  background: #000;
-}
-
-@media (max-width: 1023px) {
-  .descent {
-    --descent-zoom: 1.2;
-  }
-}
-
-@media (max-width: 639px) {
-  .descent {
-    --descent-zoom: 1.35;
-    --descent-anchor: 5%;
-  }
-}
-
-.descent-layer {
-  position: absolute;
-  top: 0;
-  left: calc((1 - var(--descent-zoom)) * var(--descent-anchor));
-  width: calc(100% * var(--descent-zoom));
-  height: 100%;
-  pointer-events: none;
-  will-change: transform;
-}
-
-/* The pointer-driven half of a layer; the scroll transform is on its parent. */
-.descent-drift {
-  position: absolute;
-  inset: 0;
-}
-
-/* A layer's plate: full width, its own height, hung from the layer's top. */
-.descent-plate {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
 }
 
 /*
- * The three bands the site's content is pinned to, each a third of the canvas.
- * Positioned on the section, not on a layer, so they hold still while the art
- * behind them drifts.
+ * Simply the panel's box.
+ *
+ * This used to be centred with `left/top: 50%` and `translate(-50%, -50%)`,
+ * which it needed while it was oversized to cover a pinned viewport. It is the
+ * same size as the panel now, and the transform was actively harmful: it puts
+ * the frame on its own compositing layer, so on a display whose width times its
+ * device pixel ratio is not a whole number - 1463 at 1.25x, 1097 at 1.75x - the
+ * left edge landed on a fractional device pixel and antialiased against the
+ * black page behind it. That read as a thin black slice down the left side.
  */
-.descent-band {
+.prehero-frame {
   position: absolute;
-  inset-inline: 0;
-  height: calc(100% / 3);
-}
-
-.descent-band-prehero {
-  top: 0;
-}
-
-.descent-band-hero {
-  top: calc(100% / 3);
-}
-
-.descent-band-street {
-  top: calc(200% / 3);
+  inset: 0;
 }
 
 /*
@@ -590,7 +570,7 @@ textarea,
 .social-marquee__track {
   display: flex;
   width: max-content;
-  animation: social-marquee 24s linear infinite;
+  animation: social-marquee 58s linear infinite;
 }
 
 /* Stop it so a card can be read and clicked rather than chased. */
@@ -678,35 +658,11 @@ textarea,
   transform: translateX(4px);
 }
 
-/* The "open" light: a slow neon breathe, not a blink. */
-.crew-card__light {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background: currentcolor;
-  box-shadow: 0 0 8px currentcolor;
-  animation: crew-light 2.6s ease-in-out infinite;
-}
-
-@keyframes crew-light {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.35;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .crew-card,
   .crew-card__fill,
   .crew-card__arrow {
     transition-duration: 0ms;
-  }
-  .crew-card__light {
-    animation: none;
   }
 }
 
@@ -772,45 +728,18 @@ textarea,
 }
 
 /*
- * The pipes band gives 20% at each end, far more than the scene panels do.
- * It is only 360px tall against their 1080, so the same share is a much
- * shorter run on screen, and it is a transition rather than a place: the
- * pipework should emerge and recede rather than start and stop.
- */
-/*
- * Both edges of the pipework, and the street above it.
- *
- * These were 20% of a 360px band - 72px - which is about as long as the strip
- * the band overlaps the street by, so the plate went from solid black to fully
- * lit in roughly the width of the overlap and the join showed as a dark bar
- * with a hard edge on each side. Measured down the middle of the page it dipped
- * to 0.37 and was back at 43 sixty pixels later.
- *
- * Longer ramps, same shape. Nothing here is darker than it was; it just takes
- * its time.
- *
- * Most of the length has to come from the neighbours. The band is only 360px
- * tall, so its own two fades eat into each other - at 40% a side they already
- * cover 288 of it and leave 72px of pipework at full strength, which is about
- * the floor before the band stops being pipework and becomes a dark gap. The
- * street and the platform are full 1080px panels either side of it and have
- * room to spare, so they carry a quarter of their height each. The crossing
- * ends up roughly 400px of gradient rather than 60, and no single stretch of
- * it is steep.
+ * Both edges of the pipework. The crossing goes through black - street fades
+ * out, pipes fade in and out, platform fades in - so each level stays its own.
+ * 30% a side leaves the middle ~40% of the band (~110px at 1440) at full
+ * strength, enough for the pipework to read, where 40% left about 72px.
  */
 .scene-ceiling-fade-pipes,
 .scene-floor-fade-pipes {
-  --scene-fade-end: 40%;
+  --scene-fade-end: 30%;
 }
 
-/*
- * The street is the bottom third of the descent's 3240px canvas, so 13% of the
- * canvas is ~420 rows of it - the quarter-panel share above, plus enough to
- * carry the foot of the near layer, where the separated art thins to loose
- * paint, down to black before the pipes.
- */
 .scene-floor-fade-street {
-  --scene-fade-end: 13%;
+  --scene-fade-end: 26%;
 }
 
 /*
@@ -1145,4 +1074,73 @@ textarea,
 [data-motion-active] .star-field:not([data-in-view]) .shooting-star::before,
 [data-motion-active] .star-field:not([data-in-view]) .shooting-star::after {
   animation-play-state: paused;
+}
+
+/*
+ * The deadline reminder's entrance (components/deadline-reminder.tsx): the
+ * card grows out of its bottom-right corner - where it lives - with a slight
+ * overshoot, and its contents fade in once the frame has landed, so the words
+ * never appear squashed. No motion for anyone who has asked for less.
+ */
+.deadline-pop {
+  transform-origin: 100% 100%;
+  animation: deadline-pop 460ms cubic-bezier(0.2, 0.9, 0.25, 1.08) both;
+}
+
+.deadline-pop__body {
+  animation: deadline-pop-body 260ms ease-out 300ms both;
+}
+
+@keyframes deadline-pop {
+  from {
+    transform: scale(0.06);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes deadline-pop-body {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deadline-pop,
+  .deadline-pop__body {
+    animation: none;
+  }
+}
+
+/*
+ * The black cover over the first moment (components/page-loader.tsx). It fades
+ * when the script sets `data-done`; the animation is the fallback for a script
+ * that never runs, at the same 1.5s cap.
+ */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #000;
+  transition:
+    opacity 500ms ease-out,
+    visibility 0s linear 500ms;
+  animation: page-loader-out 500ms ease-out 1.5s forwards;
+}
+
+.page-loader[data-done] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes page-loader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }

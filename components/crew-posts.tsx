@@ -12,8 +12,8 @@ import {
  * place that says "registration is open" also answers "and if I'm not
  * competing?" without sending the reader anywhere else.
  *
- * The three cards are set as recruitment posts: a numbered posting, an "open"
- * light, the role in the display face and the form as the action. They borrow
+ * The three cards are set as recruitment posts: the role in the display face
+ * and the form as the action. They borrow
  * the social marquee's chamfer and glass-on-hover, in px rather than the
  * marquee's percentages because these are not square - a percentage cut would
  * come out at a different angle on every breakpoint. Violet and near-black
@@ -56,14 +56,10 @@ const CHAMFER =
 export function CrewPosts() {
   return (
     <div id="get-involved" className="mt-16 sm:mt-20">
-      <p className="font-sans text-text-muted text-center text-[12px] leading-[1.55] tracking-[0.1em] uppercase">
-        Not hacking? The city still needs you
-      </p>
-
-      <ul className="mt-8 grid gap-4 md:grid-cols-3 md:gap-5">
+      <ul className="grid gap-4 md:grid-cols-3 md:gap-5">
         {POSTS.map((post, i) => (
           <li key={post.role} className={`reveal reveal-${i + 1}`}>
-            <PostCard index={i + 1} {...post} />
+            <PostCard {...post} />
           </li>
         ))}
       </ul>
@@ -71,13 +67,7 @@ export function CrewPosts() {
   );
 }
 
-function PostCard({
-  index,
-  role,
-  brief,
-  href,
-  tone,
-}: Post & { index: number }) {
+function PostCard({ role, brief, href, tone }: Post) {
   return (
     <a
       href={href}
@@ -102,19 +92,8 @@ function PostCard({
           }}
         />
 
-        <span className="relative flex items-center justify-between">
-          {/* Elevon, not Hypik: the number needs digits. */}
-          <span className="font-elevon text-accent-soft text-[11px] font-bold tracking-[0.18em] uppercase">
-            Post {String(index).padStart(2, "0")}
-          </span>
-          <span className="font-sans flex items-center gap-2 text-[10px] tracking-[0.16em] text-white/70 uppercase">
-            <span aria-hidden className="crew-card__light text-cyan" />
-            Open
-          </span>
-        </span>
-
         <span
-          className="font-hypik relative mt-9 block leading-none tracking-[-0.02em] text-white uppercase"
+          className="font-hypik relative block leading-none tracking-[-0.02em] text-white uppercase"
           style={{ fontSize: "clamp(1.75rem, 2.8vw, 2.5rem)" }}
         >
           {role}

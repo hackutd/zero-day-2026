@@ -12,13 +12,13 @@
  * where the first began.
  *
  * Each half must be at least as wide as the viewport, or the loop tears. One
- * set of five is ~1280px, so on a 1440px screen the incoming half ran out
+ * set of five was ~1280px, so on a 1440px screen the incoming half ran out
  * before it reached the right edge and left a gap after the last card until the
  * cycle restarted. Each half therefore repeats the set REPEATS times; -50%
  * still lands exactly on the boundary because the halves stay identical.
  *
  * Only the first set carries real links. Every repeat is hidden from assistive
- * tech and taken out of the tab order, so the same five destinations are not
+ * tech and taken out of the tab order, so the same six destinations are not
  * announced or tabbed through REPEATS*2 times.
  *
  * The strip pauses on hover so a card can be read and clicked rather than
@@ -28,9 +28,10 @@
 const CHAMFER = "polygon(0 0, 78% 0, 100% 22%, 100% 100%, 0 100%)";
 
 /**
- * Sets per half. A set is five cards, about 1280px, so four sets carry a half
- * past 5000px - clear of any display the loop could tear on. Three would still
- * cover an ultrawide at ~3840px, but not a 4K desktop.
+ * Sets per half. A set is six cards, about 1536px, so four sets carry a half
+ * past 6000px - clear of any display the loop could tear on. Six also keeps
+ * violet and near-black alternating across the join between sets, where five
+ * put two violets side by side.
  */
 const REPEATS = 4;
 
@@ -72,6 +73,12 @@ const SOCIALS: Social[] = [
     href: "https://www.youtube.com/@realhackutd",
     tone: "violet",
     icon: <YouTubeMark />,
+  },
+  {
+    name: "GitHub",
+    href: "https://github.com/hackutd",
+    tone: "ink",
+    icon: <GitHubMark />,
   },
 ];
 
@@ -240,6 +247,17 @@ function YouTubeMark() {
       <path
         style={FILL}
         d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.5A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.88.5 9.38.5 9.38.5s7.5 0 9.38-.5a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81zM9.55 15.57V8.43L15.82 12z"
+      />
+    </svg>
+  );
+}
+
+function GitHubMark() {
+  return (
+    <svg viewBox="0 0 24 24" className={MARK} aria-hidden>
+      <path
+        style={FILL}
+        d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3"
       />
     </svg>
   );
