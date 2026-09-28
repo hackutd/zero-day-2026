@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 
 import { AudioToggle } from "@/components/audio-toggle";
+import { DeadlineReminder } from "@/components/deadline-reminder";
 import { EdgeRails } from "@/components/edge-rails";
 import { MediaFade } from "@/components/media-fade";
+import { PageLoader } from "@/components/page-loader";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { SiteNav } from "@/components/site-nav";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -171,9 +173,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <RevealOnScroll />
         <MediaFade />
         <EdgeRails />
+        <PageLoader />
         <SiteNav />
         {children}
         <AudioToggle />
+        <DeadlineReminder />
       </body>
     </html>
   );

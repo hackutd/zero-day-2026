@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 
 import { AmbientVideo } from "@/components/ambient-video";
 import {
@@ -14,14 +14,99 @@ import { PreheroIntro } from "@/components/prehero-intro";
 import { SiteCountdown } from "@/components/site-countdown";
 import { SiteFooter } from "@/components/site-footer";
 import { SocialMarquee } from "@/components/social-marquee";
-import backBuildings from "@/assets/images/backgrounds/descent/back-buildings-2x.webp";
-import frontBuildings from "@/assets/images/backgrounds/descent/front-buildings-2x.webp";
-import moon from "@/assets/images/backgrounds/descent/moon-2x.webp";
-import sky from "@/assets/images/backgrounds/descent/sky-2x.webp";
+import prehero from "@/assets/images/backgrounds/01-prehero-city-2x.webp";
+import hero from "@/assets/images/backgrounds/02-hero-city-2x.webp";
+import sky from "@/assets/images/backgrounds/sky-2x.webp";
+import street from "@/assets/images/backgrounds/03-street-2x.webp";
 import pipes from "@/assets/images/backgrounds/03b-pipes-2x.webp";
 import subwayBackground from "@/assets/images/backgrounds/04-subway-background-2x.webp";
 import subwayForefront from "@/assets/images/backgrounds/04-subway-forefront-2x.webp";
 import zeroDay from "@/assets/images/zero_day.png";
+
+/**
+ * The opening scenes of the site, stacked in reading order.
+ *
+ * The art is one continuous descent - skyline, then down between the towers,
+ * then street level, then underground to the platform - so the panels butt
+ * against each other with no gap or divider.
+ *
+ * why it matters and why it does nothing on a wide one. Two rules set these:
+ *
+ *  - The hero's billboard carries the logo, so the crop centers on the sign
+ *    rather than on the frame: 25.31% is where the sign's own middle sits.
+ *  - The hero and the street below it share an edge - the same hexagon wall
+ *    runs off the bottom of one and into the top of the other - so they must
+ *    crop around the *same* point or the seam visibly slips. The street panel
+ *    is 25% because the hero is, not on its own merits.
+ *
+ * The skyline is a standalone frame, so it keeps the moon centered.
+ */
+const scenes: {
+  src: StaticImageData;
+  alt: string;
+  overlay?: React.ReactNode;
+  seams?: React.ReactNode;
+  /** Let the scroll settle onto this panel when the reader stops near it. */
+  settle?: boolean;
+  zoom?: number;
+  zoomOrigin?: string;
+}[] = [
+  {
+    src: prehero,
+    alt: "Neon city skyline at night under a full moon, an MMXXVI tower lit at the left.",
+  },
+  {
+    src: hero,
+    alt: "A blank glowing billboard on a wall between skyscrapers, strung with cables.",
+    overlay: <HeroOverlays />,
+    settle: true,
+  },
+  {
+    src: street,
+    alt: "Silhouetted figures on a rain-slicked street lined with red neon.",
+    seams: <StreetSeams />,
+  },
+];
+
+/**
+ * The skyline and the alley, with one night sky drifting behind both.
+ *
+ * Only the sky moves - stars, clouds and the moon, which are attached to
+ * nothing. Both panels are their plates with the sky traced out
+ * (scripts/trace-sky.py), so the cities, and everything painted or pinned on
+ * them - the cables, both skybridges, the billboard, the building screens -
+ * stay put and cannot come unstuck. One sky for both, so the patch seen down
+ * the alley moves in step with the one over the skyline.
+ *
+ * The sky is the two plates stacked wherever they are sky, so at rest the
+ * page is pixel for pixel the flat picture, and drawn night behind the
+ * buildings. As the pair scrolls up it lags, ending 35% of their height
+ * behind. It only ever lags, so a gap shows sky from above it, which the image
+ * always has; and the lag is always less than the distance scrolled, so the
+ * sky's own top edge is off screen before it could show.
+ */
+function SkyScene({ children }: { children: React.ReactNode }) {
+  return (
+    <ParallaxScene className="relative overflow-hidden">
+      <div aria-hidden className="absolute inset-0" data-parallax-y={35}>
+        <Image
+          src={sky}
+          alt=""
+          sizes="100vw"
+          placeholder="blur"
+          preload
+          className="block h-auto w-full"
+        />
+      </div>
+      {children}
+    </ParallaxScene>
+  );
+}
+
+/** Shared by both halves of the stack, so the two render identically. */
+function renderScene(scene: (typeof scenes)[number]) {
+  return <Scene key={scene.src.src} {...scene} first={false} />;
+}
 
 export default function Home() {
   return (
@@ -30,6 +115,10 @@ export default function Home() {
         HackUTD 2026: Zero Day, a 24-hour hackathon at The University of Texas
         at Dallas, November 7-8, 2026
       </h1>
+      <SkyScene>
+        <PinnedPrehero {...scenes[0]} />
+        {renderScene(scenes[1])}
+      </SkyScene>
       {/*
         The descent runs unbroken from the skyline down to the platform, then
         stops there. The countdown opens on the page background, which is
@@ -38,7 +127,7 @@ export default function Home() {
         its backdrop rather than a panel of its own, so the artwork arrives
         under the content instead of ahead of it.
       */}
-      <Descent />
+      <StreetScene scene={scenes[2]} />
       <PipesBand />
       <SubwayScene />
       <SiteCountdown />
@@ -52,185 +141,18 @@ export default function Home() {
 }
 
 /**
- * The city, from the skyline down to the street: one 1920x3240 canvas drawn as
- * four layers - sky, moon, the far towers, and the near buildings that carry
- * the billboard - stacked so that at rest they read as the single flattened
- * illustration they were cut from.
- *
- * ParallaxScene pulls them apart as the reader scrolls. The buildings - far
- * and near together - move with the page; the sky and the moon lag behind
- * them by a share of the canvas height, so the sky shows down the alley as
- * the camera drops. On a pointer device the sky and moon also lean with the
- * cursor. Every value is a percentage of the layer itself, so it holds at every
- * viewport and under the phone zoom (`.descent` in globals.css).
- *
- * The page's own content sits in three bands over the canvas - the prehero,
- * the hero and the street are each a third of it, exactly the 16:9 panels the
- * flattened plates used to be - so the intro, the settle marker and the about
- * copy all keep the geometry they were measured against. Things painted *onto*
- * the art - the building screens, the wordmark on the sign - live inside the
- * layer that carries their building instead, and move with it.
- */
-function Descent() {
-  return (
-    // The wrapper is what the pipes below overlap, and what the about copy
-    // hangs off on a phone - see StreetCopy.
-    <div className="relative">
-      <ParallaxScene className="descent">
-        {/*
-          Every layer starts from rest, so on load the three read as the one
-          flattened picture, and the sky and moon slide down the canvas as the
-          page scrolls - the further back, the further it slides. The sky ends
-          up half a canvas down, which is to say it scrolls at half the speed
-          of the street. Nothing ever shows past a layer's top edge: the
-          section's own top leaves the viewport faster than any layer descends.
-        */}
-        <DescentLayer parallaxY={50} drift={2.8}>
-          <Image
-            src={sky}
-            alt=""
-            sizes="100vw"
-            placeholder="blur"
-            quality={65}
-            loading="eager"
-            className="descent-plate"
-          />
-        </DescentLayer>
-
-        <DescentLayer
-          parallaxY={36}
-          parallaxX={8}
-          parallaxScale={1.22}
-          parallaxOrigin="63% 8%"
-          drift={3.8}
-        >
-          {/*
-            Cropped to its glow in the build script and hung back at the crop's
-            origin on the canvas: x 773, of 1920, and 868 wide.
-          */}
-          <Image
-            src={moon}
-            alt=""
-            sizes="(max-width: 639px) 62vw, (max-width: 1023px) 55vw, 46vw"
-            placeholder="blur"
-            quality={65}
-            loading="eager"
-            className="descent-plate"
-            style={{ left: "40.26%", width: "45.21%" }}
-          />
-        </DescentLayer>
-
-        {/*
-          The far towers ride in the same layer as the near buildings rather
-          than lagging behind them: the cables strung down the alley are
-          painted on the far plate but anchor to the near one, so any offset
-          between the two leaves them hanging in mid-air.
-        */}
-        <DescentLayer drift={0.5}>
-          <Image
-            src={backBuildings}
-            alt=""
-            sizes="100vw"
-            placeholder="blur"
-            quality={65}
-            loading="eager"
-            className="descent-plate"
-          />
-          {BUILDING_ADS.map((ad) => (
-            <BuildingAd key={ad.src} {...ad} />
-          ))}
-          <Image
-            src={frontBuildings}
-            alt="A neon city at night: a skyline under a full moon, a glowing billboard strung between the towers, and a rain-slicked street lined with red neon below."
-            sizes="100vw"
-            placeholder="blur"
-            quality={65}
-            preload
-            className="descent-plate"
-          />
-          <BillboardWordmark />
-          <BillboardDeadline />
-        </DescentLayer>
-
-        <PreheroBand />
-
-        {/*
-          Read by components/smooth-scroll.tsx, which eases onto this band if
-          the reader comes to rest already close to it - the billboard is the
-          one place in the descent worth stopping square on.
-        */}
-        <div
-          data-settle
-          aria-hidden
-          className="descent-band descent-band-hero pointer-events-none"
-        />
-
-        <div
-          aria-hidden
-          className="street-scrim descent-band descent-band-street pointer-events-none hidden sm:block"
-        />
-        <div className="scene-floor-fade scene-floor-fade-street" />
-      </ParallaxScene>
-
-      <StreetCopy />
-    </div>
-  );
-}
-
-/**
- * One layer of the descent: the scroll-driven element outside, the
- * pointer-driven one inside, so the two never write the same transform. The
- * plate and anything pinned to it go in the inner box, in percentages of the
- * canvas.
- *
- * Every layer is decoration to a screen reader except the front one, whose
- * plate carries the alt text for the whole picture.
- */
-function DescentLayer({
-  parallaxY,
-  parallaxX,
-  parallaxScale,
-  parallaxOrigin,
-  drift,
-  children,
-}: {
-  parallaxY?: number;
-  parallaxX?: number;
-  parallaxScale?: number;
-  parallaxOrigin?: string;
-  drift?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className="descent-layer"
-      data-parallax-y={parallaxY}
-      data-parallax-x={parallaxX}
-      data-parallax-scale={parallaxScale}
-      data-parallax-origin={parallaxOrigin}
-    >
-      <div className="descent-drift" data-drift={drift}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-/**
  * The "HackUTD's Zero Day" wordmark, sitting on the hero's blank billboard.
  *
- * Every number here was measured off the front layer of the descent
- * (`design-sources/backgrounds/descent/front-buildings.png`, 1920x3240) rather
- * than eyeballed. The sign is not a rotated rectangle - its left and right
- * edges are vertical while the top and bottom slope down to the right (~6.1
- * deg and ~5.5 deg). That is a vertical shear, so `skewY` is what makes the
- * art sit *on* the sign; a `rotate` would tilt the upright strokes away from
- * the sign's own vertical edges and read as a sticker laid on top.
+ * Every number here was measured off `02-hero.png` rather than eyeballed. The
+ * sign is not a rotated rectangle - its left and right edges are vertical while
+ * the top and bottom slope down to the right (~6.0 deg and ~7.5 deg). That is a
+ * vertical shear, so `skewY` is what makes the art sit *on* the sign; a
+ * `rotate` would tilt the upright strokes away from the sign's own vertical
+ * edges and read as a sticker laid on top.
  *
- * The sign's lit face spans x 20-955; its top edge runs from y 1090 at the left
- * to 1190 at the right, its bottom from 1600 to 1690. The wordmark takes 82% of
- * the face's width, which leaves an even ~80px of sign on either side of the
- * ink at the canvas's native scale.
+ * The sign spans x 9-963 and its midline runs through (486, 422) of the
+ * 1920x1081 frame. The wordmark takes 82% of the sign's width, which leaves an
+ * even ~86px of sign on either side of the ink at the frame's native scale.
  *
  * The offsets look crooked because they are correcting for the artwork's own
  * padding. `zero_day.png` is 781x307 but its ink only occupies 774x228, with 51
@@ -246,7 +168,7 @@ function BillboardWordmark() {
       className="billboard-sign absolute"
       style={{
         left: "4.58%",
-        top: "36.73%",
+        top: "23.62%",
         width: "41.10%",
         // Matches the source exactly, so `object-contain` fits edge to edge.
         aspectRatio: "781 / 307",
@@ -258,7 +180,7 @@ function BillboardWordmark() {
         src={zeroDay}
         alt="HackUTD's Zero Day"
         fill
-        sizes="(max-width: 639px) 56vw, (max-width: 1023px) 50vw, 42vw"
+        sizes="(max-width: 639px) 105vw, 42vw"
         className="media-fade object-contain"
       />
 
@@ -273,7 +195,7 @@ function BillboardWordmark() {
         alt=""
         aria-hidden
         fill
-        sizes="(max-width: 639px) 56vw, (max-width: 1023px) 50vw, 42vw"
+        sizes="(max-width: 639px) 105vw, 42vw"
         className="sign-echo object-contain"
       />
 
@@ -326,15 +248,15 @@ function BillboardPresenter() {
 /**
  * The application deadline, painted on the billboard under the wordmark.
  *
- * Measured off the front layer the way the wordmark above it was, because the
+ * Measured off `02-hero.png` the way the wordmark above it was, because the
  * space this has to live in is bounded on both sides. At the sign's midline the
- * wordmark's *ink* stops at y 1472 of the 1920x3240 canvas - its box runs on
- * to 1500, but 28 of those rows are the artwork's own padding, see
- * BillboardWordmark - and the sign's lit face ends at y 1645 there, its bottom
- * rail running from (20, 1600) to (955, 1690). That leaves a ~170px band.
+ * wordmark's *ink* stops at y 537 of the 1920x1080 plate - its box runs on to
+ * 565, but 28 of those rows are the artwork's own padding, see
+ * BillboardWordmark - and the sign's lit face ends at y 693, its bottom rail
+ * running from (40, 655) to (955, 734). That leaves a 156px band.
  *
- * This box takes 110 of it, centred. Being the tighter of the two is the point:
- * it shears at the wordmark's 6.72 deg while the rail only falls at 5.5, so the
+ * This box takes 135 of it, centred. Being the tighter of the two is the point:
+ * it shears at the wordmark's 6.72 deg while the rail only falls at 4.94, so the
  * band narrows as you go right, and a box measured to fit at the midline is
  * what would push through the sign at its right-hand end.
  *
@@ -346,17 +268,17 @@ function BillboardPresenter() {
  *
  * Set in Satoshi, not the Elevon the subway stats use. Elevon is deliberately
  * not preloaded (app/layout.tsx) on the grounds that nothing above the fold is
- * set in it, and the sign is a screen below the fold - the first Elevon glyphs
- * here would put ~40KB back in front of the opening artwork for two lines of
- * type.
+ * set in it, and the hero is the second panel on the page - the first Elevon
+ * glyphs here would put ~40KB back in front of the opening artwork for two
+ * lines of type.
  */
 const BILLBOARD_DEADLINE_BOX = {
   // Flush with the wordmark's box, so the two centre on the same column and the
   // shear below pivots both about the same x.
   left: "4.58%",
   width: "41.10%",
-  top: "46.14%",
-  height: "3.40%",
+  top: "50.69%",
+  height: "12.50%",
   containerType: "inline-size",
 } as const;
 
@@ -378,8 +300,8 @@ function BillboardDeadline() {
         Sized in `cqw` against this box rather than `vw`, so the type is a
         fraction of the sign instead of of the window - the sign is a fixed
         share of a panel that holds 16:9 at every width, so anything measured
-        against the viewport would drift off it as the canvas changed shape.
-        The size sits on this element and not on the box above, because `cqw` in a
+        against the viewport would drift off it as the panel changed shape. The
+        size sits on this element and not on the box above, because `cqw` in a
         property of the container itself resolves against the *next* container
         out - the same trap the subway stats' gap had to avoid.
       */}
@@ -405,58 +327,78 @@ function BillboardDeadline() {
 }
 
 /**
- * Screens playing on the sides of the far towers.
+ * The opening scene, pinned.
  *
- * Every figure is a fraction of the back layer's own 1920x3240 canvas,
- * measured off `descent/back-buildings.png` rather than eyeballed, so the
- * screens stay on their buildings at any viewport and ride with the layer as it
- * drifts. Unlike the hero billboard these need no shear: the window grids are
- * drawn axis-aligned, so the screens are plain rectangles.
+ * From `sm` up the outer section is pure scroll distance and the panel inside
+ * sticks to the top of the viewport for all of it, so the city holds still and
+ * you scroll *through* the intro rather than scrolling the city out from under
+ * it. When the track runs out the sticky releases.
+ *
+ * On a phone it does neither - see `.prehero-track` for why - and the panel
+ * just scrolls at the plate's own aspect. The intro reads the geometry rather
+ * than a breakpoint, so it follows either arrangement on its own.
+ *
+ * Unlike the other panels this one fills the viewport rather than holding 16:9
+ * - a pinned scene that letterboxed would look broken. It still needs a frame,
+ * though: the building ads are pinned to specific windows, so `.prehero-frame`
+ * tracks where the artwork actually lands and the ads sit inside it in
+ * percentages of the art. The intro text is deliberately outside that frame,
+ * because it should centre on the viewport rather than on the city.
+ *
+ * The id sits on the track rather than the panel, so the navbar - which waits
+ * for this element to scroll past - appears once the pinned sequence is done.
+ *
+ */
+/**
+ * Screens playing on the sides of two buildings in the skyline.
+ *
+ * Every figure is a fraction of the artwork's own 1920x1080, measured off the
+ * plate rather than eyeballed, so they stay on their buildings at any viewport.
+ * Unlike the hero billboard these need no shear: this building's window grid is
+ * drawn perfectly axis-aligned, so the screens are plain rectangles.
  *
  * `aspect` is the source clip's own ratio, which fixes each screen's height
  * from its width and guarantees the footage is never stretched.
  */
 const BUILDING_ADS = [
   {
-    // The tower left of centre with the dense white window grid, x 560-770
-    // by y 215-720 of the canvas.
+    // The tower left of centre with the dense white-and-black window grid.
     src: "/ads/ad-gif1.mp4",
     label: "Advertisement screen on a city building",
-    left: "31.80%",
-    top: "7.40%",
-    width: "7.00%",
+    left: "30.99%",
+    top: "37.50%",
+    width: "8.33%",
     aspect: "800 / 600",
   },
   {
-    // High on the dark tower in the top-left corner, x 50-200 by y 20-170.
+    // High on the dark tower in the top-left corner.
     src: "/ads/ad-reboot.mp4",
     label: "Reboot advertisement screen on a city building",
-    left: "3.40%",
-    top: "1.85%",
-    width: "6.25%",
+    left: "2.86%",
+    top: "18.99%",
+    width: "7.55%",
     aspect: "600 / 338",
   },
   {
-    // The purple-windowed block right of the MMXXVI tower, x 480-640 by
-    // y 370-640, just under its roofline.
+    // The wide slab under the MMXXVI clock tower - aligned with the lettered
+    // tower and stopping well short of it, its roof a flat edge at y 455 where
+    // the tower carries on up past the oval.
+    //
+    // The lit facade runs x 184-366 of the plate - read off the pixels either
+    // side, where the wall drops to the near-black of its own edge. The screen
+    // is 124 wide at x 227-351, which is not the geometric centre of that
+    // (275) but sits right of it by request: the wall's left end carries a
+    // bright column of windows at 184-206 that pulls the eye, so a screen
+    // centred on the measurement reads as sitting left of centre. It keeps
+    // 35px above it, clear of the roofline. Wider than the tower to its right
+    // could ever carry, which is the point: at this size the neon reads as a
+    // sign rather than as a lit window.
     src: "/ads/ad-tmobile.mp4",
     label: "T-Mobile advertisement screen on a city building",
-    left: "26.80%",
-    top: "12.60%",
+    left: "11.82%",
+    top: "45.38%",
     width: "6.46%",
     aspect: "480 / 228",
-  },
-  {
-    // The orange-windowed slab down the alley, x 1170-1280 by y 1500-1800.
-    // Kept small and dimmed: it is the furthest screen in the scene, so it
-    // reads as distance rather than as a panel that happens to be tiny.
-    src: "/ads/ad-gif4.mp4",
-    label: "Screen on a building down the alley",
-    left: "61.20%",
-    top: "47.50%",
-    width: "5.20%",
-    aspect: "800 / 423",
-    fade: 0.5,
   },
 ] as const;
 
@@ -512,17 +454,32 @@ function BuildingAd({
   );
 }
 
-/**
- * The opening band: the top third of the canvas, which is the 16:9 skyline the
- * intro was written over. The id is what the nav's Home link and the intro's
- * scroll maths point at; the band sits over the layers, so the line and its
- * scrim hold still on the viewport while the city moves behind them.
- */
-function PreheroBand() {
+function PinnedPrehero({ src, alt }: { src: StaticImageData; alt: string }) {
   return (
-    <section id="scene-prehero" className="descent-band descent-band-prehero">
-      <PreheroIntro />
-      <MlhBadge />
+    <section id="scene-prehero" className="prehero-track">
+      <div className="prehero-pin">
+        <div className="prehero-frame">
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="100vw"
+            preload
+            className="object-cover"
+          />
+          {BUILDING_ADS.map((ad) => (
+            <BuildingAd key={ad.src} {...ad} />
+          ))}
+          {/*
+            Inside the frame, not the panel: on a phone the frame is the
+            letterboxed art, and the pane and headline belong on the picture
+            rather than floating over the black around it. On wider screens the
+            frame covers the viewport, so this is the same thing either way.
+          */}
+          <PreheroIntro />
+        </div>
+        <MlhBadge />
+      </div>
     </section>
   );
 }
@@ -577,6 +534,34 @@ function MlhBadge() {
         className="block h-auto w-full"
       />
     </a>
+  );
+}
+
+/**
+ * Everything laid over the hero plate: the billboard wordmark and the deadline
+ * under it, and the screen on the building down the alley.
+ */
+function HeroOverlays() {
+  return (
+    <>
+      <BillboardWordmark />
+      <BillboardDeadline />
+      <BuildingAd
+        src="/ads/ad-gif4.mp4"
+        label="Screen on a building down the alley"
+        // The shorter blue block right of the orange slab down the alley,
+        // x 1275-1345 of the plate, hung between the cable that dips to y 592
+        // and the one across at 640. Kept small and dimmed: it is the furthest
+        // screen in the scene, so it reads as distance rather than as a panel
+        // that happens to be tiny. No shear: the window rows there are drawn
+        // horizontal despite the recession.
+        left="66.67%"
+        top="55.56%"
+        width="3.18%"
+        aspect="800 / 423"
+        fade={0.5}
+      />
+    </>
   );
 }
 
@@ -684,70 +669,105 @@ function SubwayCar() {
 }
 
 /**
- * What the hackathon actually is, written on the street.
+ * The platform's two seam fades, kept out of the overlay so they are not
+ * scaled with it.
  *
- * Where the copy sits was measured off the street third of the canvas rather
- * than guessed: the left half is the loud half - the lit buildings, the
- * umbrella, the wet reflections - and the road running away up the middle-right
- * is the one large region that is both dark and flat. That is where this goes,
+ * The ceiling half sits over the car for the same reason the floor half does:
+ * the carriage roof runs up into the ceiling band, so fading only the
+ * background would leave it lit. The floor half sinks the car and the platform
+ * together, since the floor belongs to the forefront plate. See
+ * `.subway-floor-fade`.
+ *
+ * Both are measured against the panel, not the plate, which is exactly why the
+ * zoom must not reach them: their black has to land on the panel's own first
+ * and last rows to meet the plates above and below.
+ */
+/**
+ * The street's own way down into the pipework.
+ *
+ * The plate already darkens toward its foot - its last row is 0.73 - but it
+ * gets there on the art's schedule, dropping from 41 to 8 over the final
+ * stretch and then meeting the pipes' fade, which took it the rest of the way
+ * to black in a few pixels. Two ramps of very different slopes meeting is what
+ * made the join read as a bar rather than a blend. This carries the street down
+ * on the same gentle slope the pipes come back up on, so the pair reads as one
+ * long crossing.
+ */
+/**
+ * The street plate, with what the hackathon actually is written on it.
+ *
+ * Where the copy sits was measured off the plate rather than guessed. Sampled
+ * on a 12x12 grid, the left half is the loud half - the lit buildings, the
+ * umbrella, the wet reflections, all high mean and high variance - and the road
+ * running away up the middle-right is the one large region that is both dark
+ * and flat: x 960-1450, y 360-900 of its 1920x1080. That is where this goes,
  * over `.street-scrim`, which has no edge of its own.
  *
- * Below `sm` the copy is not on the picture at all. Even zoomed, the street
- * band is ~330px tall on a phone - there is no room for a paragraph on it at
- * any size worth reading, and shrinking type to fit is how this ends up looking
- * like an interface rather than a page. So it drops into flow underneath
- * instead, on black, and the scrim turns off with it.
+ * Below `sm` the copy is not on the picture at all. The panel holds the plate's
+ * aspect, so at 390px wide it is 219px tall - there is no room for a paragraph
+ * on it at any size worth reading, and shrinking type to fit is how this ends
+ * up looking like an interface rather than a page. So it drops into flow
+ * underneath instead, on black, and the scrim turns off with it.
  *
- * From `sm` the section is pinned over the bottom third of the canvas, so the
- * Descent wrapper is exactly the canvas and the pipes' overlap below is
+ * The wrapper is what the pipes below overlap. On a wide screen the copy is
+ * absolutely positioned, so the wrapper is exactly the panel and the overlap is
  * unchanged. On a phone the wrapper grows by the copy's height, and the pipes'
  * 3.59% bite - about 14px there - lands inside this block's bottom padding.
  */
-function StreetCopy() {
+function StreetScene({ scene }: { scene: (typeof scenes)[number] }) {
   return (
     // A landmark, not just artwork: this is the first place the page says what
     // the event actually is, so it gets a name a screen reader can jump to.
-    <section
-      id="about"
-      aria-labelledby="about-heading"
-      className="bg-background sm:pointer-events-none sm:absolute sm:inset-x-0 sm:top-2/3 sm:bottom-0 sm:bg-transparent"
-    >
-      {/*
-        The column sits in the road. `44%` from the left puts its leading edge
-        just past the crossing's last figure; the right inset keeps it clear
-        of the silhouettes standing at the plate's edge.
-      */}
-      <div className="relative px-5 pt-10 pb-16 sm:absolute sm:top-1/2 sm:right-[7%] sm:left-[44%] sm:-translate-y-1/2 sm:px-0 sm:pt-0 sm:pb-0">
-        <p className="reveal font-sans text-accent-soft text-[11px] tracking-[0.18em] uppercase sm:text-[12px]">
-          About the event
-        </p>
+    <section id="about" aria-labelledby="about-heading" className="relative">
+      <Scene {...scene} first={false} />
+
+      <div className="bg-background sm:pointer-events-none sm:absolute sm:inset-0 sm:bg-transparent">
+        <div
+          aria-hidden
+          className="street-scrim pointer-events-none absolute inset-0 hidden sm:block"
+        />
 
         {/*
-          No question mark: Hypik is letters only, and a `?` would silently
-          fall back to another face mid-line. The question reads as a heading
-          without it.
+          The column sits in the road. `44%` from the left puts its leading edge
+          just past the crossing's last figure; the right inset keeps it clear
+          of the silhouettes standing at the plate's edge.
         */}
-        <h2
-          id="about-heading"
-          className="reveal reveal-1 font-hypik mt-3 leading-none tracking-[-0.02em] text-white uppercase"
-          style={{ fontSize: "clamp(1.75rem, 3.2vw, 3.25rem)" }}
-        >
-          What is HackUTD
-        </h2>
+        <div className="relative px-5 pt-10 pb-16 sm:absolute sm:top-1/2 sm:right-[7%] sm:left-[44%] sm:-translate-y-1/2 sm:px-0 sm:pt-0 sm:pb-0">
+          <p className="reveal font-sans text-accent-soft text-[11px] tracking-[0.18em] uppercase sm:text-[12px]">
+            About the event
+          </p>
 
-        <p className="reveal reveal-2 font-sans text-text-muted mt-5 max-w-[46ch] text-[14px] leading-[1.8] sm:text-[15px] lg:text-[16px]">
-          HackUTD is the largest 24 hour university hackathon in North America:
-          a weekend-long event where students build apps, hardware and more. It
-          is a venue for self-expression and creativity through technology.
-          People with varying technical backgrounds, from universities all over
-          the US, come together, form teams around a problem or an idea, and
-          build something from scratch. Whether you are a frequent hackathon
-          attendee or just getting started, we would love to see what you can
-          make.
-        </p>
+          {/*
+            No question mark: Hypik is letters only, and a `?` would silently
+            fall back to another face mid-line. The question reads as a heading
+            without it.
+          */}
+          <h2
+            id="about-heading"
+            className="reveal reveal-1 font-hypik mt-3 leading-none tracking-[-0.02em] text-white uppercase"
+            style={{ fontSize: "clamp(1.75rem, 3.2vw, 3.25rem)" }}
+          >
+            What is HackUTD
+          </h2>
+
+          <p className="reveal reveal-2 font-sans text-text-muted mt-5 max-w-[46ch] text-[14px] leading-[1.8] sm:text-[15px] lg:text-[16px]">
+            HackUTD is the largest 24 hour university hackathon in North
+            America: a weekend-long event where students build apps, hardware
+            and more. It is a venue for self-expression and creativity through
+            technology. People with varying technical backgrounds, from
+            universities all over the US, come together, form teams around a
+            problem or an idea, and build something from scratch. Whether you
+            are a frequent hackathon attendee or just getting started, we would
+            love to see what you can make.
+          </p>
+        </div>
       </div>
     </section>
   );
+}
+
+function StreetSeams() {
+  return <div className="scene-floor-fade scene-floor-fade-street" />;
 }
 
 /**
@@ -926,8 +946,7 @@ function PipesBand() {
   return (
     // Hidden on a phone for now. The band is 360px against the 1080 of the
     // panels either side of it, so at 390px wide it renders about 68px tall -
-    // too little for the pipework to read as anything but a smudge, and its
-    // two 40% fades leave barely a quarter of that at full strength. With it
+    // too little for the pipework to read as anything but a smudge. With it
     // out, the street's floor fade meets the platform's ceiling fade directly
     // and the descent still crosses through black.
     <div
@@ -945,6 +964,78 @@ function PipesBand() {
       <div className="pipes-tint" />
       <div className="scene-ceiling-fade scene-ceiling-fade-pipes" />
       <div className="scene-floor-fade scene-floor-fade-pipes" />
+    </div>
+  );
+}
+
+function Scene({
+  src,
+  alt,
+  overlay,
+  seams,
+  first,
+  settle = false,
+  zoom,
+  zoomOrigin,
+}: {
+  src: StaticImageData;
+  alt: string;
+  overlay?: React.ReactNode;
+  /**
+   * Rendered outside the zoomed frame. The seam fades have to stay welded to
+   * the panel's own top and bottom rows, and scaling the frame would carry
+   * them off it and leave the joins unfaded.
+   */
+  seams?: React.ReactNode;
+  first: boolean;
+  settle?: boolean;
+  /** Enlarge the plate and everything pinned to it, about `zoomOrigin`. */
+  zoom?: number;
+  zoomOrigin?: string;
+}) {
+  return (
+    <div
+      // Read by components/smooth-scroll.tsx, which eases onto this panel if
+      // the reader comes to rest already close to it.
+      data-settle={settle ? "" : undefined}
+      /*
+       * The panel takes its own plate's shape rather than a fixed 16:9. Every
+       * plate has a 16:9 aspect today, so this resolves to the same box for all of
+       * them - but it is read from the import rather than hardcoded, so a plate
+       * that comes back a different size sizes its own panel instead of being
+       * silently cropped by `object-cover`, which is how the descent drifted
+       * out of alignment before.
+       */
+      style={{ aspectRatio: `${src.width} / ${src.height}` }}
+      className="relative w-full overflow-hidden"
+    >
+      <div
+        className="scene-frame"
+        style={
+          zoom
+            ? { transform: `scale(${zoom})`, transformOrigin: zoomOrigin }
+            : undefined
+        }
+      >
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="100vw"
+          placeholder="blur"
+          // Flat illustrated art with broad gradients: 65 is indistinguishable
+          // from the default 75 here and lands ~25% smaller. Allowlisted in
+          // next.config.ts, without which the optimizer answers 400.
+          quality={65}
+          // Only the first panel is above the fold; the rest lazy-load by
+          // default. `preload`, not `priority` - the latter is deprecated as of
+          // Next 16.
+          preload={first}
+          className="object-cover"
+        />
+        {overlay}
+      </div>
+      {seams}
     </div>
   );
 }

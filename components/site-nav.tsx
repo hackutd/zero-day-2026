@@ -1,9 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 
-import logo from "@/app/icon.png";
 import { APPLY_URL } from "@/lib/links";
 
 /**
@@ -70,16 +68,9 @@ export function SiteNav() {
       <div className="relative flex h-12 w-full items-center px-5 sm:px-6">
         <a
           href="#scene-prehero"
-          className="font-hypik inline-flex items-center gap-2 text-[20px] leading-none tracking-[-0.01em] text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:gap-2.5 sm:text-[24px]"
+          className="font-hypik inline-flex items-center text-[20px] leading-none tracking-[-0.01em] text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:text-[24px]"
         >
-          <span>HackUTD</span>
-          <Image
-            src={logo}
-            alt=""
-            aria-hidden
-            sizes="(max-width: 639px) 32px, 40px"
-            className="size-8 shrink-0 object-contain sm:size-10"
-          />
+          HackUTD
         </a>
 
         <NavPill className="absolute left-1/2 hidden -translate-x-1/2 lg:block" />

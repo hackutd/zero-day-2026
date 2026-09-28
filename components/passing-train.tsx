@@ -26,6 +26,13 @@ import train from "@/assets/images/backgrounds/04-subway-train-2x.webp";
  * again rather than resetting it, so a reader who scrolls back and forth does
  * not retrigger a pass on every wobble.
  *
+ * It also waits for the plate to be loaded and decoded. The pass is the
+ * reader's first sight of the platform, and when it started on the observer
+ * alone the image was often still downloading, so the first frames stalled on
+ * the decode - a visible hitch as the nose came through. `decode()` has the
+ * browser finish that work off-screen first; the train sets off a beat later
+ * but runs clean.
+ *
  * The observed element is the still outer box, NOT the carriage inside it. An
  * IntersectionObserver measures the target as its ancestors clip it, and the
  * carriage is parked a full panel to the right of a panel that hides its
@@ -37,6 +44,7 @@ import train from "@/assets/images/backgrounds/04-subway-train-2x.webp";
 export function PassingTrain() {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -54,7 +62,9 @@ export function PassingTrain() {
 
   return (
     <div ref={ref} aria-hidden className="subway-train-track">
-      <div className={`subway-train${inView ? " subway-train-running" : ""}`}>
+      <div
+        className={`subway-train${inView && ready ? " subway-train-running" : ""}`}
+      >
         <Image
           src={train}
           alt=""
@@ -69,6 +79,13 @@ export function PassingTrain() {
           // size, so the layout is untouched.
           sizes="(max-width: 639px) 250vw, 2048px"
           quality={65}
+          onLoad={(event) => {
+            // A failed decode still leaves a drawable image; run anyway.
+            event.currentTarget
+              .decode()
+              .catch(() => {})
+              .then(() => setReady(true));
+          }}
           className="media-fade object-cover"
         />
       </div>

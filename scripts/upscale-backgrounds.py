@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageOps
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +29,21 @@ DESCENT_LAYERS = {
 
 OUTPUT_BACKGROUNDS.mkdir(parents=True, exist_ok=True)
 (OUTPUT_BACKGROUNDS / "descent").mkdir(exist_ok=True)
+
+
+# Plates with film grain baked into the source. Sharpening turns that grain
+# into scratches, so these are denoised and softened instead: a median takes
+# out the speckle at source size, and a light blur after the upscale smooths
+# what LANCZOS leaves. Only the pipes, which are soft art to begin with.
+GRAINY = {"03b-pipes.jpg"}
+
+
+def smooth(original: Image.Image) -> Image.Image:
+    size = (original.width * 2, original.height * 2)
+    denoised = original.convert("RGB").filter(ImageFilter.MedianFilter(5))
+    return denoised.resize(size, Image.Resampling.LANCZOS).filter(
+        ImageFilter.GaussianBlur(1.2)
+    )
 
 
 def upscale(original: Image.Image) -> Image.Image:
@@ -85,10 +100,68 @@ for source in sorted(SOURCE_BACKGROUNDS.iterdir()):
         continue
     with Image.open(source) as original:
         save(
-            upscale(original),
+            smooth(original) if source.name in GRAINY else upscale(original),
             OUTPUT_BACKGROUNDS / f"{source.stem}-2x.webp",
             exact_alpha=True,
         )
+
+# The skyline and the alley as cities on their own, and the one sky that
+# drifts behind both (SkyScene in app/page.tsx). Each city is its plate with
+# the sky traced out by scripts/trace-sky.py. The sky is the two plates stacked
+# - so at rest every gap shows exactly what it always did - but only where
+# they are sky; behind the buildings, which the drift uncovers as it lags, it
+# is night drawn to match: near-black with a scatter of stars. Seeded, so a
+# rebuild does not reshuffle them.
+PANELS = ["01-prehero", "02-hero"]
+# Stars painted into an edge that stays with the city - a glow blended into
+# the top skybridge's underside - would sit still while the sky they belong to
+# drifts. Each box is filled in from the pixels either side of it, row by row;
+# the edges are horizontal gradients, so that reads as unbroken paint.
+RETOUCH = {"01-prehero": [(1364, 1062, 1381, 1071)]}
+NIGHT = (2, 1, 3)
+
+
+def starfield(size: tuple[int, int], seed: int) -> Image.Image:
+    import random
+
+    rng = random.Random(seed)
+    night = Image.new("RGB", size, NIGHT)
+    stars = Image.new("L", size, 0)
+    sp = stars.load()
+    for _ in range(size[0] * size[1] // 3500):
+        x, y = rng.randrange(size[0]), rng.randrange(size[1])
+        sp[x, y] = rng.randint(90, 255)
+    glow = stars.filter(ImageFilter.GaussianBlur(0.9)).point(lambda v: min(255, v * 3))
+    night.paste((235, 238, 255), mask=glow)
+    return night
+
+
+sky = starfield((1920, 1080 * len(PANELS)), seed=2026)
+for row, name in enumerate(PANELS):
+    with (
+        Image.open(SOURCE_BACKGROUNDS / f"{name}.png") as plate,
+        Image.open(SOURCE_BACKGROUNDS / "masks" / f"{name}-sky.png") as mask,
+    ):
+        rgb = plate.convert("RGB")
+        rp = rgb.load()
+        for x0, y0, x1, y1 in RETOUCH.get(name, []):
+            for y in range(y0, y1):
+                left, right = rp[x0 - 1, y], rp[x1, y]
+                for x in range(x0, x1):
+                    t = (x - x0 + 1) / (x1 - x0 + 1)
+                    rp[x, y] = tuple(round(a + (b - a) * t) for a, b in zip(left, right))
+        sky_mask = mask.convert("L")
+        sky.paste(rgb, (0, 1080 * row), mask=sky_mask)
+        city = rgb.copy()
+        city.putalpha(ImageOps.invert(sky_mask))
+        # Soft alpha is fine: the only edges are rooflines and cables, and
+        # each sits over its own plate's sky at rest.
+        save(
+            upscale(city),
+            OUTPUT_BACKGROUNDS / f"{name}-city-2x.webp",
+            exact_alpha=False,
+        )
+save(upscale(sky), OUTPUT_BACKGROUNDS / "sky-2x.webp", exact_alpha=False)
 
 for name, box in DESCENT_LAYERS.items():
     with Image.open(SOURCE_BACKGROUNDS / "descent" / name) as original:
