@@ -22,8 +22,46 @@ const IMMUTABLE_PUBLIC_PATHS = [
   "/mlh-trust-badge-2027-black.svg",
 ];
 
+/**
+ * Sponsor and track logos are served by HARP at
+ * `{HARP_API_BASE_URL}/v1/public/{sponsors,tracks}/{id}/logo?v=<updated_at>`,
+ * keyless, so next/image can fetch them directly. The env var is read at build
+ * time here; it is the same one lib/api.ts uses at request time, so the two
+ * cannot drift. Without it no remote host is allowed and remote logos 400 at
+ * the optimizer - loud, rather than silently unoptimized.
+ */
+function harpLogoRemotePatterns(): NonNullable<
+  NonNullable<NextConfig["images"]>["remotePatterns"]
+> {
+  const base = process.env.HARP_API_BASE_URL;
+  if (!base) return [];
+
+  const { protocol, hostname, port } = new URL(base);
+  if (protocol !== "https:" && protocol !== "http:") return [];
+
+  return [
+    {
+      protocol: protocol.slice(0, -1) as "https" | "http",
+      hostname,
+      port,
+      // ?v= is the logo version and varies per upload, so `search` is left
+      // unrestricted; the pathname keeps this to logo routes only.
+      pathname: "/v1/public/*/*/logo",
+    },
+  ];
+}
+
 const nextConfig: NextConfig = {
   images: {
+    remotePatterns: harpLogoRemotePatterns(),
+
+    /*
+     * Next 16 refuses to optimize images whose host resolves to a private or
+     * loopback IP. Locally HARP runs on localhost, so logos 400 without this.
+     * Dev only: production keeps the SSRF protection.
+     */
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
+
     // WebP avoids expensive cold AVIF encodes for the large illustrated plates.
     // Static imports retain hashed URLs and Next's responsive image caching.
     formats: ["image/webp"],

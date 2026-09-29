@@ -1,12 +1,18 @@
+import Image from "next/image";
+
 import type { Sponsor } from "@/lib/types";
-import { initials, sponsorLogoSrc } from "@/lib/format";
+import { initials, logoSrc } from "@/lib/format";
 
 /**
- * Renders a sponsor's base64 logo, falling back to a monogram when the row has
- * no usable image.
+ * Renders a sponsor's logo from its HARP `logo_url`, falling back to a
+ * monogram when the row has no usable image.
+ *
+ * The URL is versioned by the backend (`?v=<updated_at>`) and served with an
+ * immutable Cache-Control, so next/image can cache the optimized variants for
+ * the full year without a stale-logo risk.
  */
 export function SponsorLogo({ sponsor }: { sponsor: Sponsor }) {
-  const src = sponsorLogoSrc(sponsor.logo_data, sponsor.logo_content_type);
+  const src = logoSrc(sponsor.logo_url);
 
   if (!src) {
     return (
@@ -20,16 +26,14 @@ export function SponsorLogo({ sponsor }: { sponsor: Sponsor }) {
   }
 
   return (
-    // next/image can't optimize a data: URI - it would pass through unoptimized
-    // while still demanding explicit dimensions we don't have. A plain img is
-    // both smaller and more honest here.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt={`${sponsor.name} logo`}
-      loading="lazy"
-      decoding="async"
-      className="h-16 w-full object-contain"
-    />
+    <div className="relative h-16 w-full">
+      <Image
+        src={src}
+        alt={`${sponsor.name} logo`}
+        fill
+        sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 240px"
+        className="object-contain"
+      />
+    </div>
   );
 }

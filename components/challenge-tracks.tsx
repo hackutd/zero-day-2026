@@ -1,5 +1,8 @@
+import Image from "next/image";
+
 import { CloseOnScroll } from "@/components/close-on-scroll";
 import { Skeleton } from "@/components/skeleton";
+import { logoSrc } from "@/lib/format";
 import type { Track, TrackPrize } from "@/lib/types";
 
 /** Challenge tracks populated by HARP in stable display order. */
@@ -69,7 +72,7 @@ function TracksPending() {
  */
 function TrackCard({ track }: { track: Track }) {
   const sponsor = track.sponsor_name.trim();
-  const logoSrc = trackLogoSrc(track);
+  const src = logoSrc(track.logo_url);
   const [topPrize] = track.prizes;
 
   return (
@@ -78,17 +81,14 @@ function TrackCard({ track }: { track: Track }) {
       className="disclosure border-border-hairline group border bg-white/[0.02] open:bg-white/[0.04]"
     >
       <summary className="flex cursor-pointer list-none items-start gap-4 p-4 sm:p-5">
-        {logoSrc && (
+        {src && (
           <div className="flex h-12 w-24 shrink-0 items-center justify-center bg-white/[0.04] p-1.5">
-            {/* Inline data URIs are not optimized by next/image. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={logoSrc}
+            <Image
+              src={src}
               alt={`${sponsor || track.title} logo`}
               width={96}
               height={48}
-              loading="lazy"
-              decoding="async"
+              sizes="96px"
               className="h-full w-full object-contain"
             />
           </div>
@@ -160,9 +160,4 @@ function PrizeList({ prizes }: { prizes: TrackPrize[] }) {
       ))}
     </ul>
   );
-}
-
-function trackLogoSrc(track: Track): string | null {
-  if (track.logo_data === "" || track.logo_content_type === "") return null;
-  return `data:${track.logo_content_type};base64,${track.logo_data}`;
 }

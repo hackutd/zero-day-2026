@@ -77,9 +77,14 @@ function SponsorTierGroup({ tier }: { tier: SponsorTier }) {
       <h3 className="font-elevon text-text-muted text-center text-[12px] font-bold tracking-[0.18em] uppercase">
         {tier.name}
       </h3>
-      <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+      {/* Flex rather than grid so a partly filled last row centers; the
+          widths reproduce the 2/3/4-column grid net of the gaps. */}
+      <ul className="mt-5 flex flex-wrap justify-center gap-3 sm:gap-4">
         {tier.sponsors.map((sponsor) => (
-          <li key={sponsor.id}>
+          <li
+            key={sponsor.id}
+            className="w-[calc(50%-0.375rem)] sm:w-[calc((100%-2rem)/3)] lg:w-[calc(25%-0.75rem)]"
+          >
             <SponsorCard sponsor={sponsor} />
           </li>
         ))}

@@ -4,29 +4,24 @@ export function errorMessage(reason: unknown): string {
 }
 
 /**
- * Builds a data URI for a sponsor logo.
+ * Validates a `logo_url` from the HARP public API.
  *
- * The backend stores logos as raw base64 in `logo_data` with the MIME type in
- * `logo_content_type` - not as a URL. This mirrors how the portal renders them
- * (client/portal/src/pages/admin/sponsors/components/SponsorsTable.tsx).
+ * The backend emits an absolute, keyless, versioned URL (or "" when a row has
+ * no logo). Only http(s) URLs are passed through: anything else - including a
+ * legacy `data:` URI - has no business in `next/image`, whose optimizer would
+ * reject it anyway.
  *
  * Returns null when there's no usable logo, so callers can fall back.
  */
-export function sponsorLogoSrc(
-  logoData: string,
-  contentType: string,
-): string | null {
-  if (!logoData) return null;
+export function logoSrc(logoUrl: string): string | null {
+  if (!logoUrl) return null;
 
-  // Tolerate rows that already hold a full data URI.
-  if (logoData.startsWith("data:")) return logoData;
-
-  // Only ever emit image/* - a data URI built from an unexpected content type
-  // has no business in an <img> tag.
-  if (!/^image\/[a-z0-9.+-]+$/i.test(contentType)) return null;
-
-  // Postgres round-trips can reintroduce newlines into base64 payloads.
-  return `data:${contentType};base64,${logoData.replace(/\s/g, "")}`;
+  try {
+    const { protocol } = new URL(logoUrl);
+    return protocol === "https:" || protocol === "http:" ? logoUrl : null;
+  } catch {
+    return null;
+  }
 }
 
 /** First letters of a sponsor name, for the no-logo fallback. */

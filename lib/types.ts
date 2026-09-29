@@ -1,11 +1,15 @@
 /**
  * Response shapes for the HARP public API (`/v1/public/*`).
  *
- * These mirror the Go structs in `internal/store/` - keep them in sync:
+ * These mirror the Go structs in the HARP repo - keep them in sync:
  *   ScheduleItem -> internal/store/schedule.go
- *   Sponsor      -> internal/store/sponsors.go
+ *   Sponsor      -> cmd/api/public.go (PublicSponsor)
  *   FAQ          -> internal/store/faqs.go
- *   Track        -> internal/store/tracks.go
+ *   Track        -> cmd/api/public.go (PublicTrack)
+ *
+ * Sponsor and track logos arrive as `logo_url`: an absolute, keyless,
+ * versioned URL to `/v1/public/{sponsors,tracks}/{id}/logo`, or "" when the
+ * row has no logo. Logo bytes are never inlined.
  *
  * Timestamps arrive as RFC 3339 strings, not Date objects.
  */
@@ -26,8 +30,7 @@ export type Sponsor = {
   id: string;
   name: string;
   tier: string;
-  logo_data: string;
-  logo_content_type: string;
+  logo_url: string;
   website_url: string;
   description: string;
   display_order: number;
@@ -55,8 +58,7 @@ export interface Track {
   sponsor_name: string;
   description: string;
   prizes: TrackPrize[];
-  logo_data: string;
-  logo_content_type: string;
+  logo_url: string;
   display_order: number;
   created_at: string;
   updated_at: string;

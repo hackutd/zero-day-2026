@@ -153,12 +153,6 @@ export const getTracks = unstable_cache(fetchTracks, ["public:tracks:v1"], {
   tags: ["public:tracks"],
 });
 
-const TRACK_LOGO_CONTENT_TYPES = new Set([
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/gif",
-]);
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const RFC_3339_PATTERN =
@@ -184,9 +178,8 @@ function isTrack(value: unknown): value is Track {
     Array.isArray(value.prizes) &&
     value.prizes.length <= 10 &&
     value.prizes.every(isTrackPrize) &&
-    typeof value.logo_data === "string" &&
-    typeof value.logo_content_type === "string" &&
-    hasValidTrackLogo(value.logo_data, value.logo_content_type) &&
+    typeof value.logo_url === "string" &&
+    isTrackLogoUrl(value.logo_url) &&
     typeof value.display_order === "number" &&
     Number.isInteger(value.display_order) &&
     value.display_order >= 0 &&
@@ -205,10 +198,15 @@ function isTrackPrize(value: unknown): value is TrackPrize {
   );
 }
 
-function hasValidTrackLogo(data: string, contentType: string): boolean {
-  return data === ""
-    ? contentType === ""
-    : TRACK_LOGO_CONTENT_TYPES.has(contentType);
+/** "" (no logo) or an absolute http(s) URL. */
+function isTrackLogoUrl(value: string): boolean {
+  if (value === "") return true;
+  try {
+    const { protocol } = new URL(value);
+    return protocol === "https:" || protocol === "http:";
+  } catch {
+    return false;
+  }
 }
 
 function isRfc3339(value: unknown): value is string {
