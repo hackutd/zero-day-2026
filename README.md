@@ -89,21 +89,28 @@ into the browser and expose the key.
 | `GET /v1/public/faq`      | `getFAQs()`     | `FAQ[]`          |
 | `GET /v1/public/tracks`   | `getTracks()`   | `Track[]`        |
 
-### Sponsor logos
+### Sponsor and track logos
 
-`logo_data` is **raw base64**, not a URL. Pair it with `logo_content_type` to
-build a data URI; `sponsorLogoSrc()` in `lib/format.ts` does this, rejecting any
-non-`image/*` content type and falling back to a monogram when a sponsor has no
-logo.
+`logo_url` is an absolute, **keyless** URL to
+`/v1/public/{sponsors,tracks}/{id}/logo` on the HARP service, or `""` when a
+row has no logo. Logo bytes are never inlined in the JSON. The URL carries a
+`?v=<updated_at>` version and the endpoint answers with
+`Cache-Control: public, max-age=31536000, immutable` plus an `ETag`, so a new
+upload produces a new URL and old ones can be cached forever.
 
-Because logos are inlined rather than linked, this response grows with every
-sponsor — a dozen 50KB logos is a ~600KB payload per revalidation. Fine at the
-5-minute ISR cadence, but worth moving to GCS URLs if logos get large.
+Components render it through `next/image`, which means Vercel's image
+optimizer fetches each logo once per size variant, caches it on the CDN, and
+visitors get a small WebP instead of a base64 blob embedded in the HTML.
+`logoSrc()` in `lib/format.ts` admits only http(s) URLs and returns null
+otherwise, so callers fall back to a monogram (sponsors) or a text-only card
+(tracks). `next.config.ts` derives `images.remotePatterns` from
+`HARP_API_BASE_URL` at build time, so that variable has to be present in the
+build environment as well as at runtime.
 
-Track logos use the same raw-base64 representation. The tracks request caches
-only after its complete response has passed runtime validation, so a malformed
-payload or non-200 response cannot replace the last valid list. Track order is
-made deterministic with `display_order`, `title`, and `id` before rendering.
+The tracks request caches only after its complete response has passed runtime
+validation, so a malformed payload or non-200 response cannot replace the last
+valid list. Track order is made deterministic with `display_order`, `title`,
+and `id` before rendering.
 
 Responses are wrapped in Harp's envelope (`{"data": ...}`); `lib/api.ts`
 unwraps it. Types in `lib/types.ts` mirror the Go structs in the Harp repo's
