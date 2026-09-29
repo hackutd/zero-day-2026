@@ -55,6 +55,13 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: harpLogoRemotePatterns(),
 
+    /*
+     * Next 16 refuses to optimize images whose host resolves to a private or
+     * loopback IP. Locally HARP runs on localhost, so logos 400 without this.
+     * Dev only: production keeps the SSRF protection.
+     */
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
+
     // WebP avoids expensive cold AVIF encodes for the large illustrated plates.
     // Static imports retain hashed URLs and Next's responsive image caching.
     formats: ["image/webp"],
