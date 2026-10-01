@@ -21,6 +21,7 @@ import sky from "@/assets/images/backgrounds/descent/sky-2x.webp";
 import pipes from "@/assets/images/backgrounds/03b-pipes-2x.webp";
 import subwayBackground from "@/assets/images/backgrounds/04-subway-background-2x.webp";
 import subwayForefront from "@/assets/images/backgrounds/04-subway-forefront-2x.webp";
+import mascots from "@/assets/images/mascots.png";
 import zeroDay from "@/assets/images/zero_day.png";
 
 export default function Home() {
@@ -45,6 +46,7 @@ export default function Home() {
       <EventBoard schedule={<ScheduleSection />} tracks={<TracksSection />} />
       <SponsorsSection />
       <FaqSection />
+      <Mascots />
       <SocialMarquee />
       <SiteFooter />
     </main>
@@ -945,6 +947,33 @@ function PipesBand() {
       <div className="pipes-tint" />
       <div className="scene-ceiling-fade scene-ceiling-fade-pipes" />
       <div className="scene-floor-fade scene-floor-fade-pipes" />
+    </div>
+  );
+}
+
+/**
+ * The mascots, standing under the FAQ with the marquee crossing in front of
+ * their feet.
+ *
+ * The overlap is a negative bottom margin here rather than a pull on the
+ * marquee, so the marquee keeps its own spacing and only this block reaches
+ * under it. The marquee is raised above this in the stack and has no opaque
+ * background of its own, so the cards cross the mascots rather than a black
+ * bar. The page is that same black underneath, so nothing else changes.
+ *
+ * The plate is trimmed to its ink and carries no padding of its own, so the
+ * overlap below is a share of the art rather than of empty pixels.
+ */
+function Mascots() {
+  return (
+    <div className="relative -mb-[7%] px-5 pt-[4%] sm:px-6">
+      <Image
+        src={mascots}
+        alt="The HackUTD mascots: an octopus cat, a masked raccoon, a winged messenger, a hooded pig and a spotted panther."
+        sizes="(max-width: 940px) 100vw, 880px"
+        placeholder="blur"
+        className="mx-auto block h-auto w-full max-w-[880px]"
+      />
     </div>
   );
 }
