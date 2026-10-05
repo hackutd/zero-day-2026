@@ -129,6 +129,14 @@ function Descent() {
           between the two leaves them hanging in mid-air.
         */}
         <DescentLayer drift={0.5}>
+          {/*
+            The sky plate is black from the skyline down, so at rest nothing
+            shows through the far plate's gaps in the alley. Once the sky and
+            moon have slid down behind them, though, stars appear through the
+            haze the front plate paints over the alley and the tower tops.
+            This closes the gaps from the skyline down.
+          */}
+          <div aria-hidden className="descent-horizon" />
           <Image
             src={backBuildings}
             alt=""
