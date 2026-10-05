@@ -477,6 +477,23 @@ body {
   inset: 0;
 }
 
+/*
+ * Black behind the buildings from the skyline down (row 850 of 3240, where
+ * the sky plate's glow has already faded out), fully opaque a hundred rows
+ * later. Sits in the buildings layer so it also moves with them.
+ */
+.descent-horizon {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% * 850 / 3240);
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    #000 calc(100% * 100 / 2390)
+  );
+}
+
 /* A layer's plate: full width, its own height, hung from the layer's top. */
 .descent-plate {
   position: absolute;
