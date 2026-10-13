@@ -22,9 +22,11 @@ import train from "@/assets/images/backgrounds/04-subway-train-2x.webp";
  * It only animates while the panel is on screen, and the observer is what makes
  * the first pass land when the reader arrives rather than somewhere mid-cycle:
  * the animation is declared `paused`, so it holds at its first frame - parked
- * off-frame - until the panel is actually in view. Leaving the panel pauses it
- * again rather than resetting it, so a reader who scrolls back and forth does
- * not retrigger a pass on every wobble.
+ * off-frame - until the panel is actually in view. Once started it is never
+ * paused: pausing on leave froze the carriage mid-panel whenever the reader
+ * scrolled the panel partly out (Chrome reports `isIntersecting` false below
+ * the threshold, not only at zero), so the pass always runs to its off-frame
+ * end and the observer disconnects after the first sighting.
  *
  * The observed element is the still outer box, NOT the carriage inside it. An
  * IntersectionObserver measures the target as its ancestors clip it, and the
@@ -43,7 +45,11 @@ export function PassingTrain() {
     if (!el) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setInView(true);
+        observer.disconnect();
+      },
       // A third of the panel, so the pass starts once the reader is looking at
       // the platform rather than the moment its top edge clears the fold.
       { threshold: 0.35 },
