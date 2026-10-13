@@ -66,6 +66,7 @@ export function ParallaxScene({
           );
 
           if (layers.length) {
+            gsap.set(layers, { willChange: "transform" });
             const timeline = gsap.timeline({
               defaults: { ease: "none" },
               scrollTrigger: {
@@ -115,6 +116,7 @@ export function ParallaxScene({
               gsap.set(el, {
                 scale: 1 + amount / 40,
                 transformOrigin: "50% 0%",
+                willChange: "transform",
               });
               return {
                 amount,
