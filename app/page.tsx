@@ -144,6 +144,7 @@ function Descent() {
             placeholder="blur"
             quality={65}
             loading="eager"
+            fetchPriority="high"
             className="descent-plate"
           />
           {BUILDING_ADS.map((ad) => (
@@ -155,7 +156,8 @@ function Descent() {
             sizes="100vw"
             placeholder="blur"
             quality={65}
-            preload
+            loading="eager"
+            fetchPriority="high"
             className="descent-plate"
           />
           <BillboardWordmark />
