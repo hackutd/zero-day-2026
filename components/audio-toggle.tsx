@@ -59,19 +59,10 @@ export function AudioToggle() {
       }
     };
     /*
-     * Warm the track once the page has gone quiet.
-     *
-     * The markup ships with no source at all, which is right - nobody should
-     * pay for music they never ask for. But it meant the first press started
-     * from nothing: open a connection, read the container, buffer, then play,
-     * all after the click. Buffering a couple of megabytes at that point is
-     * what the wait was.
-     *
-     * Fetching on idle moves that off the click. It runs after the page has
-     * finished its own work, so it competes with nothing, and it is skipped
-     * for anyone who has asked not to spend the bytes - Data Saver, or a
-     * connection the browser does not call 4g. Those readers get exactly the
-     * behaviour that was here before.
+     * The idle warm-up spent 1.5MB on every visitor, including people who
+     * leave without touching the page. Warming on the first scroll or on intent
+     * at the music button keeps the click fast for readers who are actually
+     * engaged without spending those bytes for everyone.
      */
     const warm = () => {
       if (!active || document.hidden || audio.hasAttribute("src")) return;
@@ -87,18 +78,31 @@ export function AudioToggle() {
       attach(audio);
       audio.load();
     };
-    // requestIdleCallback where it exists; a short timer everywhere else.
-    const canIdle = typeof window.requestIdleCallback === "function";
-    const warmHandle = canIdle
-      ? window.requestIdleCallback(warm, { timeout: 4000 })
-      : window.setTimeout(warm, 2500);
+    const button = buttonRef.current;
+    let listeningForWarm = true;
+    const stopWarming = () => {
+      if (!listeningForWarm) return;
+      listeningForWarm = false;
+      window.removeEventListener("scroll", onWarmIntent);
+      button?.removeEventListener("pointerenter", onWarmIntent);
+      button?.removeEventListener("focus", onWarmIntent);
+    };
+    const onWarmIntent = () => {
+      stopWarming();
+      warm();
+    };
+    window.addEventListener("scroll", onWarmIntent, {
+      passive: true,
+      once: true,
+    });
+    button?.addEventListener("pointerenter", onWarmIntent, { once: true });
+    button?.addEventListener("focus", onWarmIntent, { once: true });
 
     for (const type of events) document.addEventListener(type, onGesture);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       active = false;
-      if (canIdle) window.cancelIdleCallback(warmHandle);
-      else window.clearTimeout(warmHandle);
+      stopWarming();
       teardown();
       document.removeEventListener("visibilitychange", onVisibility);
       resumeWhenVisible.current = false;

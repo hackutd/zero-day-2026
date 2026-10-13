@@ -108,6 +108,7 @@ export function SiteNav() {
  */
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Home", href: "#scene-prehero" },
+  { label: "Schedule", href: "#schedule" },
   { label: "Tracks", href: "#tracks" },
   { label: "Sponsors", href: "#sponsors" },
   { label: "FAQ", href: "#faq" },

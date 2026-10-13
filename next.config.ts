@@ -71,8 +71,10 @@ const nextConfig: NextConfig = {
      * are 2x LANCZOS upscales of 1920px art (scripts/upscale-backgrounds.py),
      * so a 3840-wide variant is interpolated pixels at full price - and
      * `sizes="100vw"` means a 2x-DPR laptop asked for exactly that.
+     * The 1440px and 1680px steps avoid sending the 1920px plate to displays
+     * between the existing 1200px and 1920px breakpoints.
      */
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1440, 1680, 1920, 2048],
 
     /*
      * Required from Next 16: a `quality` prop outside this list is a 400 from
@@ -82,17 +84,6 @@ const nextConfig: NextConfig = {
      * at (the wordmark).
      */
     qualities: [65, 75],
-  },
-
-  experimental: {
-    /*
-     * globals.css compiles to ~43KB of atomic Tailwind, render-blocking behind
-     * a <link>. Inlining it into the head removes a round trip before first
-     * paint, which is the trade the Next docs recommend for atomic CSS on a
-     * site whose visitors are overwhelmingly first-time - which a hackathon
-     * landing page is.
-     */
-    inlineCss: true,
   },
 
   async headers() {

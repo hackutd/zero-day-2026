@@ -533,14 +533,11 @@ body {
  * script, its PDFs and the shortcut were left in it. Nothing was installed
  * system-wide; these are just images the page references.
  *
- * The hotspots are the ones baked into the .cur headers, not guesses, and they
- * are not 0 0: the arrow's tip sits 8px down its bitmap, the hand's at (6,5),
- * the beam's centred at (17,15). Getting these wrong makes clicks land off
- * where the cursor appears to point.
- *
- * They are 32px pixel art, so the 2x copies are NEAREST-doubled - a smooth
- * upscale would just blur them, where doubling keeps the pixels crisp on a
- * hi-dpi screen. Each rule keeps its native keyword as the final fallback, so
+ * Drawn at 28px to match the Harp portal, scaled down from the 32px originals,
+ * so the hotspots are 7/8 of the ones baked into the .cur headers: the arrow's
+ * tip sits 7px down its bitmap, the hand's at (5,4), the beam's centred at
+ * (15,13). Getting these wrong makes clicks land off where the cursor appears
+ * to point. Each rule keeps its native keyword as the final fallback, so
  * a failed image degrades to the right cursor rather than to nothing.
  */
 body {
@@ -549,7 +546,7 @@ body {
         url("/cursors/cp-arrow.png") 1x,
         url("/cursors/cp-arrow@2x.png") 2x
       )
-      0 8,
+      0 7,
     auto;
 }
 
@@ -560,7 +557,7 @@ label,
 [role="button"] {
   cursor:
     image-set(url("/cursors/cp-link.png") 1x, url("/cursors/cp-link@2x.png") 2x)
-      6 5,
+      5 4,
     pointer;
 }
 
@@ -569,7 +566,7 @@ textarea,
 [contenteditable="true"] {
   cursor:
     image-set(url("/cursors/cp-beam.png") 1x, url("/cursors/cp-beam@2x.png") 2x)
-      17 15,
+      15 13,
     text;
 }
 

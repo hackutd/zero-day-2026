@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import tracksPrizesFaq from "@/assets/images/backgrounds/05-tracks-prizes-faq-2x.webp";
 
@@ -49,6 +49,28 @@ export function EventBoard({
   const [active, setActive] = useState<TabId>("schedule");
   const base = useId();
   const tablist = useRef<HTMLDivElement>(null);
+
+  /**
+   * The navbar's Schedule and Tracks links both land on this board, at
+   * `#schedule` and `#tracks`, so a click on either - or arriving with one in
+   * the URL - opens the tab it names. A document listener rather than props,
+   * because the links live in the nav and smooth-scroll already owns the jump.
+   */
+  useEffect(() => {
+    const open = (hash: string | null | undefined) => {
+      const tab = TABS.find((t) => `#${t.id}` === hash);
+      if (tab) setActive(tab.id);
+    };
+    open(window.location.hash);
+    const onClick = (e: MouseEvent) =>
+      open(
+        (e.target as HTMLElement | null)
+          ?.closest?.('a[href^="#"]')
+          ?.getAttribute("href"),
+      );
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
 
   const tabId = (id: TabId) => `${base}-${id}-tab`;
   const panelId = (id: TabId) => `${base}-${id}-panel`;
@@ -115,7 +137,12 @@ export function EventBoard({
         <div className="scene-floor-fade scene-floor-fade-tunnel" />
       </div>
 
-      <div className="relative col-start-1 row-start-1 px-5 py-20 sm:px-6 sm:py-28">
+      {/* `#schedule` sits on the content, which shares the section's top, so
+          both nav links scroll to the same place and only the tab differs. */}
+      <div
+        id="schedule"
+        className="relative col-start-1 row-start-1 px-5 py-20 sm:px-6 sm:py-28"
+      >
         <h2 className="reveal sr-only">Schedule and challenge tracks</h2>
 
         <div
