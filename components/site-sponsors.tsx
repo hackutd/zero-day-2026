@@ -136,7 +136,27 @@ function groupByTier(sponsors: Sponsor[]): SponsorTier[] {
     tiers.set(tier, entries);
   }
 
-  return [...tiers].map(([name, entries]) => ({ name, sponsors: entries }));
+  // Tiers rank by sponsorship level; display_order only orders within a tier.
+  return [...tiers]
+    .map(([name, entries]) => ({ name, sponsors: entries }))
+    .sort((a, b) => tierRank(a.name) - tierRank(b.name));
+}
+
+// Mirrors TIER_OPTIONS in HARP's SponsorFormDialog.
+const TIER_ORDER = [
+  "Title",
+  "Platinum",
+  "Gold",
+  "Silver",
+  "Bronze",
+  "Other Sponsors",
+  "Also Thanking",
+];
+
+/** Unknown tiers (and "Partners") sit after the known ones, in API order. */
+function tierRank(name: string): number {
+  const rank = TIER_ORDER.indexOf(name);
+  return rank === -1 ? TIER_ORDER.length : rank;
 }
 
 /** Only let organizer-supplied HTTP(S) URLs become clickable links. */
