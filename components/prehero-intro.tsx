@@ -157,7 +157,9 @@ export function PreheroIntro() {
 
       text.style.opacity = String(opacity);
       text.style.transform = reduced ? "none" : `translateX(${shift}px)`;
-      scrim.style.opacity = String(opacity * maxScrim);
+      const scrimOpacity = opacity * maxScrim;
+      scrim.style.opacity = String(scrimOpacity);
+      scrim.style.visibility = scrimOpacity === 0 ? "hidden" : "";
     };
 
     const onScroll = () => {
