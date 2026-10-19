@@ -98,6 +98,17 @@ const nextConfig: NextConfig = {
     }));
   },
 
+  async redirects() {
+    return [
+      // Temporary (307) so a rotated invite isn't stuck in browser caches.
+      {
+        source: "/discord",
+        destination: "https://discord.com/invite/hm8br55Dy",
+        permanent: false,
+      },
+    ];
+  },
+
   // Hides the floating Next.js badge in the corner during `next dev`. Compile
   // and runtime errors still surface. This is a dev-only overlay — it never
   // shipped to production in the first place.
