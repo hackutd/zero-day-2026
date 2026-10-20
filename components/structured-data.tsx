@@ -41,7 +41,7 @@ const graph = {
       name: "HackUTD 2026: Zero Day",
       description: SITE_DESCRIPTION,
       url: SITE_URL,
-      image: `${SITE_URL}/opengraph-image`,
+      image: `${SITE_URL}/opengraph-image.jpg`,
       startDate: EVENT_START,
       endDate: EVENT_END,
       eventStatus: "https://schema.org/EventScheduled",
