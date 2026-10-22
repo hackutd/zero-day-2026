@@ -103,7 +103,7 @@ const nextConfig: NextConfig = {
       // Temporary (307) so a rotated invite isn't stuck in browser caches.
       {
         source: "/discord",
-        destination: "https://discord.com/invite/hm8br55Dy",
+        destination: "https://discord.gg/NrapTPedyn",
         permanent: false,
       },
     ];
