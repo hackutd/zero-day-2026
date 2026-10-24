@@ -13,6 +13,7 @@ import {
   getTracks,
 } from "@/lib/api";
 import { errorMessage } from "@/lib/format";
+import { sponsorLogoFit } from "@/lib/logo-fit";
 
 /**
  * The four sections backed by HARP, each behind its own Suspense boundary.
@@ -70,9 +71,20 @@ async function ScheduleFromApi() {
 
 async function SponsorsFromApi() {
   const { items, unavailable } = await load(getSponsors, "sponsors");
+  // Measured here so the board can size and plate every logo before the
+  // image arrives. A logo that can't be measured is shown whole, unplated,
+  // rather than costing the whole wall.
+  const fits = Object.fromEntries(
+    await Promise.all(
+      items.map(
+        async (s) =>
+          [s.id, await sponsorLogoFit(s.logo_url).catch(() => null)] as const,
+      ),
+    ),
+  );
   return (
     <RevealScope phase="sponsors-loaded">
-      <SiteSponsors sponsors={items} unavailable={unavailable} />
+      <SiteSponsors sponsors={items} fits={fits} unavailable={unavailable} />
     </RevealScope>
   );
 }

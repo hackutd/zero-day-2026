@@ -30,8 +30,8 @@ import { REVEAL_READY_EVENT } from "@/components/reveal-ready";
  *     event only after that boundary hydrates, at which point this controller
  *     can safely observe and mutate the scope's elements.
  */
-const REVEAL = ".reveal";
-const GATED = ".wall-stats, .billboard-sign, .social-marquee, .star-field";
+const REVEAL = ".reveal, .sponsor-board, .board-cell";
+const GATED = ".wall-stats, .billboard-sign, .star-field, .sponsor-board";
 const STREAMED_SCOPE = "[data-reveal-scope]";
 
 export function RevealOnScroll() {
@@ -60,8 +60,8 @@ export function RevealOnScroll() {
     );
 
     // Keep the occasional interference asleep outside the viewport - the wall
-    // stats, the hero's sign, and the two that used to run for the life of the
-    // page: the marquee's 24s translate and the prehero's shooting star.
+    // stats, the hero's sign, the sponsor board's ticker and beacons, and the
+    // prehero's shooting star, which used to run for the life of the page.
     const motionObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         entry.target.toggleAttribute("data-in-view", entry.isIntersecting);
