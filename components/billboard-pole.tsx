@@ -4,7 +4,7 @@
  * a red aviation beacon at each end of the head beam.
  *
  * Drawn rather than painted so it scales with the board at any width and can
- * take the board's light: the top faces catch the screen's purple, and the
+ * take the board's light: the top faces catch a cyan light, and the
  * whole thing sinks into the dark below (`.billboard-pole` in globals.css).
  * Decoration only, so it is hidden from screen readers.
  */
@@ -19,19 +19,6 @@ export function BillboardPole() {
       preserveAspectRatio="xMidYMin meet"
     >
       <defs>
-        {/* A round gunmetal pole: lit on its left, falling to black. */}
-        <linearGradient id="pole-steel" x1="0" x2="1">
-          <stop offset="0" stopColor="#111318" />
-          <stop offset="0.28" stopColor="#5a6070" />
-          <stop offset="0.45" stopColor="#2b2f39" />
-          <stop offset="1" stopColor="#07080b" />
-        </linearGradient>
-        {/* Flat steel, lit from above by the screen. */}
-        <linearGradient id="pole-beam" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#6a7080" />
-          <stop offset="0.25" stopColor="#2b2f39" />
-          <stop offset="1" stopColor="#0e1015" />
-        </linearGradient>
         <pattern
           id="pole-hazard"
           width="10"
@@ -48,19 +35,19 @@ export function BillboardPole() {
       </defs>
 
       {/* Head beam: an I-beam the width of the board's middle, then its flange. */}
-      <rect x="40" y="0" width="920" height="16" fill="url(#pole-beam)" />
+      <rect x="40" y="0" width="920" height="16" fill="#2b2f39" />
       <rect
         x="40"
         y="0"
         width="920"
         height="1.5"
-        fill="#9b6dff"
+        fill="#4fbdd6"
         opacity="0.55"
       />
       <rect x="60" y="16" width="880" height="8" fill="#0e1015" />
 
       {/* Truss: two braces down to the pole, a tie, and the web between. */}
-      <g stroke="url(#pole-beam)" strokeLinecap="square">
+      <g stroke="#2b2f39" strokeLinecap="square">
         <line x1="110" y1="24" x2="486" y2="176" strokeWidth="13" />
         <line x1="890" y1="24" x2="514" y2="176" strokeWidth="13" />
         <line x1="274" y1="90" x2="726" y2="90" strokeWidth="7" />
@@ -78,15 +65,15 @@ export function BillboardPole() {
       </g>
 
       {/* The pole, tapering slightly to the ground, with two collars. */}
-      <path d="M470 24 L530 24 L541 330 L459 330 Z" fill="url(#pole-steel)" />
+      <path d="M470 24 L530 24 L541 330 L459 330 Z" fill="#1c1f27" />
       <path
         d="M470 24 L459 330"
-        stroke="#9b6dff"
+        stroke="#4fbdd6"
         strokeWidth="1.5"
         opacity="0.35"
       />
-      <rect x="461" y="24" width="78" height="12" fill="url(#pole-beam)" />
-      <rect x="463" y="170" width="74" height="14" fill="url(#pole-beam)" />
+      <rect x="461" y="24" width="78" height="12" fill="#2b2f39" />
+      <rect x="463" y="170" width="74" height="14" fill="#2b2f39" />
 
       {/* Service ladder up the right side. */}
       <g stroke="#2b2f39" strokeWidth="3">

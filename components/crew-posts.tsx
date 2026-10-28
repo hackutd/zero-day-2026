@@ -24,6 +24,7 @@ type Post = {
   brief: string;
   href: string;
   tone: "violet" | "ink";
+  closed?: boolean;
 };
 
 const POSTS: Post[] = [
@@ -40,6 +41,7 @@ const POSTS: Post[] = [
       "See the finished builds before anyone else and help decide which projects take home the prizes.",
     href: JUDGE_INTEREST_URL,
     tone: "ink",
+    closed: true,
   },
   {
     role: "Volunteer",
@@ -77,7 +79,86 @@ function PostCard({
   brief,
   href,
   tone,
+  closed,
 }: Post & { index: number }) {
+  const body = (
+    <span
+      className="relative flex h-full min-h-[260px] flex-col p-6 sm:min-h-[300px] sm:p-7"
+      style={{ clipPath: CHAMFER }}
+    >
+      {/* Its own layer, so hover can fade it without dimming the copy. */}
+      <span
+        aria-hidden
+        className="crew-card__fill"
+        style={{
+          backgroundImage:
+            tone === "violet"
+              ? "linear-gradient(145deg, #7c34d8 0%, #4a1a8c 48%, #2a0e52 100%)"
+              : "linear-gradient(145deg, #1c1826 0%, #121019 55%, #0b0910 100%)",
+        }}
+      />
+
+      <span className="relative flex items-center justify-between">
+        {/* Elevon, not Hypik: the number needs digits. */}
+        <span className="font-elevon text-accent-soft text-[11px] font-bold tracking-[0.18em] uppercase">
+          Post {String(index).padStart(2, "0")}
+        </span>
+        <span className="font-sans flex items-center gap-2 text-[10px] tracking-[0.16em] text-white/70 uppercase">
+          {closed ? (
+            <span aria-hidden className="size-1.5 rounded-full bg-white/35" />
+          ) : (
+            <span aria-hidden className="crew-card__light text-cyan" />
+          )}
+          {closed ? "Closed" : "Open"}
+        </span>
+      </span>
+
+      <span
+        className="font-hypik relative mt-9 block leading-none tracking-[-0.02em] text-white uppercase"
+        style={{ fontSize: "clamp(1.75rem, 2.8vw, 2.5rem)" }}
+      >
+        {role}
+      </span>
+
+      <span className="font-sans relative mt-4 block max-w-[30ch] text-[13px] leading-[1.7] tracking-[0.02em] text-white/72 sm:text-[14px]">
+        {brief}
+      </span>
+
+      <span className="font-sans relative mt-auto flex items-center gap-2 pt-8 text-[12px] leading-none font-medium tracking-[0.1em] text-white uppercase">
+        {closed ? (
+          <span className="text-white/55">Applications closed</span>
+        ) : (
+          <>
+            Interest form
+            <Arrow />
+          </>
+        )}
+      </span>
+
+      {/* The same run of diagonal ticks the social cards carry. */}
+      <span
+        aria-hidden
+        className="absolute right-6 bottom-7 h-10 w-6 opacity-45 sm:right-7"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(-60deg, rgba(255,255,255,0.75) 0 1px, transparent 1px 6px)",
+        }}
+      />
+    </span>
+  );
+
+  // A closed post is no longer a link, and skips the hover that implies one.
+  if (closed) {
+    return (
+      <div
+        className="relative block h-full bg-white/14 p-px"
+        style={{ clipPath: CHAMFER }}
+      >
+        {body}
+      </div>
+    );
+  }
+
   return (
     <a
       href={href}
@@ -86,59 +167,7 @@ function PostCard({
       className="crew-card relative block h-full p-px"
       style={{ clipPath: CHAMFER }}
     >
-      <span
-        className="relative flex h-full min-h-[260px] flex-col p-6 sm:min-h-[300px] sm:p-7"
-        style={{ clipPath: CHAMFER }}
-      >
-        {/* Its own layer, so hover can fade it without dimming the copy. */}
-        <span
-          aria-hidden
-          className="crew-card__fill"
-          style={{
-            backgroundImage:
-              tone === "violet"
-                ? "linear-gradient(145deg, #7c34d8 0%, #4a1a8c 48%, #2a0e52 100%)"
-                : "linear-gradient(145deg, #1c1826 0%, #121019 55%, #0b0910 100%)",
-          }}
-        />
-
-        <span className="relative flex items-center justify-between">
-          {/* Elevon, not Hypik: the number needs digits. */}
-          <span className="font-elevon text-accent-soft text-[11px] font-bold tracking-[0.18em] uppercase">
-            Post {String(index).padStart(2, "0")}
-          </span>
-          <span className="font-sans flex items-center gap-2 text-[10px] tracking-[0.16em] text-white/70 uppercase">
-            <span aria-hidden className="crew-card__light text-cyan" />
-            Open
-          </span>
-        </span>
-
-        <span
-          className="font-hypik relative mt-9 block leading-none tracking-[-0.02em] text-white uppercase"
-          style={{ fontSize: "clamp(1.75rem, 2.8vw, 2.5rem)" }}
-        >
-          {role}
-        </span>
-
-        <span className="font-sans relative mt-4 block max-w-[30ch] text-[13px] leading-[1.7] tracking-[0.02em] text-white/72 sm:text-[14px]">
-          {brief}
-        </span>
-
-        <span className="font-sans relative mt-auto flex items-center gap-2 pt-8 text-[12px] leading-none font-medium tracking-[0.1em] text-white uppercase">
-          Interest form
-          <Arrow />
-        </span>
-
-        {/* The same run of diagonal ticks the social cards carry. */}
-        <span
-          aria-hidden
-          className="absolute right-6 bottom-7 h-10 w-6 opacity-45 sm:right-7"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(-60deg, rgba(255,255,255,0.75) 0 1px, transparent 1px 6px)",
-          }}
-        />
-      </span>
+      {body}
     </a>
   );
 }

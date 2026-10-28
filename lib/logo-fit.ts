@@ -5,7 +5,7 @@ import sharp from "sharp";
 import { logoSrc } from "@/lib/format";
 
 /**
- * How a sponsor's logo sits on the purple sponsor board. Measured only: the
+ * How a sponsor's logo sits on the night-sky sponsor board. Measured only: the
  * file itself is always shown exactly as the sponsor supplied it.
  *
  * Organizers upload whatever the sponsor sent - black wordmarks on transparent
@@ -14,7 +14,7 @@ import { logoSrc } from "@/lib/format";
  * off each file so the board can present them evenly without touching them:
  *
  *  - `plate`: a colour to mount the logo on, or null. A logo that does not
- *    read on purple gets white, the background every brand's primary logo is
+ *    read on the dark sky gets white, the background every brand's primary logo is
  *    drawn for. A file with a backdrop baked in gets that backdrop's own
  *    colour, so the plate and the file meet without a seam.
  *  - `box`: where the logo actually is in the file, so empty margins can be
@@ -33,8 +33,9 @@ export type LogoFit = {
   coverage: number;
 };
 
-// The board's screen, as painted by `.sponsor-board__screen` in globals.css.
-const SCREEN = luminance(20, 10, 40);
+// The board's screen: the hero's night sky (descent/sky-2x.webp), averaged
+// over the part `.sponsor-board__screen` in globals.css shows.
+const SCREEN = luminance(2, 22, 27);
 
 export async function sponsorLogoFit(logoUrl: string): Promise<LogoFit | null> {
   const src = logoSrc(logoUrl);
@@ -88,7 +89,7 @@ function measure(px: Uint8Array, w: number, h: number) {
   const isInk = (i: number) => px[i + 3] > 128;
   const extent = inkExtent(px, w, h, isInk);
 
-  // Plate the logo if more than a sliver of its ink would vanish on purple.
+  // Plate the logo if more than a sliver of its ink would vanish on the sky.
   let ink = 0;
   let lost = 0;
   for (let i = 0; i < px.length; i += 4) {

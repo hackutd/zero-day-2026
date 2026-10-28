@@ -1,6 +1,9 @@
+import Image from "next/image";
 import type { CSSProperties } from "react";
 
+import sky from "@/assets/images/backgrounds/descent/sky-2x.webp";
 import { BillboardPole } from "@/components/billboard-pole";
+import { BoardGlow } from "@/components/board-glow";
 import { Skeleton } from "@/components/skeleton";
 import { SponsorLogo } from "@/components/sponsor-logo";
 import type { LogoFit } from "@/lib/logo-fit";
@@ -8,19 +11,18 @@ import type { Sponsor } from "@/lib/types";
 
 type SponsorTier = { name: string; sponsors: Sponsor[] };
 
-/** One sponsor, placed: its tier's look and its code on the board. */
+/** One sponsor, placed: its tier's look on the board. */
 type Slot = {
   sponsor: Sponsor;
   tier: string;
   look: TierLook;
-  code: string;
   /** The tier's first sponsor, whose section carries the tier's name. */
   first: boolean;
 };
 
 /**
  * The sponsor board: one billboard in the station's concourse, bolted to a
- * tiled wall under a running LED board. On a desktop it has a billboard's
+ * tiled wall over a running LED board. On a desktop it has a billboard's
  * proportions, 5:2, and grows with the screen, logos and all. Tiers run top
  * to bottom in bands, each shorter than the one above, so a higher tier always
  * sits higher and gets bigger logos; a hairline separates one tier from the
@@ -30,7 +32,7 @@ type Slot = {
  * effects. What the board controls is everything around them: each is sized
  * by its real shape, so a wide wordmark and a square mark carry the same
  * visual weight in a cell of the same size, and one that would not read on
- * purple is mounted on a white plate. `fits` holds those measurements
+ * the screen is mounted on a plate. `fits` holds those measurements
  * (lib/logo-fit.ts).
  *
  * As the board scrolls in, its tube strikes. As each cell does, a cipher of
@@ -90,77 +92,76 @@ export function SiteSponsors({
       ) : (
         <div className="sponsor-board relative mx-auto mt-12 max-w-[1600px] sm:mt-16">
           <div className="sponsor-board__frame">
-            {/* Floodlights on the top edge, lighting the LED strip. */}
-            {[12.5, 37.5, 62.5, 87.5].map((left) => (
-              <span
-                key={left}
-                aria-hidden
-                className="board-lamp"
-                style={{ left: `${left}%` }}
+            <BoardHardware />
+            <div className="sponsor-board__screen flex flex-col p-2 sm:p-3 lg:aspect-[5/2]">
+              <Image
+                src={sky}
+                alt=""
+                fill
+                sizes="(max-width: 1600px) 100vw, 1600px"
+                placeholder="blur"
+                quality={65}
+                className="-z-10 object-cover object-top opacity-40"
               />
-            ))}
-            <LedTicker names={tiers.flat().map((slot) => slot.sponsor.name)} />
-            <div className="sponsor-board__trim">
-              <div className="sponsor-board__screen flex flex-col p-2 sm:p-3 lg:aspect-[5/2]">
-                {pending ? (
-                  <BoardPending />
-                ) : (
-                  bands.map((band) => (
-                    <div
-                      key={band[0][0].sponsor.id}
-                      className="board-band flex flex-wrap lg:flex-nowrap"
-                      style={
-                        {
-                          "--band-weight": Math.max(
-                            ...band.flat().map((slot) => slot.look.bandWeight),
-                          ),
-                        } as CSSProperties
-                      }
-                    >
-                      {band.map((group) => (
-                        <div
-                          key={group[0].sponsor.id}
-                          className="board-group relative"
-                          style={
-                            {
-                              "--group-units": group.reduce(
-                                (sum, slot) => sum + slot.look.units,
-                                0,
-                              ),
-                              "--tier": TIER_COLOR[group[0].tier] ?? "#8b93a1",
-                            } as CSSProperties
-                          }
-                        >
-                          {/* The tier's name, once, where its section starts.
+              {pending ? (
+                <BoardPending />
+              ) : (
+                bands.map((band) => (
+                  <div
+                    key={band[0][0].sponsor.id}
+                    className="board-band flex flex-wrap lg:flex-nowrap"
+                    style={
+                      {
+                        "--band-weight": Math.max(
+                          ...band.flat().map((slot) => slot.look.bandWeight),
+                        ),
+                      } as CSSProperties
+                    }
+                  >
+                    {band.map((group) => (
+                      <div
+                        key={group[0].sponsor.id}
+                        className="board-group relative"
+                        style={
+                          {
+                            "--group-units": group.reduce(
+                              (sum, slot) => sum + slot.look.units,
+                              0,
+                            ),
+                          } as CSSProperties
+                        }
+                      >
+                        {/* The tier's name, once, where its section starts.
                             Each cell's label already says it to a screen
                             reader. */}
-                          {group[0].first && (
-                            <p
-                              aria-hidden
-                              className="board-group__tier font-sans"
-                            >
-                              {group[0].tier}
-                            </p>
-                          )}
-                          <ul className="flex h-full flex-wrap lg:flex-nowrap">
-                            {group.map((slot, index) => (
-                              <BoardCell
-                                key={slot.sponsor.id}
-                                slot={slot}
-                                index={index}
-                                fit={fits[slot.sponsor.id] ?? null}
-                              />
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  ))
-                )}
-              </div>
+                        {group[0].first && (
+                          <p
+                            aria-hidden
+                            className="board-group__tier font-sans"
+                          >
+                            {group[0].tier}
+                          </p>
+                        )}
+                        <ul className="flex h-full flex-wrap lg:flex-nowrap">
+                          {group.map((slot, index) => (
+                            <BoardCell
+                              key={slot.sponsor.id}
+                              slot={slot}
+                              index={index}
+                              fit={fits[slot.sponsor.id] ?? null}
+                            />
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ))
+              )}
             </div>
+            <LedTicker names={tiers.flat().map((slot) => slot.sponsor.name)} />
           </div>
           <BillboardPole />
+          <BoardGlow />
         </div>
       )}
     </section>
@@ -185,13 +186,40 @@ function LedTicker({ names }: { names: string[] }) {
           {[0, 1].map((copy) => (
             <span
               key={copy}
-              className="led-ticker__text font-elevon pr-[0.5em] text-[17px] leading-10 font-extrabold tracking-[0.22em] whitespace-pre uppercase sm:text-[20px] sm:leading-11"
+              className="led-ticker__text font-elevon pr-[0.5em] text-[17px] leading-10 font-extrabold tracking-[0.06em] whitespace-pre sm:text-[20px] sm:leading-11"
             >
               {line}
             </span>
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Hardware set into the housing's border: a screw in each corner, a ruler
+ * along the top edge, and power lights along the bottom.
+ */
+function BoardHardware() {
+  return (
+    <div aria-hidden>
+      {(
+        [
+          { top: 0, left: 0 },
+          { top: 0, right: 0 },
+          { bottom: 0, left: 0 },
+          { bottom: 0, right: 0 },
+        ] as const
+      ).map((corner, index) => (
+        <span key={index} className="board-screw" style={corner} />
+      ))}
+      <span className="board-ruler" />
+      <span className="board-lights">
+        <span />
+        <span />
+        <span />
+      </span>
     </div>
   );
 }
@@ -279,7 +307,7 @@ type TierLook = (typeof TIER_LOOK)[number];
 
 const BAND_UNITS = 21;
 
-/** Each tier's colour, for its hover brackets and HUD. */
+/** Each tier's colour, for its cells' hover. */
 const TIER_COLOR: Record<string, string> = {
   Title: "#ff2ee6",
   Platinum: "#dbc4ff",
@@ -290,19 +318,13 @@ const TIER_COLOR: Record<string, string> = {
   "Also Thanking": "#8b7bff",
 };
 
-/** A tier's sponsors, each with the tier's look and its code on the board. */
+/** A tier's sponsors, each with the tier's look on the board. */
 function placeTier(tier: SponsorTier): Slot[] {
-  const rank = tierRank(tier.name);
-  const look = TIER_LOOK[Math.min(rank, TIER_LOOK.length - 1)];
-  const line = tier.name.charAt(0).toUpperCase();
+  const look = TIER_LOOK[Math.min(tierRank(tier.name), TIER_LOOK.length - 1)];
   return tier.sponsors.map((sponsor, index) => ({
     sponsor,
     tier: tier.name,
     look,
-    code:
-      rank === 0
-        ? "Presented by"
-        : `${line}-${String(index + 1).padStart(2, "0")}`,
     first: index === 0,
   }));
 }
@@ -349,7 +371,7 @@ function BoardCell({
   index: number;
   fit: LogoFit | null;
 }) {
-  const { sponsor, tier, look, code } = slot;
+  const { sponsor, tier, look } = slot;
   const website = safeWebsiteUrl(sponsor.website_url);
   // Unmeasured logos (and monograms) get a typical wordmark's shape.
   const ratio =
@@ -384,7 +406,6 @@ function BoardCell({
         </div>
       </div>
       <span aria-hidden className="board-cell__cipher">
-        <span className="board-cell__cipher-head">{`// ${code}`}</span>
         {cipherOf(sponsor.id)}
       </span>
       <span aria-hidden className="board-cell__scan" />
@@ -438,9 +459,7 @@ function BoardCell({
 
 /** The ciphertext a cell decrypts: the head of the sponsor's own id. */
 function cipherOf(id: string): string {
-  return (id.replace(/-/g, "").toUpperCase().match(/.{4}/g) ?? [])
-    .slice(0, 4)
-    .join(" ");
+  return (id.replace(/-/g, "").match(/.{4}/g) ?? []).slice(0, 4).join(" ");
 }
 
 function groupByTier(sponsors: Sponsor[]): SponsorTier[] {
