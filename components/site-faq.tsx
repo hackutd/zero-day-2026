@@ -24,7 +24,10 @@ export function SiteFaq({
     <section
       id="faq"
       aria-labelledby="faq-heading"
-      className="bg-background px-5 py-20 sm:px-6 sm:py-28"
+      // On a desktop, pulled up over the faded foot of the sponsor board's
+      // pole, which sinks into the black behind the heading rather than
+      // leaving a gap above it. A phone's pole is too short to overlap.
+      className="relative px-5 pt-18 pb-20 sm:px-6 sm:pt-16 sm:pb-28 lg:-mt-6"
       aria-busy={pending || undefined}
     >
       <div className="mx-auto max-w-[820px]">

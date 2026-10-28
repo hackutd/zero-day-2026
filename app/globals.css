@@ -571,93 +571,9 @@ textarea,
 }
 
 /*
- * Social card marquee (components/social-marquee.tsx).
- *
- * The track carries the card set twice and travels exactly -50%, so at the end
- * of a cycle the second copy sits precisely where the first started and the
- * restart is invisible. Any other distance would visibly jump.
- *
- * Animating `transform` keeps it on the compositor; animating `left` or a
- * scroll offset would relayout every frame.
- *
- * The mask fades both ends so cards arrive and leave rather than being sliced
- * off square at the viewport edge.
- */
-.social-marquee {
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent 0,
-    #000 7%,
-    #000 93%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent 0,
-    #000 7%,
-    #000 93%,
-    transparent 100%
-  );
-}
-
-.social-marquee__track {
-  display: flex;
-  width: max-content;
-  animation: social-marquee 24s linear infinite;
-}
-
-/* Stop it so a card can be read and clicked rather than chased. */
-.social-marquee:hover .social-marquee__track,
-.social-marquee:focus-within .social-marquee__track {
-  animation-play-state: paused;
-}
-
-@keyframes social-marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .social-marquee__track {
-    animation: none;
-  }
-  /* Without the animation the row is unreachable, so hand it back to the user. */
-  .social-marquee {
-    overflow-x: auto;
-  }
-}
-
-/*
- * Card hover. No lift - the fill drops toward the page black and the rim
- * brightens, so the card reads as glass catching light rather than as a tile
- * being picked up. The fill is a separate layer precisely so this can fade
- * without dimming the mark and label sitting on top of it.
- */
-.social-card {
-  background: rgba(255, 255, 255, 0.14);
-  transition: background 300ms ease;
-}
-
-.social-card:hover {
-  background: rgba(255, 255, 255, 0.42);
-}
-
-.social-card__fill {
-  position: absolute;
-  inset: 0;
-  transition: opacity 300ms ease;
-}
-
-.social-card:hover .social-card__fill {
-  opacity: 0.45;
-}
-
-/*
- * Recruitment posts (components/get-involved.tsx). The social cards' hover,
- * on a card that is a link in its own right: the fill drops toward the page
- * black and the rim brightens. Keyboard focus lands on the rim too, because
+ * Recruitment posts (components/get-involved.tsx). No lift on hover - the
+ * fill drops toward the page black and the rim brightens, so the card reads as
+ * glass catching light rather than as a tile being picked up. Keyboard focus lands on the rim too, because
  * the clip-path would cut an outline off at the chamfer.
  */
 .crew-card {
@@ -1102,6 +1018,585 @@ textarea,
 }
 
 /*
+ * Sponsor board (components/site-sponsors.tsx).
+ *
+ * One billboard holding every sponsor, bolted to the concourse's tiled wall.
+ * Logos are shown exactly as supplied and are never animated or filtered:
+ * every effect here plays on the board around them.
+ */
+.tile-wall {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px);
+  background-size: 72px 36px;
+  background-position: center top;
+  mask-image: radial-gradient(80% 70% at 50% 55%, #000 35%, transparent 100%);
+}
+
+/*
+ * The housing: a thick gray box. It reads as a solid object from its right
+ * face (`::before`) and its underside (`::after`), drawn square-on rather than
+ * in perspective so the face, and every logo on it, stays undistorted.
+ */
+.sponsor-board__frame {
+  --depth: clamp(8px, 0.9vw, 16px);
+  --pad: clamp(12px, 1.3vw, 22px);
+  position: relative;
+  padding: var(--pad);
+  background: #4b4e56;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 16%),
+    0 0 0 1px #1a1b1f,
+    0 40px 70px -24px rgb(0 0 0 / 90%);
+}
+
+.sponsor-board__frame::before,
+.sponsor-board__frame::after {
+  content: "";
+  position: absolute;
+}
+.sponsor-board__frame::before {
+  top: 0;
+  left: 100%;
+  width: var(--depth);
+  height: calc(100% + var(--depth));
+  background: #393b42;
+  clip-path: polygon(
+    0 0,
+    100% var(--depth),
+    100% 100%,
+    0 calc(100% - var(--depth))
+  );
+}
+.sponsor-board__frame::after {
+  top: 100%;
+  left: 0;
+  width: calc(100% + var(--depth));
+  height: var(--depth);
+  background: #2c2e33;
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--depth)) 0,
+    100% 100%,
+    var(--depth) 100%
+  );
+}
+
+/* The housing's hardware (`BoardHardware`), all in its border. */
+.board-screw {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin: calc(var(--pad) / 2 - 3px);
+  border-radius: 50%;
+  background: #8b8e96;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 35%),
+    0 0 0 1px #2c2e33;
+}
+.board-screw::after {
+  content: "";
+  position: absolute;
+  inset: 2.5px 1px;
+  background: #2c2e33;
+  rotate: 45deg;
+}
+
+/* Minor ticks every 8px, a major one every 40px. */
+.board-ruler {
+  position: absolute;
+  top: calc(var(--pad) / 2 - 3px);
+  left: 50%;
+  width: min(28%, 320px);
+  height: 6px;
+  translate: -50% 0;
+  background:
+    repeating-linear-gradient(90deg, #a4a7ae 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, #7b7e86 0 1px, transparent 1px 8px)
+      bottom / 100% 3px no-repeat;
+  opacity: 0.7;
+}
+
+.board-lights {
+  position: absolute;
+  right: calc(var(--pad) + 4px);
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: var(--pad);
+}
+.board-lights > span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #2c2e33;
+}
+.board-lights > span:nth-child(1) {
+  background: var(--cyan);
+  box-shadow: 0 0 4px var(--cyan);
+}
+.board-lights > span:nth-child(2) {
+  background: var(--magenta);
+  box-shadow: 0 0 4px var(--magenta);
+}
+
+/*
+ * The screen shows the hero's night sky, as an image behind the bands
+ * (components/site-sponsors.tsx); `background` is the sky's own colour until
+ * it loads. `--ink` is for everything the board writes on it. lib/logo-fit.ts
+ * plates logos against this sky.
+ */
+.sponsor-board__screen {
+  --ink: #e6f1f4;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: #03161b;
+  /* Set back into the housing: shadowed under its top edge. */
+  box-shadow: inset 0 12px 18px -12px rgb(0 0 0 / 85%);
+}
+
+/* The tube behind the screen, struck on reveal. */
+.sponsor-board__screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: #05030a;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/*
+ * A band holds one tier, or a few small ones side by side; a group is one
+ * tier within it. On a phone both wrap like any flow of tiles, every group on
+ * its own line. From `lg` the screen is locked to billboard proportions: the
+ * bands split its height by `--band-weight` and the groups split a band's
+ * width by `--group-units`, each on exactly one line.
+ *
+ * The separators run between tiers only, never between logos: across the
+ * board between bands, and down it between groups sharing a band.
+ */
+.board-group {
+  flex: 1 1 100%;
+  padding-top: clamp(6px, 0.5vw, 9px);
+}
+
+.board-band + .board-band,
+.board-group + .board-group {
+  border-top: 1px solid rgb(255 255 255 / 25%);
+}
+
+@media (width >= 64rem) {
+  .board-band {
+    flex: var(--band-weight) 1 0;
+    min-height: 0;
+  }
+
+  .board-group {
+    flex: var(--group-units) 1 0;
+    min-width: 0;
+  }
+
+  .board-group + .board-group {
+    border-top: 0;
+    border-left: 1px solid rgb(255 255 255 / 25%);
+  }
+}
+
+/*
+ * A cell takes its tier's share of its group's width - `--units` - and grows
+ * to fill whatever the group leaves over, so no line ends in a gap. On a phone
+ * every cell also gets a fixed head start, so the smallest tiers still sit
+ * three or four to a line; on the billboard widths are purely by tier. It is
+ * a size container, so the logo inside can be sized in the cell's own units.
+ */
+.board-cell {
+  flex: var(--units) 1 calc(var(--units) * 1.6rem + 2.5rem);
+  container-type: size;
+}
+@media (width >= 64rem) {
+  .board-cell {
+    flex-basis: 0;
+  }
+}
+
+.board-cell__link {
+  position: relative;
+  display: block;
+  height: 100%;
+  transition: background-color 260ms ease;
+}
+
+/*
+ * On hover the cell lights up in the sponsor's tier colour: a wash over the
+ * sky, and a bright glow that follows the cursor (`--mx`/`--my`, from
+ * components/board-glow.tsx). The glow is its own layer so it can fade in.
+ * Both paint under the logo, never on it.
+ */
+.board-cell__link:is(:hover, :focus-visible) {
+  background-color: color-mix(in srgb, var(--tier) 16%, transparent);
+}
+.board-cell__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle max(60px, 75cqh) at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--tier) 80%, transparent),
+    color-mix(in srgb, var(--tier) 25%, transparent) 45%,
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+.board-cell__link:is(:hover, :focus-visible)::before {
+  opacity: 1;
+}
+
+.board-cell__link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -3px;
+}
+
+.board-cell__reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+ * Every logo gets the same share of its cell's area, whatever its shape:
+ * width = weight x height x sqrt(ratio), nudged by how dense its ink is - the
+ * product of those two is `--span`, from components/site-sponsors.tsx. Then it
+ * is held inside the cell - no wider than 86% of it, no taller than 74%, less
+ * with a plate around it - so a very wide or very tall mark still fits.
+ */
+.board-cell__logo {
+  --max-w: 86cqw;
+  --max-h: 74cqh;
+  position: relative;
+  isolation: isolate;
+  --w: min(
+    var(--max-w),
+    calc(var(--max-h) * var(--ratio)),
+    calc(var(--weight) * 100cqh * var(--span))
+  );
+  aspect-ratio: var(--ratio);
+  width: var(--w);
+}
+
+/*
+ * The plate, for a logo that does not read on the screen or that brought its
+ * own backdrop: `--plate` is white, or that backdrop's colour, so the file meets it without a seam (lib/logo-fit.ts).
+ *
+ * Every plate in a cell of the same height is the same height - 76% of it -
+ * so a band of plated logos lines up rather than going ragged. Only a logo
+ * too tall to leave a margin in that pushes its plate past it.
+ */
+.board-cell__logo[data-plate] {
+  --max-w: 76cqw;
+  --max-h: 62cqh;
+}
+.board-cell__logo[data-plate]::before {
+  content: "";
+  position: absolute;
+  inset: min(
+      calc(-1 * clamp(4px, 6cqh, 12px)),
+      calc((var(--w) / var(--ratio) - 76cqh) / 2)
+    )
+    calc(-1 * clamp(8px, 9cqh, 20px));
+  z-index: -1;
+  border-radius: 3px;
+  background: var(--plate);
+}
+
+/*
+ * A tier's name at the top-right of its section, on a tab of the sky's colour
+ * that cuts the hairline above the section, so it never lands on a logo; the section keeps
+ * a few pixels clear below the line for its lower half (`.board-group`'s top
+ * padding).
+ */
+.board-group__tier {
+  position: absolute;
+  top: 0;
+  right: clamp(10px, 1.2vw, 22px);
+  z-index: 2;
+  padding: 0.35em 0.6em;
+  border-radius: 2px;
+  background: #03161b;
+  transform: translateY(-50%);
+  color: var(--ink);
+  font-size: clamp(10px, 0.7vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/*
+ * "Opens in a new tab", in the cell's bottom corner, on hover and on focus.
+ * Bottom rather than top, because the top-right of a section is its tier.
+ */
+.board-cell__open {
+  position: absolute;
+  bottom: clamp(4px, 6cqh, 10px);
+  right: clamp(4px, 6cqh, 10px);
+  z-index: 2;
+  width: clamp(12px, 13cqh, 18px);
+  height: clamp(12px, 13cqh, 18px);
+  color: var(--tier);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-3px, 3px);
+  transition:
+    opacity 200ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.board-cell__link:is(:hover, :focus-visible) .board-cell__open {
+  opacity: 1;
+  transform: none;
+}
+
+/* The locked cell: the head of the sponsor's id, before it decodes. */
+.board-cell__cipher {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45em;
+  padding: 6px;
+  color: var(--ink);
+  font:
+    500 clamp(8px, 7cqh, 12px) / 1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  letter-spacing: 0.14em;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The read head that sweeps the cipher off and the logo on, top to bottom. */
+.board-cell__scan {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+.board-cell__scan::before {
+  content: "";
+  position: absolute;
+  right: 12%;
+  bottom: 0;
+  left: 12%;
+  height: 2px;
+  background: #d4faff;
+  box-shadow:
+    0 0 10px 2px rgb(34 224 255 / 80%),
+    0 0 26px 6px rgb(255 46 230 / 35%);
+}
+
+/*
+ * All of the motion. Wrapped in no-preference rather than undone under
+ * `reduce`, so a reader who asked for less motion never sees the board dark.
+ * The dark state also hangs off the root `[data-motion-active]` flag, so with
+ * no script the board is simply lit.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion-active]
+    .sponsor-board:not([data-revealed])
+    .sponsor-board__screen::before {
+    opacity: 0.85;
+  }
+  .sponsor-board[data-revealed] .sponsor-board__screen::before {
+    animation: tube-strike 1200ms steps(1, end) both;
+  }
+
+  [data-motion-active] .board-cell:not([data-revealed]) .board-cell__cipher {
+    opacity: 1;
+  }
+  [data-motion-active] .board-cell:not([data-revealed]) .board-cell__reveal {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  .board-cell[data-revealed] {
+    --delay: calc(var(--i, 0) * 110ms + 250ms);
+  }
+  .board-cell[data-revealed] .board-cell__cipher {
+    animation: cipher-wipe 760ms cubic-bezier(0.65, 0, 0.35, 1) var(--delay)
+      both;
+  }
+  .board-cell[data-revealed] .board-cell__reveal {
+    animation: logo-wipe 760ms cubic-bezier(0.65, 0, 0.35, 1) var(--delay) both;
+  }
+  .board-cell[data-revealed] .board-cell__scan {
+    animation: scan-sweep 760ms cubic-bezier(0.65, 0, 0.35, 1) var(--delay) both;
+  }
+
+  .led-ticker__track {
+    animation: led-ticker-scroll 40s linear infinite;
+  }
+  [data-motion-active] .sponsor-board:not([data-in-view]) .led-ticker__track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes cipher-wipe {
+  0%,
+  15% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+/* The inverse of the wipe above, so the logo appears exactly where the cipher goes. */
+@keyframes logo-wipe {
+  0%,
+  15% {
+    clip-path: inset(0 0 100% 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Keyframed with the wipes, so the bar rides the line between them. */
+@keyframes scan-sweep {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-100%);
+  }
+  99% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+/* A fluorescent tube striking: two false starts, then it holds. */
+@keyframes tube-strike {
+  0% {
+    opacity: 0.85;
+  }
+  9% {
+    opacity: 0;
+  }
+  13% {
+    opacity: 0.75;
+  }
+  24% {
+    opacity: 0.05;
+  }
+  28% {
+    opacity: 0.6;
+  }
+  40%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/*
+ * The pole under the sponsor board (components/billboard-pole.tsx). It hangs
+ * from the frame's bottom edge and sinks into the dark below rather than
+ * stopping on a line.
+ */
+.billboard-pole {
+  display: block;
+  width: min(62%, 880px);
+  margin: calc(clamp(8px, 0.9vw, 16px) - 1px) auto 0;
+  mask-image: linear-gradient(#000 55%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .billboard-pole__beacon {
+    animation: pole-beacon 2.4s steps(1, end) infinite paused;
+  }
+  .billboard-pole__beacon + .billboard-pole__beacon {
+    animation-delay: 1.2s;
+  }
+  .sponsor-board[data-in-view] .billboard-pole__beacon {
+    animation-play-state: running;
+  }
+  .sponsor-board[data-in-view] .board-lights > span:first-child {
+    animation: pole-beacon 2.4s steps(1, end) infinite;
+  }
+}
+
+/* On for a beat, off for the rest, like a real obstruction light. */
+@keyframes pole-beacon {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.15;
+  }
+}
+
+/* The track holds its text twice, so -50% lands the second copy where the first began. */
+@keyframes led-ticker-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/*
+ * The board's dot-matrix header. Unlit pixels are a dot grid on the strip;
+ * the type is masked through the same grid, so it reads as lit LEDs rather
+ * than as a font.
+ */
+.led-ticker {
+  overflow: hidden;
+  margin-top: 7px;
+  border: 1px solid #1c1628;
+  background-color: #040208;
+  background-image: radial-gradient(
+    circle,
+    rgb(255 46 230 / 9%) 0.9px,
+    transparent 1.3px
+  );
+  background-size: 3px 3px;
+}
+
+.led-ticker__track {
+  display: flex;
+  width: max-content;
+}
+
+.led-ticker__text {
+  color: var(--magenta);
+  text-shadow: 0 0 8px rgb(255 46 230 / 70%);
+  mask-image: radial-gradient(circle, #000 1.05px, transparent 1.45px);
+  mask-size: 3px 3px;
+}
+
+/*
  * Sections waiting on HARP (components/skeleton.tsx).
  *
  * The shimmer is one gradient wider than the box, slid across by
@@ -1144,17 +1639,15 @@ textarea,
  * Decoration that only runs while it is on screen
  * (components/reveal-on-scroll.tsx).
  *
- * The marquee and the shooting star are both infinite, and both used to tick
- * for the life of the page - the marquee sits near the footer, the star in the
- * prehero, so between them one of the two is almost always off screen and
- * animating for nobody. `animation-play-state` is free to toggle: the
+ * The shooting star is infinite, and used to tick for the life of the page -
+ * in the prehero, which is off screen for nearly all of it, animating for
+ * nobody. `animation-play-state` is free to toggle: the
  * compositor simply stops advancing the timeline, no repaint, no reflow.
  *
- * `[data-motion-active]` is the root flag set by the observer that gates them,
+ * `[data-motion-active]` is the root flag set by the observer that gates it,
  * so the pause only applies once something is actually watching. If the script
- * never runs, neither rule matches and both keep moving.
+ * never runs, the rule never matches and the star keeps moving.
  */
-[data-motion-active] .social-marquee:not([data-in-view]) .social-marquee__track,
 [data-motion-active] .star-field:not([data-in-view]) .shooting-star,
 [data-motion-active] .star-field:not([data-in-view]) .shooting-star::before,
 [data-motion-active] .star-field:not([data-in-view]) .shooting-star::after {
