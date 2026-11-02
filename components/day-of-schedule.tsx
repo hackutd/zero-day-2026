@@ -73,10 +73,6 @@ export function DayOfSchedule({
     // No heading of its own: this is a tab panel, and the tab that opens it is
     // the heading. See components/event-board.tsx.
     <div className="mx-auto max-w-[1000px]" aria-busy={pending || undefined}>
-      <p className="font-sans text-text-muted text-center text-[13px] leading-[1.6] tracking-[0.04em]">
-        Day-of schedule, all times CT. Events are subject to change.
-      </p>
-
       {pending ? (
         <SchedulePending />
       ) : schedule.length === 0 ? (
@@ -87,7 +83,7 @@ export function DayOfSchedule({
             <div
               role="group"
               aria-label="Filter the schedule by kind of event"
-              className="mt-9 flex flex-wrap justify-center gap-2"
+              className="flex flex-wrap justify-center gap-2"
             >
               <FilterChip
                 label="All"
@@ -110,6 +106,10 @@ export function DayOfSchedule({
               ))}
             </div>
           )}
+
+          <p className="font-sans mt-4 text-center text-[11px] leading-[1.5] tracking-[0.04em] text-white first:mt-0">
+            Day-of schedule, all times CT. Events are subject to change.
+          </p>
 
           <div className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2">
             {days.map((day, dayIndex) => {
