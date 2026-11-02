@@ -13,7 +13,6 @@ import { PassingTrain } from "@/components/passing-train";
 import { PreheroIntro } from "@/components/prehero-intro";
 import { SiteCountdown } from "@/components/site-countdown";
 import { SiteFooter } from "@/components/site-footer";
-import { SocialMarquee } from "@/components/social-marquee";
 import backBuildings from "@/assets/images/backgrounds/descent/back-buildings-2x.webp";
 import frontBuildings from "@/assets/images/backgrounds/descent/front-buildings-2x.webp";
 import moon from "@/assets/images/backgrounds/descent/moon-2x.webp";
@@ -47,7 +46,6 @@ export default function Home() {
       <SponsorsSection />
       <FaqSection />
       <Mascots />
-      <SocialMarquee />
       <SiteFooter />
     </main>
   );
