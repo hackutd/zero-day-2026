@@ -5,7 +5,7 @@ import sharp from "sharp";
 import { logoSrc } from "@/lib/format";
 
 /**
- * How a sponsor's logo sits on the night-sky sponsor board. Measured only: the
+ * How a sponsor's logo sits on the sponsor board. Measured only: the
  * file itself is always shown exactly as the sponsor supplied it.
  *
  * Organizers upload whatever the sponsor sent - black wordmarks on transparent
@@ -13,10 +13,13 @@ import { logoSrc } from "@/lib/format";
  * white marks (AT&T), and every amount of empty padding. Two things are read
  * off each file so the board can present them evenly without touching them:
  *
- *  - `plate`: a colour to mount the logo on, or null. A logo that does not
- *    read on the dark sky gets white, the background every brand's primary logo is
- *    drawn for. A file with a backdrop baked in gets that backdrop's own
- *    colour, so the plate and the file meet without a seam.
+ *  - `plate`: a colour to mount the logo on, or null. Only a file with a
+ *    backdrop baked in gets one, in that backdrop's own colour, so the plate
+ *    and the file meet without a seam. A logo on transparent sits straight on
+ *    the screen, dark ones included - no white card.
+ *  - `glow`: the logo is a dark mark that would vanish on the dimmed screen,
+ *    so the board lights the screen behind it with a soft white glow. The
+ *    logo itself is untouched.
  *  - `box`: where the logo actually is in the file, so empty margins can be
  *    cropped by layout and every logo sized by its real shape. Only margins
  *    that look identical once cropped - transparent ones, or a backdrop on a
@@ -24,6 +27,7 @@ import { logoSrc } from "@/lib/format";
  */
 export type LogoFit = {
   plate: string | null;
+  glow: boolean;
   /** The logo's extent in the file, as fractions of its width and height. */
   box: { x: number; y: number; width: number; height: number };
   /** The file's own pixel size, for next/image. */
@@ -32,10 +36,6 @@ export type LogoFit = {
   /** How much of `box` is ink (0-1), so dense and thin marks can be evened out. */
   coverage: number;
 };
-
-// The board's screen: the hero's night sky (descent/sky-2x.webp), averaged
-// over the part `.sponsor-board__screen` in globals.css shows.
-const SCREEN = luminance(2, 22, 27);
 
 export async function sponsorLogoFit(logoUrl: string): Promise<LogoFit | null> {
   const src = logoSrc(logoUrl);
@@ -78,26 +78,31 @@ function measure(px: Uint8Array, w: number, h: number) {
       .reduce((best, next) => (next[1] > best[1] ? next : best));
 
     // No one colour: the file is a picture, shown whole as a tile.
-    if (count < edge.length / 2) return { plate: null, box: FULL, coverage: 1 };
+    if (count < edge.length / 2) {
+      return { plate: null, glow: false, box: FULL, coverage: 1 };
+    }
 
     // The plate takes the backdrop's own colour, so the file's margins can be
     // cropped and the logo looks exactly as it does in the file.
     const isInk = (i: number) => !near(i, backdrop);
-    return { plate: hex(backdrop), ...inkExtent(px, w, h, isInk) };
+    return { plate: hex(backdrop), glow: false, ...inkExtent(px, w, h, isInk) };
   }
 
   const isInk = (i: number) => px[i + 3] > 128;
-  const extent = inkExtent(px, w, h, isInk);
 
-  // Plate the logo if more than a sliver of its ink would vanish on the sky.
+  // A dark mark: more than a sliver of its ink has no channel at half.
   let ink = 0;
-  let lost = 0;
+  let dark = 0;
   for (let i = 0; i < px.length; i += 4) {
     if (!isInk(i)) continue;
     ink++;
-    if (contrast(luminance(px[i], px[i + 1], px[i + 2]), SCREEN) < 3) lost++;
+    if (Math.max(px[i], px[i + 1], px[i + 2]) < 128) dark++;
   }
-  return { plate: lost > ink * 0.15 ? "#ffffff" : null, ...extent };
+  return {
+    plate: null,
+    glow: dark > ink * 0.15,
+    ...inkExtent(px, w, h, isInk),
+  };
 }
 
 function hex(c: number[]): string {
@@ -147,17 +152,4 @@ function inkExtent(
     box: { x: x0, y: y0, width: x1 - x0, height: y1 - y0 },
     coverage: ink / ((right - left + 1) * (bottom - top + 1)),
   };
-}
-
-/** WCAG relative luminance of an sRGB colour. */
-function luminance(r: number, g: number, b: number): number {
-  const lin = (c: number) => {
-    const v = c / 255;
-    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-  };
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-}
-
-function contrast(a: number, b: number): number {
-  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }

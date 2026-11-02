@@ -1145,10 +1145,9 @@ textarea,
 }
 
 /*
- * The screen shows the hero's night sky, as an image behind the bands
- * (components/site-sponsors.tsx); `background` is the sky's own colour until
- * it loads. `--ink` is for everything the board writes on it. lib/logo-fit.ts
- * plates logos against this sky.
+ * The screen shows a wall of TVs, dimmed, as an image behind the bands
+ * (components/site-sponsors.tsx); `background` is the dark it is dimmed over.
+ * `--ink` is for everything the board writes on it.
  */
 .sponsor-board__screen {
   --ink: #e6f1f4;
@@ -1182,8 +1181,9 @@ textarea,
  * board between bands, and down it between groups sharing a band.
  */
 .board-group {
+  --pad-top: clamp(6px, 0.5vw, 9px);
   flex: 1 1 100%;
-  padding-top: clamp(6px, 0.5vw, 9px);
+  padding-top: var(--pad-top);
 }
 
 .board-band + .board-band,
@@ -1229,28 +1229,35 @@ textarea,
   position: relative;
   display: block;
   height: 100%;
-  transition: background-color 260ms ease;
 }
 
 /*
  * On hover the cell lights up in the sponsor's tier colour: a wash over the
- * sky, and a bright glow that follows the cursor (`--mx`/`--my`, from
- * components/board-glow.tsx). The glow is its own layer so it can fade in.
- * Both paint under the logo, never on it.
+ * screen, and a bright glow that follows the cursor (`--mx`/`--my`, from
+ * components/board-glow.tsx), fading in together. Both paint under the logo,
+ * never on it. On the billboard, where a section is one line of cells, they
+ * reach up through the section's top padding (`--reach`) so the whole
+ * section, hairline to hairline, lights up; the glow's centre moves down by
+ * as much, to stay on the cursor.
  */
-.board-cell__link:is(:hover, :focus-visible) {
-  background-color: color-mix(in srgb, var(--tier) 16%, transparent);
+@media (width >= 64rem) {
+  .board-cell__link {
+    --reach: var(--pad-top);
+  }
 }
 .board-cell__link::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle max(60px, 75cqh) at var(--mx, 50%) var(--my, 50%),
-    color-mix(in srgb, var(--tier) 80%, transparent),
-    color-mix(in srgb, var(--tier) 25%, transparent) 45%,
-    transparent
-  );
+  inset: calc(-1 * var(--reach, 0px)) 0 0;
+  background:
+    radial-gradient(
+      circle max(60px, 75cqh) at var(--mx, 50%)
+        calc(var(--my, 50%) + var(--reach, 0px)),
+      color-mix(in srgb, var(--tier) 80%, transparent),
+      color-mix(in srgb, var(--tier) 25%, transparent) 45%,
+      transparent
+    ),
+    color-mix(in srgb, var(--tier) 16%, transparent);
   opacity: 0;
   pointer-events: none;
   transition: opacity 260ms ease;
@@ -1294,8 +1301,32 @@ textarea,
 }
 
 /*
- * The plate, for a logo that does not read on the screen or that brought its
- * own backdrop: `--plate` is white, or that backdrop's colour, so the file meets it without a seam (lib/logo-fit.ts).
+ * A dark logo's glow: a white shape just past the logo's edges, heavily
+ * blurred, so the ink sits on a light haze that fades out gradually into the
+ * screen. Only the screen behind the logo is lit; the logo itself is
+ * untouched. The haze runs well past the logo, so the logo is held to
+ * smaller bounds to leave room for it inside the cell - `logo-wipe` ends
+ * clipped to the cell, and a clipped fade would show a hard edge.
+ */
+.board-cell__logo[data-glow] {
+  --max-w: 72cqw;
+  --max-h: 54cqh;
+}
+.board-cell__logo[data-glow]::before {
+  --glow: clamp(6px, 6cqh, 16px);
+  content: "";
+  position: absolute;
+  inset: calc(-2 * var(--glow)) calc(-3 * var(--glow));
+  z-index: -1;
+  border-radius: calc(4 * var(--glow));
+  /* Translucent, so the screen still shows through behind the logo. */
+  background: rgb(255 255 255 / 55%);
+  filter: blur(var(--glow));
+}
+
+/*
+ * The plate, for a logo that brought its own backdrop: `--plate` is that
+ * backdrop's colour, so the file meets it without a seam (lib/logo-fit.ts).
  *
  * Every plate in a cell of the same height is the same height - 76% of it -
  * so a band of plated logos lines up rather than going ragged. Only a logo
@@ -1319,20 +1350,16 @@ textarea,
 }
 
 /*
- * A tier's name at the top-right of its section, on a tab of the sky's colour
- * that cuts the hairline above the section, so it never lands on a logo; the section keeps
- * a few pixels clear below the line for its lower half (`.board-group`'s top
- * padding).
+ * A tier's name at the top-right of its section, straight on the screen with
+ * no background, just under the hairline above it rather than across it. It
+ * fits in the section's top padding and the empty margin every cell keeps
+ * above its logo, so it never lands on a logo.
  */
 .board-group__tier {
   position: absolute;
-  top: 0;
+  top: clamp(3px, 0.3vw, 5px);
   right: clamp(10px, 1.2vw, 22px);
   z-index: 2;
-  padding: 0.35em 0.6em;
-  border-radius: 2px;
-  background: #03161b;
-  transform: translateY(-50%);
   color: var(--ink);
   font-size: clamp(10px, 0.7vw, 12px);
   font-weight: 500;

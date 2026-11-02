@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 
-import sky from "@/assets/images/backgrounds/descent/sky-2x.webp";
+import tvWall from "@/assets/images/backgrounds/sponsors/tv-wall-2x.webp";
 import { BillboardPole } from "@/components/billboard-pole";
 import { BoardGlow } from "@/components/board-glow";
 import { Skeleton } from "@/components/skeleton";
@@ -31,9 +31,9 @@ type Slot = {
  * Logos are shown exactly as the sponsor supplied them - no recolouring, no
  * effects. What the board controls is everything around them: each is sized
  * by its real shape, so a wide wordmark and a square mark carry the same
- * visual weight in a cell of the same size, and one that would not read on
- * the screen is mounted on a plate. `fits` holds those measurements
- * (lib/logo-fit.ts).
+ * visual weight in a cell of the same size, one that brought its own
+ * backdrop is mounted on a plate of that colour, and a dark one gets a soft
+ * white glow behind it. `fits` holds those measurements (lib/logo-fit.ts).
  *
  * As the board scrolls in, its tube strikes. As each cell does, a cipher of
  * the sponsor's own id is scanned away to uncover the logo (globals.css,
@@ -93,15 +93,21 @@ export function SiteSponsors({
         <div className="sponsor-board relative mx-auto mt-12 max-w-[1600px] sm:mt-16">
           <div className="sponsor-board__frame">
             <BoardHardware />
-            <div className="sponsor-board__screen flex flex-col p-2 sm:p-3 lg:aspect-[5/2]">
+            {/* No padding once loaded, so the tier hairlines run to the
+                screen's very edges; the skeleton keeps an inset. */}
+            <div
+              className={`sponsor-board__screen flex flex-col lg:aspect-[5/2] ${
+                pending ? "p-2 sm:p-3" : ""
+              }`}
+            >
               <Image
-                src={sky}
+                src={tvWall}
                 alt=""
                 fill
                 sizes="(max-width: 1600px) 100vw, 1600px"
                 placeholder="blur"
                 quality={65}
-                className="-z-10 object-cover object-top opacity-40"
+                className="-z-10 object-cover opacity-40"
               />
               {pending ? (
                 <BoardPending />
@@ -236,16 +242,18 @@ function BoardPending() {
 }
 
 /*
- * How each tier sits on the board, by rank. A cell takes `units` of its band's
+ * How each tier sits on the board, by its rank in HARP's tier order - the
+ * order sponsors arrive in (`groupByTier`) - so custom and renamed tiers rank
+ * wherever an admin puts them. A cell takes `units` of its band's
  * width - a band holds BAND_UNITS - and grows to fill what the band leaves
  * over. A band's height on the billboard is the largest `bandWeight` in it; on
  * a phone, where bands wrap, a cell has its own `height` instead. `weight` is
  * how much of the cell's height the logo's area is scaled to. Every one of
  * them shrinks down the ranks, so a higher tier is always the bigger logo.
- * Unknown tiers take the last, smallest look.
+ * Tiers past the last look take it, the smallest.
  */
 const TIER_LOOK = [
-  // Title
+  // 1st tier (Title, in HARP's default order)
   {
     units: 7,
     bandWeight: 1.5,
@@ -253,7 +261,7 @@ const TIER_LOOK = [
     height: "h-36 lg:h-auto",
     sizes: "(max-width: 1023px) 80vw, 480px",
   },
-  // Platinum
+  // 2nd (Platinum)
   {
     units: 5,
     bandWeight: 1.4,
@@ -261,7 +269,7 @@ const TIER_LOOK = [
     height: "h-28 lg:h-auto",
     sizes: "(max-width: 1023px) 45vw, 340px",
   },
-  // Gold
+  // 3rd (Gold)
   {
     units: 4,
     bandWeight: 1.3,
@@ -269,7 +277,7 @@ const TIER_LOOK = [
     height: "h-24 lg:h-auto",
     sizes: "(max-width: 1023px) 45vw, 280px",
   },
-  // Silver
+  // 4th (Silver)
   {
     units: 3.6,
     bandWeight: 1.05,
@@ -277,7 +285,7 @@ const TIER_LOOK = [
     height: "h-20 lg:h-auto",
     sizes: "(max-width: 1023px) 33vw, 220px",
   },
-  // Bronze
+  // 5th (Bronze)
   {
     units: 3.6,
     bandWeight: 1.05,
@@ -285,7 +293,7 @@ const TIER_LOOK = [
     height: "h-20 lg:h-auto",
     sizes: "(max-width: 1023px) 33vw, 220px",
   },
-  // Other Sponsors
+  // 6th (Other Sponsors)
   {
     units: 2,
     bandWeight: 0.8,
@@ -293,7 +301,7 @@ const TIER_LOOK = [
     height: "h-16 lg:h-auto",
     sizes: "(max-width: 1023px) 25vw, 160px",
   },
-  // Also Thanking, and anything unranked.
+  // 7th (Also Thanking), and every tier after it.
   {
     units: 1.8,
     bandWeight: 0.8,
@@ -307,7 +315,7 @@ type TierLook = (typeof TIER_LOOK)[number];
 
 const BAND_UNITS = 21;
 
-/** Each tier's colour, for its cells' hover. */
+/** Each tier's colour, for its cells' hover; other tiers get a neutral one. */
 const TIER_COLOR: Record<string, string> = {
   Title: "#ff2ee6",
   Platinum: "#dbc4ff",
@@ -318,9 +326,9 @@ const TIER_COLOR: Record<string, string> = {
   "Also Thanking": "#8b7bff",
 };
 
-/** A tier's sponsors, each with the tier's look on the board. */
-function placeTier(tier: SponsorTier): Slot[] {
-  const look = TIER_LOOK[Math.min(tierRank(tier.name), TIER_LOOK.length - 1)];
+/** A tier's sponsors, each with the look of the tier's rank on the board. */
+function placeTier(tier: SponsorTier, rank: number): Slot[] {
+  const look = TIER_LOOK[Math.min(rank, TIER_LOOK.length - 1)];
   return tier.sponsors.map((sponsor, index) => ({
     sponsor,
     tier: tier.name,
@@ -393,6 +401,7 @@ function BoardCell({
         <div
           className="board-cell__logo"
           data-plate={fit?.plate ? "" : undefined}
+          data-glow={fit?.glow ? "" : undefined}
           style={
             {
               "--plate": fit?.plate ?? undefined,
@@ -472,27 +481,9 @@ function groupByTier(sponsors: Sponsor[]): SponsorTier[] {
     tiers.set(tier, entries);
   }
 
-  // Tiers rank by sponsorship level; display_order only orders within a tier.
-  return [...tiers]
-    .map(([name, entries]) => ({ name, sponsors: entries }))
-    .sort((a, b) => tierRank(a.name) - tierRank(b.name));
-}
-
-// Mirrors TIER_OPTIONS in HARP's SponsorFormDialog.
-const TIER_ORDER = [
-  "Title",
-  "Platinum",
-  "Gold",
-  "Silver",
-  "Bronze",
-  "Other Sponsors",
-  "Also Thanking",
-];
-
-/** Unknown tiers (and "Partners") sit after the known ones, in API order. */
-function tierRank(name: string): number {
-  const rank = TIER_ORDER.indexOf(name);
-  return rank === -1 ? TIER_ORDER.length : rank;
+  // HARP sends sponsors in its admin-set tier order (tiers not in it last),
+  // then by display_order, so tiers keep the order they first appear in.
+  return [...tiers].map(([name, entries]) => ({ name, sponsors: entries }));
 }
 
 /** Only let organizer-supplied HTTP(S) URLs become clickable links. */

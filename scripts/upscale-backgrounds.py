@@ -101,3 +101,18 @@ for name, box in DESCENT_LAYERS.items():
             OUTPUT_BACKGROUNDS / "descent" / f"{Path(name).stem}-2x.webp",
             exact_alpha=False,
         )
+
+# The sponsor board's screens (`SiteSponsors`). Their sources are far wider than
+# the board ever draws, so they are scaled down to twice its 1600px max, not up.
+(OUTPUT_BACKGROUNDS / "sponsors").mkdir(exist_ok=True)
+for source in sorted((SOURCE_BACKGROUNDS / "sponsors").glob("*.png")):
+    with Image.open(source) as original:
+        width = 3200
+        save(
+            original.resize(
+                (width, round(original.height * width / original.width)),
+                Image.Resampling.LANCZOS,
+            ),
+            OUTPUT_BACKGROUNDS / "sponsors" / f"{source.stem}-2x.webp",
+            exact_alpha=False,
+        )
