@@ -190,7 +190,7 @@ function EmptySchedule({ unavailable }: { unavailable: boolean }) {
   );
 }
 
-function FilterChip({
+export function FilterChip({
   label,
   active,
   onClick,

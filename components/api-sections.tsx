@@ -69,19 +69,28 @@ async function ScheduleFromApi() {
   );
 }
 
-async function SponsorsFromApi() {
-  const { items, unavailable } = await load(getSponsors, "sponsors");
-  // Measured here so the board can size and plate every logo before the
-  // image arrives. A logo that can't be measured is shown whole, unplated,
-  // rather than costing the whole wall.
-  const fits = Object.fromEntries(
+/**
+ * Measured here so a section can size, plate or glow every logo before the
+ * image arrives. A logo that can't be measured is shown whole and unlit
+ * rather than costing the whole section.
+ */
+async function logoFits(items: { id: string; logo_url: string }[]) {
+  return Object.fromEntries(
     await Promise.all(
       items.map(
-        async (s) =>
-          [s.id, await sponsorLogoFit(s.logo_url).catch(() => null)] as const,
+        async (item) =>
+          [
+            item.id,
+            await sponsorLogoFit(item.logo_url).catch(() => null),
+          ] as const,
       ),
     ),
   );
+}
+
+async function SponsorsFromApi() {
+  const { items, unavailable } = await load(getSponsors, "sponsors");
+  const fits = await logoFits(items);
   return (
     <RevealScope phase="sponsors-loaded">
       <SiteSponsors sponsors={items} fits={fits} unavailable={unavailable} />
@@ -100,9 +109,11 @@ async function FaqsFromApi() {
 
 async function TracksFromApi() {
   const { items, unavailable } = await load(getTracks, "tracks");
+  // A track's logo is its sponsor's, so these share the sponsor wall's fetches.
+  const fits = await logoFits(items);
   return (
     <RevealScope phase="tracks-loaded">
-      <ChallengeTracks tracks={items} unavailable={unavailable} />
+      <ChallengeTracks tracks={items} fits={fits} unavailable={unavailable} />
     </RevealScope>
   );
 }

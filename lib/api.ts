@@ -180,6 +180,10 @@ function isTrack(value: unknown): value is Track {
     value.prizes.every(isTrackPrize) &&
     typeof value.logo_url === "string" &&
     isTrackLogoUrl(value.logo_url) &&
+    (value.resources_url === undefined ||
+      (typeof value.resources_url === "string" &&
+        isTrackLogoUrl(value.resources_url))) &&
+    (value.organizer === undefined || typeof value.organizer === "boolean") &&
     typeof value.display_order === "number" &&
     Number.isInteger(value.display_order) &&
     value.display_order >= 0 &&
@@ -198,7 +202,7 @@ function isTrackPrize(value: unknown): value is TrackPrize {
   );
 }
 
-/** "" (no logo) or an absolute http(s) URL. */
+/** "" (no logo or link) or an absolute http(s) URL. */
 function isTrackLogoUrl(value: string): boolean {
   if (value === "") return true;
   try {

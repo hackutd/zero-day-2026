@@ -8,8 +8,9 @@
  *   Track        -> cmd/api/public.go (PublicTrack)
  *
  * Sponsor and track logos arrive as `logo_url`: an absolute, keyless,
- * versioned URL to `/v1/public/{sponsors,tracks}/{id}/logo`, or "" when the
- * row has no logo. Logo bytes are never inlined.
+ * versioned URL to `/v1/public/sponsors/{id}/logo`, or "" when the row has no
+ * logo. Logo bytes are never inlined. HARP builds each track from a sponsor's
+ * challenge, so a track's id and logo are its sponsor's.
  *
  * Timestamps arrive as RFC 3339 strings, not Date objects.
  */
@@ -58,6 +59,10 @@ export interface Track {
   sponsor_name: string;
   description: string;
   prizes: TrackPrize[];
+  /** "" or an http(s) link to the sponsor's docs. Optional until HARP sends it everywhere. */
+  resources_url?: string;
+  /** One of the organizers' own prizes rather than a company's. Optional until HARP sends it. */
+  organizer?: boolean;
   logo_url: string;
   display_order: number;
   created_at: string;
