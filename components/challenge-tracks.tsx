@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useState } from "react";
 
-import { CloseOnScroll } from "@/components/close-on-scroll";
 import { FilterChip } from "@/components/day-of-schedule";
 import { Skeleton } from "@/components/skeleton";
 import { logoSrc } from "@/lib/format";
@@ -67,33 +66,33 @@ export function ChallengeTracks({
             : "This year's challenge tracks will be announced soon."}
         </p>
       ) : (
-        <>
-          {GROUPS.map(({ id, label }) => {
-            const shown = tracks.filter(
-              (track) => Boolean(track.organizer) === (id === "organizer"),
-            );
-            return (
-              <div key={id} hidden={group !== id}>
-                {shown.length === 0 ? (
-                  <p className="font-sans text-text-dim mt-12 text-center text-[13px] leading-relaxed">
-                    {label} will be announced soon.
-                  </p>
-                ) : (
-                  <div className="mt-10 grid items-start gap-3 lg:grid-cols-2">
-                    {shown.map((track) => (
-                      <TrackCard
-                        key={track.id}
-                        track={track}
-                        fit={fits[track.id] ?? null}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          <CloseOnScroll name="challenge-track" />
-        </>
+        GROUPS.map(({ id, label }) => {
+          const shown = tracks.filter(
+            (track) => Boolean(track.organizer) === (id === "organizer"),
+          );
+          return (
+            <div key={id} hidden={group !== id}>
+              {shown.length === 0 ? (
+                <p className="font-sans text-text-dim mt-12 text-center text-[13px] leading-relaxed">
+                  {label} will be announced soon.
+                </p>
+              ) : (
+                <div className="mt-10 grid items-start gap-3 lg:grid-cols-2">
+                  {shown.map((track, index) => (
+                    <TrackCard
+                      key={track.id}
+                      track={track}
+                      fit={fits[track.id] ?? null}
+                      // The first row starts open; every card opens and
+                      // closes on its own after that.
+                      defaultOpen={index < 2}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })
       )}
     </div>
   );
@@ -126,7 +125,15 @@ function TracksPending() {
 const TRACK_TITLE =
   "font-elevon text-[16px] leading-[1.15] font-extrabold tracking-[0.02em] text-white uppercase sm:text-[18px]";
 
-function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
+function TrackCard({
+  track,
+  fit,
+  defaultOpen,
+}: {
+  track: Track;
+  fit: LogoFit | null;
+  defaultOpen: boolean;
+}) {
   const sponsor = track.sponsor_name.trim();
   const src = logoSrc(track.logo_url);
   const [topPrize] = track.prizes;
@@ -199,7 +206,7 @@ function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
 
   return (
     <details
-      name="challenge-track"
+      open={defaultOpen}
       className="disclosure border-border-hairline group border bg-white/[0.02] open:bg-white/[0.04]"
     >
       <summary className="flex cursor-pointer list-none items-start gap-4 p-4 sm:p-5">
