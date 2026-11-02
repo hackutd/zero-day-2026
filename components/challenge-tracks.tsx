@@ -79,7 +79,7 @@ export function ChallengeTracks({
                     {label} will be announced soon.
                   </p>
                 ) : (
-                  <div className="mt-10 grid gap-3 lg:grid-cols-2">
+                  <div className="mt-10 grid items-start gap-3 lg:grid-cols-2">
                     {shown.map((track) => (
                       <TrackCard
                         key={track.id}
