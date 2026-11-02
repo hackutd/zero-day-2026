@@ -95,6 +95,10 @@ export function DayOfSchedule({
                   key={tag.key}
                   label={tag.label}
                   active={filter.includes(tag.key)}
+                  // Selected, a tag takes its badge's colours. A tag without
+                  // its own keeps the default, since the fallback badge looks
+                  // the same as an unselected chip.
+                  activeStyle={TAG_STYLES[tag.key]}
                   onClick={() =>
                     setFilter((keys) =>
                       keys.includes(tag.key)
@@ -205,10 +209,13 @@ export function FilterChip({
   label,
   active,
   onClick,
+  activeStyle = "border-white bg-white text-[#05070a]",
 }: {
   label: string;
   active: boolean;
   onClick: () => void;
+  /** Classes for the selected state; a tag passes its badge's colours. */
+  activeStyle?: string;
 }) {
   return (
     <button
@@ -217,7 +224,7 @@ export function FilterChip({
       onClick={onClick}
       className={`font-sans focus-visible:outline-accent-magenta border px-3.5 py-1.5 text-[11px] leading-none tracking-[0.12em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${
         active
-          ? "border-white bg-white text-[#05070a]"
+          ? activeStyle
           : "border-border-hairline text-text-muted hover:border-white/40 hover:text-white"
       }`}
     >
