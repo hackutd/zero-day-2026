@@ -63,7 +63,9 @@ export function DayOfSchedule({
   /** The HARP request is still in flight; see components/api-sections.tsx. */
   pending?: boolean;
 }) {
-  const [filter, setFilter] = useState<string | null>(null);
+  // Selected tag keys; none selected shows everything. An event matches if it
+  // carries any of them.
+  const [filter, setFilter] = useState<string[]>([]);
   const tags = scheduleTags(schedule);
   const days = groupByDay(schedule);
 
@@ -89,15 +91,21 @@ export function DayOfSchedule({
             >
               <FilterChip
                 label="All"
-                active={filter === null}
-                onClick={() => setFilter(null)}
+                active={filter.length === 0}
+                onClick={() => setFilter([])}
               />
               {tags.map((tag) => (
                 <FilterChip
                   key={tag.key}
                   label={tag.label}
-                  active={filter === tag.key}
-                  onClick={() => setFilter(filter === tag.key ? null : tag.key)}
+                  active={filter.includes(tag.key)}
+                  onClick={() =>
+                    setFilter((keys) =>
+                      keys.includes(tag.key)
+                        ? keys.filter((key) => key !== tag.key)
+                        : [...keys, tag.key],
+                    )
+                  }
                 />
               ))}
             </div>
@@ -105,11 +113,14 @@ export function DayOfSchedule({
 
           <div className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2">
             {days.map((day, dayIndex) => {
-              const shown = filter
-                ? day.events.filter((event) =>
-                    event.tags.some((tag) => normalizeTag(tag) === filter),
-                  )
-                : day.events;
+              const shown =
+                filter.length > 0
+                  ? day.events.filter((event) =>
+                      event.tags.some((tag) =>
+                        filter.includes(normalizeTag(tag)),
+                      ),
+                    )
+                  : day.events;
 
               return (
                 <div key={day.key}>
@@ -317,6 +328,12 @@ function tagStyle(tag: string): string {
   return TAG_STYLES[normalizeTag(tag)] ?? FALLBACK_TAG_STYLE;
 }
 
-function tagLabel(tags: TagOption[], key: string | null): string {
-  return tags.find((tag) => tag.key === key)?.label ?? "this category";
+const tagListFormatter = new Intl.ListFormat("en-US", { type: "disjunction" });
+
+/** The selected tags as prose, e.g. "Food, Talks, or Workshops". */
+function tagLabel(tags: TagOption[], keys: string[]): string {
+  const labels = tags
+    .filter((tag) => keys.includes(tag.key))
+    .map((tag) => tag.label);
+  return labels.length > 0 ? tagListFormatter.format(labels) : "this category";
 }
