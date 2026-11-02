@@ -123,10 +123,79 @@ function TracksPending() {
  * One track, collapsed to the details a hacker scans first. The API logo is
  * rendered only when present; logo-less tracks remain text-only cards.
  */
+const TRACK_TITLE =
+  "font-elevon text-[16px] leading-[1.15] font-extrabold tracking-[0.02em] text-white uppercase sm:text-[18px]";
+
 function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
   const sponsor = track.sponsor_name.trim();
   const src = logoSrc(track.logo_url);
   const [topPrize] = track.prizes;
+
+  const logo = src && (
+    <div
+      data-glow={fit?.glow ? "" : undefined}
+      className="track-logo flex h-12 w-24 shrink-0 items-center justify-center bg-white/[0.04] p-1.5"
+    >
+      <Image
+        src={src}
+        alt={`${sponsor || track.title} logo`}
+        width={96}
+        height={48}
+        sizes="96px"
+        className="h-full w-full object-contain"
+      />
+    </div>
+  );
+
+  // Sections are padded rather than the body, so each hairline runs the
+  // card's full width: under the header, and between brief and prizes.
+  const body = (
+    <div className="border-border-hairline divide-border-hairline divide-y border-t">
+      <div className="px-4 py-4 sm:px-5">
+        {/* Set like the prize places below it (PrizeList). */}
+        <h4 className="font-elevon text-accent-soft mb-3 text-[12px] leading-none font-extrabold tracking-[0.06em] uppercase">
+          Challenge statement
+        </h4>
+        {track.description ? (
+          <p className="font-sans text-[15px] leading-[1.6] whitespace-pre-line text-white">
+            {track.description}
+          </p>
+        ) : (
+          <p className="font-sans text-text-dim text-[13px] leading-[1.65]">
+            Challenge description coming soon.
+          </p>
+        )}
+      </div>
+      <div className="px-4 pt-4 pb-5 sm:px-5">
+        <PrizeList prizes={track.prizes} />
+        {/* isTrack has already checked this is an http(s) URL. */}
+        {track.resources_url && (
+          <a
+            href={track.resources_url}
+            target="_blank"
+            rel="noreferrer"
+            className="footer-link font-sans text-accent-soft mt-4 inline-block text-[12px] leading-[1.4]"
+          >
+            Resources &#8599;
+          </a>
+        )}
+      </div>
+    </div>
+  );
+
+  // The organizers' own tracks are few and open to every team, so they are
+  // always shown in full: no toggle, and no "Presented by" under their tab.
+  if (track.organizer) {
+    return (
+      <article className="border-border-hairline border bg-white/[0.04]">
+        <div className="flex items-center gap-4 p-4 sm:p-5">
+          {logo}
+          <h3 className={`${TRACK_TITLE} min-w-0 flex-1`}>{track.title}</h3>
+        </div>
+        {body}
+      </article>
+    );
+  }
 
   return (
     <details
@@ -134,32 +203,15 @@ function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
       className="disclosure border-border-hairline group border bg-white/[0.02] open:bg-white/[0.04]"
     >
       <summary className="flex cursor-pointer list-none items-start gap-4 p-4 sm:p-5">
-        {src && (
-          <div
-            data-glow={fit?.glow ? "" : undefined}
-            className="track-logo flex h-12 w-24 shrink-0 items-center justify-center bg-white/[0.04] p-1.5"
-          >
-            <Image
-              src={src}
-              alt={`${sponsor || track.title} logo`}
-              width={96}
-              height={48}
-              sizes="96px"
-              className="h-full w-full object-contain"
-            />
-          </div>
-        )}
+        {logo}
 
         <div className="min-w-0 flex-1">
-          {/* The organizers' own tracks sit under their own toggle already. */}
-          {!track.organizer && sponsor && (
+          {sponsor && (
             <p className="font-sans text-text-dim text-[10px] tracking-[0.14em] uppercase">
               Presented by {sponsor}
             </p>
           )}
-          <h3 className="font-elevon mt-1.5 first:mt-0 text-[16px] leading-[1.15] font-extrabold tracking-[0.02em] text-white uppercase sm:text-[18px]">
-            {track.title}
-          </h3>
+          <h3 className={`${TRACK_TITLE} mt-1.5 first:mt-0`}>{track.title}</h3>
           <p className="font-sans text-accent-soft mt-2 text-[12px] leading-[1.4] group-open:hidden">
             {topPrize
               ? `${topPrize.place}: ${topPrize.prize}`
@@ -175,39 +227,7 @@ function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
         </span>
       </summary>
 
-      {/* Sections are padded rather than the body, so each hairline runs the
-          card's full width: under the sponsor, and between brief and prizes. */}
-      <div className="border-border-hairline divide-border-hairline divide-y border-t">
-        <div className="px-4 py-4 sm:px-5">
-          {/* Set like the prize places below it (PrizeList). */}
-          <h4 className="font-elevon text-accent-soft mb-3 text-[12px] leading-none font-extrabold tracking-[0.06em] uppercase">
-            Challenge statement
-          </h4>
-          {track.description ? (
-            <p className="font-sans text-[15px] leading-[1.6] whitespace-pre-line text-white">
-              {track.description}
-            </p>
-          ) : (
-            <p className="font-sans text-text-dim text-[13px] leading-[1.65]">
-              Challenge description coming soon.
-            </p>
-          )}
-        </div>
-        <div className="px-4 pt-4 pb-5 sm:px-5">
-          <PrizeList prizes={track.prizes} />
-          {/* isTrack has already checked this is an http(s) URL. */}
-          {track.resources_url && (
-            <a
-              href={track.resources_url}
-              target="_blank"
-              rel="noreferrer"
-              className="footer-link font-sans text-accent-soft mt-4 inline-block text-[12px] leading-[1.4]"
-            >
-              Resources &#8599;
-            </a>
-          )}
-        </div>
-      </div>
+      {body}
     </details>
   );
 }
