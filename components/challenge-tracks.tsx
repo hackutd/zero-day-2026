@@ -177,7 +177,7 @@ function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
 
       <div className="border-border-hairline mx-4 border-t pt-4 pb-5 sm:mx-5">
         {track.description ? (
-          <p className="font-sans text-text-muted text-[13px] leading-[1.65] whitespace-pre-line">
+          <p className="font-sans text-[15px] leading-[1.6] whitespace-pre-line text-white">
             {track.description}
           </p>
         ) : (
