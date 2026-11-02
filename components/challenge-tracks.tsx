@@ -175,30 +175,34 @@ function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
         </span>
       </summary>
 
-      <div className="border-border-hairline mx-4 border-t pt-4 pb-5 sm:mx-5">
-        {track.description ? (
-          <p className="font-sans text-[15px] leading-[1.6] whitespace-pre-line text-white">
-            {track.description}
-          </p>
-        ) : (
-          <p className="font-sans text-text-dim text-[13px] leading-[1.65]">
-            Challenge description coming soon.
-          </p>
-        )}
-        <div className="mt-4">
-          <PrizeList prizes={track.prizes} />
+      {/* Sections are padded rather than the body, so each hairline runs the
+          card's full width: under the sponsor, and between brief and prizes. */}
+      <div className="border-border-hairline divide-border-hairline divide-y border-t">
+        <div className="px-4 py-4 sm:px-5">
+          {track.description ? (
+            <p className="font-sans text-[15px] leading-[1.6] whitespace-pre-line text-white">
+              {track.description}
+            </p>
+          ) : (
+            <p className="font-sans text-text-dim text-[13px] leading-[1.65]">
+              Challenge description coming soon.
+            </p>
+          )}
         </div>
-        {/* isTrack has already checked this is an http(s) URL. */}
-        {track.resources_url && (
-          <a
-            href={track.resources_url}
-            target="_blank"
-            rel="noreferrer"
-            className="footer-link font-sans text-accent-soft mt-4 inline-block text-[12px] leading-[1.4]"
-          >
-            Resources &#8599;
-          </a>
-        )}
+        <div className="px-4 pt-4 pb-5 sm:px-5">
+          <PrizeList prizes={track.prizes} />
+          {/* isTrack has already checked this is an http(s) URL. */}
+          {track.resources_url && (
+            <a
+              href={track.resources_url}
+              target="_blank"
+              rel="noreferrer"
+              className="footer-link font-sans text-accent-soft mt-4 inline-block text-[12px] leading-[1.4]"
+            >
+              Resources &#8599;
+            </a>
+          )}
+        </div>
       </div>
     </details>
   );
