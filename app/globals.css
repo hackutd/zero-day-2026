@@ -678,8 +678,7 @@ textarea,
  * a marker there.
  */
 /*
- * Shared by every native disclosure on the page: the FAQ's questions and the
- * challenge-track briefs. Both hide the browser's own marker and rotate a
+ * The FAQ's native disclosures: hide the browser's own marker and rotate a
  * chevron of their own instead.
  */
 .disclosure summary::-webkit-details-marker,
