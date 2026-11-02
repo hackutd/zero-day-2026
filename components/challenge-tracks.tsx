@@ -179,6 +179,10 @@ function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
           card's full width: under the sponsor, and between brief and prizes. */}
       <div className="border-border-hairline divide-border-hairline divide-y border-t">
         <div className="px-4 py-4 sm:px-5">
+          {/* Set like the prize places below it (PrizeList). */}
+          <h4 className="font-elevon text-accent-soft mb-3 text-[12px] leading-none font-extrabold tracking-[0.06em] uppercase">
+            Challenge statement
+          </h4>
           {track.description ? (
             <p className="font-sans text-[15px] leading-[1.6] whitespace-pre-line text-white">
               {track.description}
