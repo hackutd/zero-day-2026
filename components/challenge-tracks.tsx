@@ -21,7 +21,7 @@ export function ChallengeTracks({
     // the heading. See components/event-board.tsx.
     <div className="mx-auto max-w-[1100px]" aria-busy={pending || undefined}>
       <p className="font-sans text-text-muted text-center text-[13px] leading-[1.6] tracking-[0.04em]">
-        Enter up to two. Open a track to read its challenge and prize details.
+        Enter up to two.
       </p>
 
       {pending ? (
@@ -30,7 +30,7 @@ export function ChallengeTracks({
         <p className="font-sans text-text-dim mt-12 text-center text-[13px] leading-relaxed">
           {unavailable
             ? "Our live challenge tracks are temporarily unavailable. Please check back soon."
-            : "This year's challenge tracks will be announced soon."}
+            : "This year's challenge tracks will be announced once hacking starts."}
         </p>
       ) : (
         <>
