@@ -35,11 +35,11 @@ const TAG_STYLES: Record<string, string> = {
   food: "border-accent-soft/40 text-accent-soft",
   workshop: "border-magenta/40 text-magenta",
   workshops: "border-magenta/40 text-magenta",
-  social: "border-muted/40 text-muted",
-  "for fun": "border-muted/40 text-muted",
+  social: "border-muted/40 text-white",
+  "for fun": "border-muted/40 text-white",
 };
 
-const FALLBACK_TAG_STYLE = "border-border-hairline text-text-muted";
+const FALLBACK_TAG_STYLE = "border-border-hairline text-white";
 
 type TagOption = { key: string; label: string };
 type ScheduleDay = {
@@ -71,7 +71,7 @@ export function DayOfSchedule({
     // No heading of its own: this is a tab panel, and the tab that opens it is
     // the heading. See components/event-board.tsx.
     <div className="mx-auto max-w-[1000px]" aria-busy={pending || undefined}>
-      <p className="font-sans text-text-muted text-center text-[13px] leading-[1.6] tracking-[0.04em]">
+      <p className="font-sans text-white text-center text-[13px] leading-[1.6] tracking-[0.04em]">
         Day-of schedule, all times CT. Events are subject to change.
       </p>
 
@@ -117,7 +117,7 @@ export function DayOfSchedule({
                     <h3 className="font-elevon text-[15px] leading-none font-extrabold tracking-[0.08em] text-white uppercase">
                       {day.date ? `Day ${dayIndex + 1}` : "TBA"}
                     </h3>
-                    <span className="font-sans text-text-dim text-[12px] tracking-[0.12em] uppercase">
+                    <span className="font-sans text-white text-[12px] tracking-[0.12em] uppercase">
                       {day.date
                         ? dayLabelFormatter.format(day.date)
                         : "Date to be announced"}
@@ -125,7 +125,7 @@ export function DayOfSchedule({
                   </div>
 
                   {shown.length === 0 ? (
-                    <p className="font-sans text-text-dim mt-6 text-[13px]">
+                    <p className="font-sans text-white mt-6 text-[13px]">
                       Nothing tagged {tagLabel(tags, filter)} on this day.
                     </p>
                   ) : (
@@ -182,7 +182,7 @@ function SchedulePending() {
 
 function EmptySchedule({ unavailable }: { unavailable: boolean }) {
   return (
-    <p className="font-sans text-text-dim mt-10 text-center text-[13px] leading-relaxed">
+    <p className="font-sans text-white mt-10 text-center text-[13px] leading-relaxed">
       {unavailable
         ? "The live schedule is temporarily unavailable. Please check back soon."
         : "The event schedule has not been published yet. Check back soon."}
@@ -207,7 +207,7 @@ function FilterChip({
       className={`font-sans focus-visible:outline-accent-magenta border px-3.5 py-1.5 text-[11px] leading-none tracking-[0.12em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${
         active
           ? "border-white bg-white text-[#05070a]"
-          : "border-border-hairline text-text-muted hover:border-white/40 hover:text-white"
+          : "border-border-hairline text-white hover:border-white/40"
       }`}
     >
       {label}
@@ -245,7 +245,7 @@ function ScheduleRow({
       ))}
 
       {event.location && (
-        <p className="font-sans text-text-dim ml-auto text-[11px] tracking-[0.04em]">
+        <p className="font-sans text-white ml-auto text-[11px] tracking-[0.04em]">
           {event.location}
         </p>
       )}

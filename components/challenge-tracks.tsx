@@ -20,7 +20,7 @@ export function ChallengeTracks({
     // No heading of its own: this is a tab panel, and the tab that opens it is
     // the heading. See components/event-board.tsx.
     <div className="mx-auto max-w-[1100px]" aria-busy={pending || undefined}>
-      <p className="font-sans text-text-muted text-center text-[13px] leading-[1.6] tracking-[0.04em]">
+      <p className="font-sans text-white text-center text-[13px] leading-[1.6] tracking-[0.04em]">
         Enter up to two.
       </p>
 
