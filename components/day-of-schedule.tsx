@@ -63,7 +63,9 @@ export function DayOfSchedule({
   /** The HARP request is still in flight; see components/api-sections.tsx. */
   pending?: boolean;
 }) {
-  const [filter, setFilter] = useState<string | null>(null);
+  // Selected tag keys; none selected shows everything. An event matches if it
+  // carries any of them.
+  const [filter, setFilter] = useState<string[]>([]);
   const tags = scheduleTags(schedule);
   const days = groupByDay(schedule);
 
@@ -71,10 +73,6 @@ export function DayOfSchedule({
     // No heading of its own: this is a tab panel, and the tab that opens it is
     // the heading. See components/event-board.tsx.
     <div className="mx-auto max-w-[1000px]" aria-busy={pending || undefined}>
-      <p className="font-sans text-white text-center text-[13px] leading-[1.6] tracking-[0.04em]">
-        Day-of schedule, all times CT. Events are subject to change.
-      </p>
-
       {pending ? (
         <SchedulePending />
       ) : schedule.length === 0 ? (
@@ -85,31 +83,48 @@ export function DayOfSchedule({
             <div
               role="group"
               aria-label="Filter the schedule by kind of event"
-              className="mt-9 flex flex-wrap justify-center gap-2"
+              className="flex flex-wrap justify-center gap-2"
             >
               <FilterChip
                 label="All"
-                active={filter === null}
-                onClick={() => setFilter(null)}
+                active={filter.length === 0}
+                onClick={() => setFilter([])}
               />
               {tags.map((tag) => (
                 <FilterChip
                   key={tag.key}
                   label={tag.label}
-                  active={filter === tag.key}
-                  onClick={() => setFilter(filter === tag.key ? null : tag.key)}
+                  active={filter.includes(tag.key)}
+                  // Selected, a tag takes its badge's colours. A tag without
+                  // its own keeps the default, since the fallback badge looks
+                  // the same as an unselected chip.
+                  activeStyle={TAG_STYLES[tag.key]}
+                  onClick={() =>
+                    setFilter((keys) =>
+                      keys.includes(tag.key)
+                        ? keys.filter((key) => key !== tag.key)
+                        : [...keys, tag.key],
+                    )
+                  }
                 />
               ))}
             </div>
           )}
 
+          <p className="font-sans mt-4 text-center text-[11px] leading-[1.5] tracking-[0.04em] text-white first:mt-0">
+            Day-of schedule, all times CT. Events are subject to change.
+          </p>
+
           <div className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2">
             {days.map((day, dayIndex) => {
-              const shown = filter
-                ? day.events.filter((event) =>
-                    event.tags.some((tag) => normalizeTag(tag) === filter),
-                  )
-                : day.events;
+              const shown =
+                filter.length > 0
+                  ? day.events.filter((event) =>
+                      event.tags.some((tag) =>
+                        filter.includes(normalizeTag(tag)),
+                      ),
+                    )
+                  : day.events;
 
               return (
                 <div key={day.key}>
@@ -191,14 +206,17 @@ function EmptySchedule({ unavailable }: { unavailable: boolean }) {
   );
 }
 
-function FilterChip({
+export function FilterChip({
   label,
   active,
   onClick,
+  activeStyle = "border-white bg-white text-[#05070a]",
 }: {
   label: string;
   active: boolean;
   onClick: () => void;
+  /** Classes for the selected state; a tag passes its badge's colours. */
+  activeStyle?: string;
 }) {
   return (
     <button
@@ -207,7 +225,7 @@ function FilterChip({
       onClick={onClick}
       className={`font-sans focus-visible:outline-accent-magenta border px-3.5 py-1.5 text-[11px] leading-none tracking-[0.12em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${
         active
-          ? "border-white bg-white text-[#05070a]"
+          ? activeStyle
           : "border-border-hairline text-white hover:border-white/40"
       }`}
     >
@@ -335,6 +353,12 @@ function tagStyle(tag: string): string {
   return TAG_STYLES[normalizeTag(tag)] ?? FALLBACK_TAG_STYLE;
 }
 
-function tagLabel(tags: TagOption[], key: string | null): string {
-  return tags.find((tag) => tag.key === key)?.label ?? "this category";
+const tagListFormatter = new Intl.ListFormat("en-US", { type: "disjunction" });
+
+/** The selected tags as prose, e.g. "Food, Talks, or Workshops". */
+function tagLabel(tags: TagOption[], keys: string[]): string {
+  const labels = tags
+    .filter((tag) => keys.includes(tag.key))
+    .map((tag) => tag.label);
+  return labels.length > 0 ? tagListFormatter.format(labels) : "this category";
 }

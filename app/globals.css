@@ -59,7 +59,7 @@ body {
   color: var(--foreground);
 }
 
-/* Draw footer underlines from left to right without changing text layout. */
+/* Draw link underlines (footer, track resources) from left to right without changing text layout. */
 .footer-link {
   background-image: linear-gradient(currentcolor, currentcolor);
   background-position: 0 100%;
@@ -678,8 +678,7 @@ textarea,
  * a marker there.
  */
 /*
- * Shared by every native disclosure on the page: the FAQ's questions and the
- * challenge-track briefs. Both hide the browser's own marker and rotate a
+ * The FAQ's native disclosures: hide the browser's own marker and rotate a
  * chevron of their own instead.
  */
 .disclosure summary::-webkit-details-marker,
@@ -1322,6 +1321,24 @@ textarea,
   /* Translucent, so the screen still shows through behind the logo. */
   background: rgb(255 255 255 / 55%);
   filter: blur(var(--glow));
+}
+
+/*
+ * A dark track logo gets the same glow as the sponsor board's: a blurred white
+ * haze behind the logo box (lib/logo-fit.ts decides which logos are dark).
+ */
+.track-logo {
+  position: relative;
+  isolation: isolate;
+}
+.track-logo[data-glow]::before {
+  content: "";
+  position: absolute;
+  inset: 6px 2px;
+  z-index: -1;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 55%);
+  filter: blur(10px);
 }
 
 /*
