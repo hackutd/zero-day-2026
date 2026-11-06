@@ -132,17 +132,18 @@ export function DayOfSchedule({
                     <ul className="mt-2">
                       {shown.map((event, eventIndex) => {
                         const time = formatEventTime(event.start_time);
+                        const end = formatEventEnd(event);
+                        const prev = shown[eventIndex - 1];
                         return (
                           <ScheduleRow
                             key={event.id}
                             event={event}
                             time={time}
+                            end={end}
                             showTime={
-                              eventIndex === 0 ||
-                              time !==
-                                formatEventTime(
-                                  shown[eventIndex - 1].start_time,
-                                )
+                              !prev ||
+                              time !== formatEventTime(prev.start_time) ||
+                              end !== formatEventEnd(prev)
                             }
                           />
                         );
@@ -218,10 +219,12 @@ function FilterChip({
 function ScheduleRow({
   event,
   time,
+  end,
   showTime,
 }: {
   event: ScheduleItem;
   time: string;
+  end: string | null;
   showTime: boolean;
 }) {
   const tags = event.tags.map((tag) => tag.trim()).filter(Boolean);
@@ -235,6 +238,13 @@ function ScheduleRow({
         }`}
       >
         {time}
+        {end && (
+          <span className="mt-1 block text-[11px]">
+            <span aria-hidden>–</span>
+            <span className="sr-only">to </span>
+            {end}
+          </span>
+        )}
       </span>
 
       <h4 className="font-sans text-[13px] leading-[1.3] font-medium text-white sm:text-[14px]">
@@ -307,6 +317,14 @@ function formatEventTime(value: string): string {
   const date = parseDate(value);
   if (!date) return "TBA";
   return timeFormatter.format(date).replace(/\s/g, "").toLowerCase();
+}
+
+/** Null when there's no usable end, or it matches the start (a point event). */
+function formatEventEnd(event: ScheduleItem): string | null {
+  const end = formatEventTime(event.end_time);
+  return end === "TBA" || end === formatEventTime(event.start_time)
+    ? null
+    : end;
 }
 
 function normalizeTag(tag: string): string {
