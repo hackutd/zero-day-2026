@@ -57,13 +57,17 @@ export function ChallengeTracks({
         ))}
       </div>
 
+      <p className="font-sans mt-4 text-center text-[11px] leading-[1.5] tracking-[0.04em] text-white">
+        Enter up to two.
+      </p>
+
       {pending ? (
         <TracksPending />
       ) : tracks.length === 0 ? (
         <p className="font-sans text-text-dim mt-12 text-center text-[13px] leading-relaxed">
           {unavailable
             ? "Our live challenge tracks are temporarily unavailable. Please check back soon."
-            : "This year's challenge tracks will be announced soon."}
+            : "This year's challenge tracks will be announced once hacking starts."}
         </p>
       ) : (
         GROUPS.map(({ id, label }) => {

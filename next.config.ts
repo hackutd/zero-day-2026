@@ -109,6 +109,11 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  async rewrites() {
+    // Rewrite, not redirect, so the address bar stays on /parking.
+    return [{ source: "/parking", destination: "/docs/parking.pdf" }];
+  },
+
   // Hides the floating Next.js badge in the corner during `next dev`. Compile
   // and runtime errors still surface. This is a dev-only overlay — it never
   // shipped to production in the first place.

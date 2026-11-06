@@ -35,11 +35,11 @@ const TAG_STYLES: Record<string, string> = {
   food: "border-accent-soft/40 text-accent-soft",
   workshop: "border-magenta/40 text-magenta",
   workshops: "border-magenta/40 text-magenta",
-  social: "border-muted/40 text-muted",
-  "for fun": "border-muted/40 text-muted",
+  social: "border-muted/40 text-white",
+  "for fun": "border-muted/40 text-white",
 };
 
-const FALLBACK_TAG_STYLE = "border-border-hairline text-text-muted";
+const FALLBACK_TAG_STYLE = "border-border-hairline text-white";
 
 type TagOption = { key: string; label: string };
 type ScheduleDay = {
@@ -132,7 +132,7 @@ export function DayOfSchedule({
                     <h3 className="font-elevon text-[15px] leading-none font-extrabold tracking-[0.08em] text-white uppercase">
                       {day.date ? `Day ${dayIndex + 1}` : "TBA"}
                     </h3>
-                    <span className="font-sans text-text-dim text-[12px] tracking-[0.12em] uppercase">
+                    <span className="font-sans text-white text-[12px] tracking-[0.12em] uppercase">
                       {day.date
                         ? dayLabelFormatter.format(day.date)
                         : "Date to be announced"}
@@ -140,24 +140,25 @@ export function DayOfSchedule({
                   </div>
 
                   {shown.length === 0 ? (
-                    <p className="font-sans text-text-dim mt-6 text-[13px]">
+                    <p className="font-sans text-white mt-6 text-[13px]">
                       Nothing tagged {tagLabel(tags, filter)} on this day.
                     </p>
                   ) : (
                     <ul className="mt-2">
                       {shown.map((event, eventIndex) => {
                         const time = formatEventTime(event.start_time);
+                        const end = formatEventEnd(event);
+                        const prev = shown[eventIndex - 1];
                         return (
                           <ScheduleRow
                             key={event.id}
                             event={event}
                             time={time}
+                            end={end}
                             showTime={
-                              eventIndex === 0 ||
-                              time !==
-                                formatEventTime(
-                                  shown[eventIndex - 1].start_time,
-                                )
+                              !prev ||
+                              time !== formatEventTime(prev.start_time) ||
+                              end !== formatEventEnd(prev)
                             }
                           />
                         );
@@ -197,7 +198,7 @@ function SchedulePending() {
 
 function EmptySchedule({ unavailable }: { unavailable: boolean }) {
   return (
-    <p className="font-sans text-text-dim mt-10 text-center text-[13px] leading-relaxed">
+    <p className="font-sans text-white mt-10 text-center text-[13px] leading-relaxed">
       {unavailable
         ? "The live schedule is temporarily unavailable. Please check back soon."
         : "The event schedule has not been published yet. Check back soon."}
@@ -225,7 +226,7 @@ export function FilterChip({
       className={`font-sans focus-visible:outline-accent-magenta border px-3.5 py-1.5 text-[11px] leading-none tracking-[0.12em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${
         active
           ? activeStyle
-          : "border-border-hairline text-text-muted hover:border-white/40 hover:text-white"
+          : "border-border-hairline text-white hover:border-white/40"
       }`}
     >
       {label}
@@ -236,10 +237,12 @@ export function FilterChip({
 function ScheduleRow({
   event,
   time,
+  end,
   showTime,
 }: {
   event: ScheduleItem;
   time: string;
+  end: string | null;
   showTime: boolean;
 }) {
   const tags = event.tags.map((tag) => tag.trim()).filter(Boolean);
@@ -253,6 +256,13 @@ function ScheduleRow({
         }`}
       >
         {time}
+        {end && (
+          <span className="mt-1 block text-[11px]">
+            <span aria-hidden>–</span>
+            <span className="sr-only">to </span>
+            {end}
+          </span>
+        )}
       </span>
 
       <h4 className="font-sans text-[13px] leading-[1.3] font-medium text-white sm:text-[14px]">
@@ -263,7 +273,7 @@ function ScheduleRow({
       ))}
 
       {event.location && (
-        <p className="font-sans text-text-dim ml-auto text-[11px] tracking-[0.04em]">
+        <p className="font-sans text-white ml-auto text-[11px] tracking-[0.04em]">
           {event.location}
         </p>
       )}
@@ -325,6 +335,14 @@ function formatEventTime(value: string): string {
   const date = parseDate(value);
   if (!date) return "TBA";
   return timeFormatter.format(date).replace(/\s/g, "").toLowerCase();
+}
+
+/** Null when there's no usable end, or it matches the start (a point event). */
+function formatEventEnd(event: ScheduleItem): string | null {
+  const end = formatEventTime(event.end_time);
+  return end === "TBA" || end === formatEventTime(event.start_time)
+    ? null
+    : end;
 }
 
 function normalizeTag(tag: string): string {
