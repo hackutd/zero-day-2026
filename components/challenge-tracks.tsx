@@ -59,7 +59,7 @@ export function ChallengeTracks({
       </div>
 
       <p className="font-sans mt-4 text-center text-[11px] leading-[1.5] tracking-[0.04em] text-white">
-        Enter up to two.
+        Enter up to three.
       </p>
 
       {pending ? (
