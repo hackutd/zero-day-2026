@@ -791,7 +791,7 @@ const WALL_SCREEN = {
 } as const;
 
 /** The video playing on the wall screen behind the train. */
-const WALL_VIDEO_ID = "Mc_1z_VjxO4";
+const WALL_VIDEO_ID = "kRyxu0HdgtM";
 
 /**
  * Starts muted on loop so it reads as a screen playing on the platform (muted
