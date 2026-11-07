@@ -678,8 +678,8 @@ textarea,
  * a marker there.
  */
 /*
- * The FAQ's native disclosures: hide the browser's own marker and rotate a
- * chevron of their own instead.
+ * Native disclosures (FAQ, challenge tracks): hide the browser's own marker
+ * and rotate a chevron of their own instead.
  */
 .disclosure summary::-webkit-details-marker,
 .disclosure summary::marker {
@@ -698,6 +698,26 @@ textarea,
   .disclosure-chevron {
     transition: none;
   }
+}
+
+/*
+ * A track card's chevron points right, nudges right on hover, and turns down
+ * as the card opens (components/challenge-tracks.tsx). It animates through the
+ * transition and reduced-motion rules above. Every state lists the same
+ * functions, so each pair interpolates directly rather than via a matrix.
+ */
+.track-card .disclosure-chevron {
+  transform: translateX(0) rotate(-90deg);
+}
+
+@media (hover: hover) {
+  .track-card:not([open]) summary:hover .disclosure-chevron {
+    transform: translateX(3px) rotate(-90deg);
+  }
+}
+
+.track-card[open] .disclosure-chevron {
+  transform: translateX(0) rotate(0deg);
 }
 
 /*

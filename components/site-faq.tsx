@@ -97,7 +97,7 @@ function FaqList({ items }: { items: FAQ[] }) {
 }
 
 /** Rotates to point down when its details element is open; see globals.css. */
-function Chevron() {
+export function Chevron() {
   return (
     <svg
       viewBox="0 0 24 24"

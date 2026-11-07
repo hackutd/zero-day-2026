@@ -551,7 +551,8 @@ function PreheroBand() {
  * staying the size that already looked right here.
  *
  * Hangs flush to the top edge because the artwork is a ribbon with its own
- * hanger, and sits above the intro layer so the scrim never dims it.
+ * hanger, and sits above the intro layer so the scrim never dims it, and above
+ * the navbar (z-50) so it hangs over the Apply button in the same corner.
  */
 function MlhBadge() {
   return (
@@ -560,7 +561,7 @@ function MlhBadge() {
       href="https://mlh.io/na?utm_source=na-hackathon&utm_medium=TrustBadge&utm_campaign=2026-season&utm_content=black"
       target="_blank"
       rel="noreferrer"
-      className="absolute top-0 right-3 z-40 block w-[60px] sm:right-6 sm:w-[74px]"
+      className="absolute top-0 right-3 z-[60] block w-[60px] sm:right-6 sm:w-[74px]"
     >
       {/*
         A plain img, not next/image: it is an SVG, so there is nothing to resize

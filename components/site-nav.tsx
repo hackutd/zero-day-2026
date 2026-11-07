@@ -9,8 +9,7 @@ import { APPLY_URL } from "@/lib/links";
 /**
  * The hero navbar, from the Figma Hero frame (node 1994:101).
  *
- * It stays fixed over the page, fading in as soon as the reader leaves the very
- * top of the opening skyline and fading out again only when they return there.
+ * It stays fixed over the page and is visible from the very top.
  *
  * The bar runs the full width of the site rather than the Figma's centred
  * 1440 column, so the wordmark and the Apply button sit in the actual
@@ -31,21 +30,41 @@ import { APPLY_URL } from "@/lib/links";
  * a one-line swap. The wordmark's Hypik is the real thing.
  */
 export function SiteNav() {
-  const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const wordmarkRef = useRef<HTMLAnchorElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
 
+  // The MLH badge hangs in this corner at the top of the page, so the actions
+  // sit to its left until it scrolls up past them, then slide back.
   useEffect(() => {
-    const syncVisibility = () => {
-      const nextVisible = window.scrollY > 12;
-      setVisible(nextVisible);
-      if (!nextVisible) setOpen(false);
+    const badge = document.getElementById("mlh-trust-badge");
+    const wordmark = wordmarkRef.current;
+    const actions = actionsRef.current;
+    const bar = actions?.offsetParent;
+    if (!badge || !wordmark || !actions || !bar) return;
+
+    const sync = () => {
+      const b = badge.getBoundingClientRect();
+      // offsetLeft/Top ignore the transform, so this is the actions' home spot.
+      const home = bar.getBoundingClientRect();
+      const top = home.top + actions.offsetTop;
+      const left = home.left + actions.offsetLeft;
+      const right = left + actions.offsetWidth;
+      // Never slide over the wordmark; on a narrow phone the badge overlaps instead.
+      const room = left - wordmark.getBoundingClientRect().right - 8;
+      const shift = b.bottom > top ? Math.min(right - b.left + 8, room) : 0;
+      actions.style.transform = shift > 0 ? `translateX(${-shift}px)` : "";
     };
 
-    syncVisibility();
-    window.addEventListener("scroll", syncVisibility, { passive: true });
-    return () => window.removeEventListener("scroll", syncVisibility);
+    sync();
+    window.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    return () => {
+      window.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+    };
   }, []);
 
   // Escape closes and hands focus back to the button that opened it, so a
@@ -62,13 +81,10 @@ export function SiteNav() {
   }, [open]);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-4 z-50 transition-[opacity,visibility] duration-500 ease-out motion-reduce:transition-none ${
-        visible ? "visible opacity-100" : "invisible opacity-0"
-      }`}
-    >
+    <header className="fixed inset-x-0 top-4 z-50">
       <div className="relative flex h-12 w-full items-center px-5 sm:px-6">
         <a
+          ref={wordmarkRef}
           href="#scene-prehero"
           className="font-hypik inline-flex items-center gap-2 text-[20px] leading-none tracking-[-0.01em] text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:gap-2.5 sm:text-[24px]"
         >
@@ -84,7 +100,10 @@ export function SiteNav() {
 
         <NavPill className="absolute left-1/2 hidden -translate-x-1/2 lg:block" />
 
-        <div className="ms-auto flex items-center gap-2 sm:gap-3">
+        <div
+          ref={actionsRef}
+          className="ms-auto flex items-center gap-2 transition-transform duration-300 ease-out motion-reduce:transition-none sm:gap-3"
+        >
           <MenuButton
             ref={menuButtonRef}
             open={open}

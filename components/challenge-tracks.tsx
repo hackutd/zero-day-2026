@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { FilterChip } from "@/components/day-of-schedule";
+import { Chevron } from "@/components/site-faq";
 import { Skeleton } from "@/components/skeleton";
 import { logoSrc } from "@/lib/format";
 import type { LogoFit } from "@/lib/logo-fit";
@@ -81,7 +82,7 @@ export function ChallengeTracks({
                   {label} will be announced soon.
                 </p>
               ) : (
-                <div className="mt-10 grid items-start gap-3 lg:grid-cols-2">
+                <div className="mt-4 grid items-start gap-3 lg:grid-cols-2">
                   {shown.map((track) => (
                     <TrackCard
                       key={track.id}
@@ -101,11 +102,12 @@ export function ChallengeTracks({
 
 function TracksPending() {
   return (
-    <div className="mt-10 grid gap-3 lg:grid-cols-2">
+    <div className="mt-4 grid gap-3 lg:grid-cols-2">
       {Array.from({ length: 6 }, (_, index) => (
         <div
           key={index}
-          className="border-border-hairline flex min-h-28 items-center gap-4 border bg-white/[0.02] p-4 sm:p-5"
+          // Matches a closed TrackCard's summary, so the swap doesn't jump.
+          className="border-border-hairline flex min-h-[176px] items-center gap-4 border bg-white/[0.02] p-4 sm:min-h-[188px] sm:p-5"
         >
           <Skeleton className="h-12 w-24 shrink-0 rounded-[3px]" />
           <div className="flex-1 space-y-3">
@@ -120,7 +122,9 @@ function TracksPending() {
 }
 
 /**
- * One track, shown in full: no toggle, so every brief and prize is visible.
+ * One track as a native disclosure, like the FAQ: the summary keeps the logo,
+ * sponsor, title and top prize in view, and the brief, every prize and the
+ * resources link open below it. Closed content still answers find-in-page.
  * The API logo is rendered only when present; logo-less tracks are text-only.
  */
 function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
@@ -128,10 +132,15 @@ function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
   const src = logoSrc(track.logo_url);
 
   return (
-    <article className="border-border-hairline border bg-white/[0.04]">
-      <div className="flex items-center gap-4 p-4 sm:p-5">
+    <details className="disclosure track-card group border-border-hairline border bg-white/[0.04]">
+      {/* Spans, not divs, p or ul: <summary> takes only phrasing and heading
+          content. Closed, every summary is one height: the clamps below cap
+          its text at sponsor 15px + 6 + title 2 lines + 8 + three one-line
+          prizes (3 x 20.3 + 2 x 8), and min-h is that plus padding (175px
+          phone, 188px sm+), rounded up. Open, the clamps lift. */}
+      <summary className="flex min-h-[176px] cursor-pointer list-none items-center gap-4 p-4 transition-colors hover:bg-white/[0.03] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:min-h-[188px] sm:p-5">
         {src && (
-          <div
+          <span
             data-glow={fit?.glow ? "" : undefined}
             className="track-logo flex h-12 w-24 shrink-0 items-center justify-center bg-white/[0.04] p-1.5"
           >
@@ -143,83 +152,80 @@ function TrackCard({ track, fit }: { track: Track; fit: LogoFit | null }) {
               sizes="96px"
               className="h-full w-full object-contain"
             />
-          </div>
+          </span>
         )}
 
-        <div className="min-w-0 flex-1">
+        <span className="min-w-0 flex-1">
           {/* The organizers' own tracks sit under their own toggle already. */}
           {!track.organizer && sponsor && (
-            <p className="font-sans text-text-dim text-[10px] tracking-[0.14em] uppercase">
+            <span className="font-sans text-text-dim line-clamp-1 text-[10px] leading-[1.5] tracking-[0.14em] uppercase group-open:line-clamp-none">
               Presented by {sponsor}
-            </p>
+            </span>
           )}
-          <h3 className="font-elevon mt-1.5 text-[16px] leading-[1.15] font-extrabold tracking-[0.02em] text-white uppercase first:mt-0 sm:text-[18px]">
+          <h3 className="font-elevon mt-1.5 line-clamp-2 text-[16px] leading-[1.15] font-extrabold tracking-[0.02em] text-white uppercase group-open:line-clamp-none first:mt-0 sm:text-[18px]">
             {track.title}
           </h3>
-        </div>
-      </div>
-
-      {/* Sections are padded rather than the body, so each hairline runs the
-          card's full width: under the header, and between brief and prizes. */}
-      <div className="border-border-hairline divide-border-hairline divide-y border-t">
-        <div className="px-4 py-4 sm:px-5">
-          {/* Set like the prize places below it (PrizeList). */}
-          <h4 className="font-elevon text-accent-soft mb-3 text-[12px] leading-none font-extrabold tracking-[0.06em] uppercase">
-            Challenge statement
-          </h4>
-          {track.description ? (
-            <p className="font-sans text-[15px] leading-[1.6] whitespace-pre-line text-white">
-              {track.description}
-            </p>
-          ) : (
-            <p className="font-sans text-text-dim text-[13px] leading-[1.65]">
-              Challenge description coming soon.
-            </p>
-          )}
-        </div>
-        <div className="px-4 pt-4 pb-5 sm:px-5">
           <PrizeList prizes={track.prizes} />
-          {/* isTrack has already checked this is an http(s) URL. */}
-          {track.resources_url && (
-            <a
-              href={track.resources_url}
-              target="_blank"
-              rel="noreferrer"
-              className="footer-link font-sans text-accent-soft mt-4 inline-block text-[12px] leading-[1.4]"
-            >
-              Resources &#8599;
-            </a>
-          )}
-        </div>
+        </span>
+
+        <Chevron />
+      </summary>
+
+      <div className="border-border-hairline border-t px-4 pt-4 pb-5 sm:px-5">
+        {/* Set like the prize places (PrizeList). */}
+        <h4 className="font-elevon text-accent-soft mb-3 text-[12px] leading-none font-extrabold tracking-[0.06em] uppercase">
+          Challenge statement
+        </h4>
+        {track.description ? (
+          <p className="font-sans text-[15px] leading-[1.6] whitespace-pre-line text-white">
+            {track.description}
+          </p>
+        ) : (
+          <p className="font-sans text-text-dim text-[13px] leading-[1.65]">
+            Challenge description coming soon.
+          </p>
+        )}
+        {/* isTrack has already checked this is an http(s) URL. */}
+        {track.resources_url && (
+          <a
+            href={track.resources_url}
+            target="_blank"
+            rel="noreferrer"
+            className="footer-link font-sans text-accent-soft mt-4 inline-block text-[12px] leading-[1.4]"
+          >
+            Resources &#8599;
+          </a>
+        )}
       </div>
-    </article>
+    </details>
   );
 }
 
+/** Spans rather than a ul, since it sits inside the card's <summary>. */
 function PrizeList({ prizes }: { prizes: TrackPrize[] }) {
   if (prizes.length === 0) {
     return (
-      <p className="font-sans text-text-dim text-[13px] leading-[1.45]">
+      <span className="font-sans text-text-dim mt-2 block text-[14px] leading-[1.45]">
         Prize details coming soon.
-      </p>
+      </span>
     );
   }
 
   return (
-    <ul className="flex flex-col gap-2">
+    <span className="mt-2 flex flex-col gap-2">
       {prizes.map(({ place, prize }, index) => (
-        <li
+        <span
           key={`${place}-${prize}-${index}`}
           className="flex items-baseline gap-3"
         >
           <span className="font-elevon text-accent-soft min-w-8 shrink-0 text-[12px] leading-none font-extrabold tracking-[0.06em] uppercase">
             {place}
           </span>
-          <span className="font-sans text-[13px] leading-[1.45] text-white">
+          <span className="font-sans line-clamp-1 min-w-0 text-[14px] leading-[1.45] text-white group-open:line-clamp-none">
             {prize}
           </span>
-        </li>
+        </span>
       ))}
-    </ul>
+    </span>
   );
 }
