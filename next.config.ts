@@ -110,8 +110,11 @@ const nextConfig: NextConfig = {
   },
 
   async rewrites() {
-    // Rewrite, not redirect, so the address bar stays on /parking.
-    return [{ source: "/parking", destination: "/docs/parking.pdf" }];
+    // Rewrite, not redirect, so the address bar stays on /parking and /menu.
+    return [
+      { source: "/parking", destination: "/docs/parking.pdf" },
+      { source: "/menu", destination: "/docs/menu.pdf" },
+    ];
   },
 
   // Hides the floating Next.js badge in the corner during `next dev`. Compile
