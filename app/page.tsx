@@ -621,6 +621,7 @@ const SUBWAY_ZOOM = { transform: "scale(1.3)", transformOrigin: "37% 29%" };
 function SubwayScene() {
   return (
     <ParallaxScene
+      id="video"
       className="relative w-full overflow-hidden"
       style={{
         aspectRatio: `${subwayBackground.width} / ${subwayBackground.height}`,
@@ -789,37 +790,44 @@ const WALL_SCREEN = {
   height: "16.30%",
 } as const;
 
+/** The video playing on the wall screen behind the train. */
+const WALL_VIDEO_ID = "Mc_1z_VjxO4";
+
 /**
- * The wall screen, dark.
- *
- * There is no recap to run here yet. It held a YouTube playlist embed, which
- * cost well over a megabyte of player for a box this size and drew its own
- * chrome that could not be styled from outside a cross-origin document. A
- * screen between showings is a better answer than a bad showing.
- *
- * So this is the panel with nothing playing: the same box, unlit, with the
- * faint vertical wash a dark display gives off and a hairline where its bezel
- * catches the platform light. It reads as part of the wall rather than as a
- * hole in it.
- *
- * TODO(organizers): when there is a video, put an <AmbientVideo> in here with
- * an MP4 in public/. Prefer that to an embed: it defers its own fetch, carries
- * no third-party player, and sets no cookies.
+ * Starts muted on loop so it reads as a screen playing on the platform (muted
+ * is the only way browsers allow autoplay); controls stay on so a visitor can
+ * unmute or go fullscreen. `loop` on a single video needs `playlist=<id>`.
  */
+const WALL_SCREEN_PARAMS = [
+  "autoplay=1",
+  "mute=1",
+  "loop=1",
+  `playlist=${WALL_VIDEO_ID}`,
+  "rel=0",
+  "iv_load_policy=3",
+  "disablekb=1",
+  "playsinline=1",
+].join("&");
+
 function WallScreen() {
   return (
-    <div
-      aria-hidden
-      className="absolute overflow-hidden bg-[#05040a]"
-      style={WALL_SCREEN}
-    >
-      <div
-        className="h-full w-full"
-        style={{
-          background:
-            "linear-gradient(160deg, rgb(255 255 255 / 5%) 0%, rgb(255 255 255 / 1%) 42%, rgb(0 0 0 / 0%) 70%)",
-          boxShadow: "inset 0 0 0 1px rgb(255 255 255 / 8%)",
-        }}
+    <div className="absolute overflow-hidden bg-black" style={WALL_SCREEN}>
+      {/*
+        `youtube-nocookie.com` so a visitor who never presses play is not
+        handed tracking cookies; `loading="lazy"` because the player is over a
+        megabyte and this panel is several screens down.
+
+        On a phone the box is ~63px wide and YouTube sizes its chrome off the
+        iframe's pixel width with a floor, so the iframe is laid out at 4x and
+        scaled back to a quarter. Above `sm` its own sizing is right.
+      */}
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/${WALL_VIDEO_ID}?${WALL_SCREEN_PARAMS}`}
+        title="HackUTD live stream"
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="h-[400%] w-[400%] origin-top-left scale-25 border-0 sm:h-full sm:w-full sm:scale-100"
       />
     </div>
   );
