@@ -97,7 +97,7 @@ export function SiteFooter() {
         rather than overflowing it. "ZERODAY" is all letters, which is the only
         reason this is safe - Hypik has no digits or punctuation.
 
-        DAY takes the accent purple, the same token as the Apply button and
+        DAY takes the accent purple, the same token as the Join the Team button and
         the "open" below it, so the one word carries the site accent at the
         size where it reads best. It is one `<p>` with a span rather than two
         elements, so the two halves cannot be split across a line break or

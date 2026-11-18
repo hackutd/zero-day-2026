@@ -15,5 +15,5 @@ export const MENTOR_INTEREST_URL = "https://acmutd.typeform.com/to/NmauHXXH";
 export const JUDGE_INTEREST_URL = "https://acmutd.typeform.com/to/d7pEj05a";
 export const VOLUNTEER_INTEREST_URL = "https://acmutd.typeform.com/to/ejoiXRfJ";
 
-/** HackUTD organizer interest form, opened by the nav's Apply button. */
+/** HackUTD organizer interest form, opened by the nav's Join the Team button. */
 export const ORGANIZER_INTEREST_URL = "https://acmutd.typeform.com/hofficer27";
