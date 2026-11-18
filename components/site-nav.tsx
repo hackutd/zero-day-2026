@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 
 import logo from "@/app/icon.png";
-import { APPLY_URL } from "@/lib/links";
+import { ORGANIZER_INTEREST_URL } from "@/lib/links";
 
 /**
  * The hero navbar, from the Figma Hero frame (node 1994:101).
@@ -268,7 +268,7 @@ const NOTCH =
 function ApplyButton() {
   return (
     <a
-      href={APPLY_URL}
+      href={ORGANIZER_INTEREST_URL}
       style={{ clipPath: NOTCH }}
       className="bg-accent-magenta relative inline-flex h-10 w-32 items-center justify-center transition-opacity hover:opacity-90 sm:h-12 sm:w-44"
     >

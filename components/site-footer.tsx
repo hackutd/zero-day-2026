@@ -16,8 +16,8 @@ import { CrewPosts } from "@/components/crew-posts";
 import { APPLY_URL } from "@/lib/links";
 
 /**
- * Registration is HARP, the same portal the nav's Apply button opens - the two
- * are one destination under two labels, so both read it from `lib/links`.
+ * Registration is HARP, read from `lib/links` alongside the event's structured
+ * data so the two cannot drift apart.
  */
 const REGISTER_URL = APPLY_URL;
 
