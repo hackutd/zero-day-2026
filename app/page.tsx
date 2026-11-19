@@ -552,7 +552,7 @@ function PreheroBand() {
  *
  * Hangs flush to the top edge because the artwork is a ribbon with its own
  * hanger, and sits above the intro layer so the scrim never dims it, and above
- * the navbar (z-50) so it hangs over the Apply button in the same corner.
+ * the navbar (z-50) so it hangs over the Join the Team button in the same corner.
  */
 function MlhBadge() {
   return (

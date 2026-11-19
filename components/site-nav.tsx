@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 
 import logo from "@/app/icon.png";
-import { APPLY_URL } from "@/lib/links";
+import { ORGANIZER_INTEREST_URL } from "@/lib/links";
 
 /**
  * The hero navbar, from the Figma Hero frame (node 1994:101).
@@ -12,7 +12,7 @@ import { APPLY_URL } from "@/lib/links";
  * It stays fixed over the page and is visible from the very top.
  *
  * The bar runs the full width of the site rather than the Figma's centred
- * 1440 column, so the wordmark and the Apply button sit in the actual
+ * 1440 column, so the wordmark and the Join the Team button sit in the actual
  * corners. The links ride in a rounded white pill centred between them.
  *
  * Neither the pill nor the button carries the outline the Figma exports draw,
@@ -110,7 +110,7 @@ export function SiteNav() {
             panelId={panelId}
             onToggle={() => setOpen((v) => !v)}
           />
-          <ApplyButton />
+          <JoinTeamButton />
         </div>
       </div>
 
@@ -229,7 +229,7 @@ const NOTCH_LG =
  * The centre pill: a plain white box with a soft 6px radius - enough to read as
  * rounded without going full capsule, which fought the angular chrome around
  * it. It sits at 40px against the bar's 48px so it reads as lighter than the
- * Apply button rather than matching its weight.
+ * Join the Team button rather than matching its weight.
  *
  * The Figma export was a notched outline, which is neither the shape nor the
  * border wanted here, so the shape is CSS and there is no asset to stretch.
@@ -265,15 +265,15 @@ function NavPill({ className }: { className?: string }) {
 const NOTCH =
   "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)";
 
-function ApplyButton() {
+function JoinTeamButton() {
   return (
     <a
-      href={APPLY_URL}
+      href={ORGANIZER_INTEREST_URL}
       style={{ clipPath: NOTCH }}
       className="bg-accent-magenta relative inline-flex h-10 w-32 items-center justify-center transition-opacity hover:opacity-90 sm:h-12 sm:w-44"
     >
-      <span className="font-sans text-[12px] leading-[1.3] font-medium tracking-[0.1em] text-[#f2f2f2] uppercase">
-        Apply
+      <span className="font-sans text-[12px] leading-[1.3] font-medium tracking-[0.1em] whitespace-nowrap text-[#f2f2f2] uppercase">
+        Join the Team
       </span>
     </a>
   );
